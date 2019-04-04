@@ -12,8 +12,3 @@ pluginManagement {
     gradlePluginPortal()
   }
 }
-
-fun includeProject(path: String, id: String = "resource.${path.replace('/', '.')}") {
-  include(id)
-  project(":$id").projectDir = file(path)
-}
