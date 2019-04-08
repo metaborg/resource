@@ -1,31 +1,32 @@
 package mb.resource.fs;
 
+import mb.resource.ResourceKey;
 import mb.resource.ResourceRuntimeException;
-import mb.resource.path.FilenameExtensionUtil;
-import mb.resource.path.Path;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-public class FSPath implements Path {
+public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
     // URI version of the path which can be serialized and deserialized.
     final URI uri;
     // Transient and non-final for deserialization in readObject. Invariant: always nonnull.
-    transient java.nio.file.Path javaPath;
+    transient Path javaPath;
 
 
-    public FSPath(java.nio.file.Path javaPath) {
+    public FSPath(Path javaPath) {
         this.uri = javaPath.toUri();
         this.javaPath = javaPath;
     }
@@ -59,15 +60,10 @@ public class FSPath implements Path {
     }
 
 
-    @Override public String qualifier() {
-        return "java.nio.file"; // java.nio.file file system.
-    }
-
-
     /**
-     * @return {@link java.nio.file.Path} corresponding to this path.
+     * @return {@link Path} corresponding to this path.
      */
-    public java.nio.file.Path getJavaPath() {
+    public Path getJavaPath() {
         return javaPath;
     }
 
@@ -86,7 +82,7 @@ public class FSPath implements Path {
     }
 
 
-    @Override public boolean isAbsolute() {
+    public boolean isAbsolute() {
         return javaPath.isAbsolute();
     }
 
@@ -113,130 +109,125 @@ public class FSPath implements Path {
     }
 
 
-    @Override public int getSegmentCount() {
+    public int getSegmentCount() {
         return javaPath.getNameCount();
     }
 
-    @Override public Iterable<String> getSegments() {
+    public Iterable<String> getSegments() {
         return () -> new PathIterator(javaPath.iterator());
     }
 
 
-    @Override public @Nullable FSPath getParent() {
-        final java.nio.file.@Nullable Path parentJavaPath = this.javaPath.getParent();
+    public @Nullable FSPath getParent() {
+        final @Nullable Path parentJavaPath = this.javaPath.getParent();
         if(parentJavaPath == null) {
             return null;
         }
         return new FSPath(parentJavaPath);
     }
 
-    @Override public @Nullable FSPath getRoot() {
-        final java.nio.file.@Nullable Path rootJavaPath = this.javaPath.getRoot();
+    public @Nullable FSPath getRoot() {
+        final @Nullable Path rootJavaPath = this.javaPath.getRoot();
         if(rootJavaPath == null) {
             return null;
         }
         return new FSPath(rootJavaPath);
     }
 
-    @Override public String getLeaf() {
-        final java.nio.file.@Nullable Path fileName = this.javaPath.getFileName();
+    public @Nullable String getLeaf() {
+        final @Nullable Path fileName = this.javaPath.getFileName();
         if(fileName == null) {
             return null;
         }
         return fileName.toString();
     }
 
-    @Override public FSPath getNormalized() {
-        final java.nio.file.Path normalizedJavaPath = this.javaPath.normalize();
+    public @Nullable String getLeafExtension() {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return null;
+        }
+        return FilenameExtensionUtil.extension(leaf);
+    }
+
+    public FSPath getNormalized() {
+        final Path normalizedJavaPath = this.javaPath.normalize();
         return new FSPath(normalizedJavaPath);
     }
 
-    @Override public FSPath relativize(Path other) {
-        if(!(other instanceof FSPath)) {
-            throw new ResourceRuntimeException(
-                "Cannot relativize '" + this + "' relative to '" + other + "', it is not a file system path");
-        }
-        return relativize((FSPath) other);
-    }
-
     public FSPath relativize(FSPath other) {
-        final java.nio.file.Path javaRelativePath = javaPath.relativize(other.javaPath);
+        final Path javaRelativePath = javaPath.relativize(other.javaPath);
         return new FSPath(javaRelativePath);
     }
 
 
-    @Override public FSPath appendSegment(String segment) {
-        final java.nio.file.Path javaPath = this.javaPath.resolve(segment);
+    public FSPath appendSegment(String segment) {
+        final Path javaPath = this.javaPath.resolve(segment);
         return new FSPath(javaPath);
     }
 
-    @Override public FSPath appendSegments(Iterable<String> segments) {
+    public FSPath appendSegments(Iterable<String> segments) {
         final ArrayList<String> segmentsList = new ArrayList<>();
         segments.forEach(segmentsList::add);
         return appendSegments(segmentsList);
     }
 
-    @Override public FSPath appendSegments(Collection<String> segments) {
-        final java.nio.file.Path relJavaPath = createLocalPath(segments);
-        final java.nio.file.Path javaPath = this.javaPath.resolve(relJavaPath);
+    public FSPath appendSegments(Collection<String> segments) {
+        final Path relJavaPath = createLocalPath(segments);
+        final Path javaPath = this.javaPath.resolve(relJavaPath);
         return new FSPath(javaPath);
     }
 
-    @Override public FSPath appendSegments(List<String> segments) {
-        final java.nio.file.Path relJavaPath = createLocalPath(segments);
-        final java.nio.file.Path javaPath = this.javaPath.resolve(relJavaPath);
+    public FSPath appendSegments(List<String> segments) {
+        final Path relJavaPath = createLocalPath(segments);
+        final Path javaPath = this.javaPath.resolve(relJavaPath);
         return new FSPath(javaPath);
     }
 
-    @Override public FSPath appendSegments(String... segments) {
-        final java.nio.file.Path relJavaPath = createLocalPath(segments);
-        final java.nio.file.Path javaPath = this.javaPath.resolve(relJavaPath);
+    public FSPath appendSegments(String... segments) {
+        final Path relJavaPath = createLocalPath(segments);
+        final Path javaPath = this.javaPath.resolve(relJavaPath);
         return new FSPath(javaPath);
     }
 
 
-    @Override public FSPath appendRelativePath(Path relativePath) {
-        if(!(relativePath instanceof FSPath)) {
-            throw new ResourceRuntimeException(
-                "Cannot append path '" + relativePath + "', it is not a file system path");
-        }
-        return appendRelativePath((FSPath) relativePath);
-    }
-
+    /**
+     * @throws ResourceRuntimeException when relativePath is not a relative path (but instead an absolute one).
+     */
     public FSPath appendRelativePath(FSPath relativePath) {
         if(relativePath.isAbsolute()) {
             throw new ResourceRuntimeException(
                 "Cannot append path '" + relativePath + "', it is an absolute path");
         }
-        final java.nio.file.Path javaPath = this.javaPath.resolve(relativePath.javaPath);
+        final Path javaPath = this.javaPath.resolve(relativePath.javaPath);
         return new FSPath(javaPath);
     }
 
-    public FSPath appendJavaPath(java.nio.file.Path segments) {
-        final java.nio.file.Path javaPath = this.javaPath.resolve(segments);
+    public FSPath appendJavaPath(Path segments) {
+        final Path javaPath = this.javaPath.resolve(segments);
         return new FSPath(javaPath);
     }
 
 
-    @Override public FSPath appendToLeaf(String str) {
+    public FSPath appendToLeaf(String str) {
         final String fileName = this.javaPath.getFileName().toString();
         final String newFileName = fileName + str;
-        final java.nio.file.Path javaPath = this.javaPath.resolveSibling(newFileName);
+        final Path javaPath = this.javaPath.resolveSibling(newFileName);
         return new FSPath(javaPath);
     }
 
-    @Override public FSPath replaceLeaf(String segment) {
-        final java.nio.file.Path javaPath = this.javaPath.resolveSibling(segment);
+    public FSPath replaceLeaf(String segment) {
+        final Path javaPath = this.javaPath.resolveSibling(segment);
         return new FSPath(javaPath);
     }
 
-    @Override public FSPath applyToLeaf(Function<String, String> func) {
+    public FSPath applyToLeaf(Function<String, String> func) {
         final String fileName = this.javaPath.getFileName().toString();
-        final java.nio.file.Path javaPath = this.javaPath.resolveSibling(func.apply(fileName));
+        final Path javaPath = this.javaPath.resolveSibling(func.apply(fileName));
         return new FSPath(javaPath);
     }
 
-    @Override public FSPath replaceLeafExtension(String extension) {
+    public FSPath replaceLeafExtension(String extension) {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return this;
@@ -244,7 +235,7 @@ public class FSPath implements Path {
         return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
     }
 
-    @Override public FSPath appendExtensionToLeaf(String extension) {
+    public FSPath appendExtensionToLeaf(String extension) {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return this;
@@ -252,7 +243,7 @@ public class FSPath implements Path {
         return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
     }
 
-    @Override public FSPath applyToLeafExtension(Function<String, String> func) {
+    public FSPath applyToLeafExtension(Function<String, String> func) {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return this;
@@ -261,7 +252,7 @@ public class FSPath implements Path {
     }
 
 
-    private static java.nio.file.Path createJavaPath(URI uri) {
+    private static Path createJavaPath(URI uri) {
         try {
             return Paths.get(uri);
         } catch(IllegalArgumentException | FileSystemNotFoundException e) {
@@ -269,7 +260,7 @@ public class FSPath implements Path {
         }
     }
 
-    private static java.nio.file.Path createLocalPath(Collection<String> segments) {
+    private static Path createLocalPath(Collection<String> segments) {
         final int segmentsSize = segments.size();
         if(segmentsSize == 0) {
             return FileSystems.getDefault().getPath("/");
@@ -288,7 +279,7 @@ public class FSPath implements Path {
         }
     }
 
-    private static java.nio.file.Path createLocalPath(String... segments) {
+    private static Path createLocalPath(String... segments) {
         final int segmentsSize = segments.length;
         if(segmentsSize == 0) {
             return FileSystems.getDefault().getPath("/");
@@ -300,7 +291,7 @@ public class FSPath implements Path {
         }
     }
 
-    private static java.nio.file.Path createLocalPath(File javaFile) {
+    private static Path createLocalPath(File javaFile) {
         try {
             return FileSystems.getDefault().getPath(javaFile.getPath());
         } catch(InvalidPathException e) {
@@ -309,13 +300,33 @@ public class FSPath implements Path {
         }
     }
 
-    private static java.nio.file.Path createLocalPath(String localPathStr) {
+    private static Path createLocalPath(String localPathStr) {
         try {
             return FileSystems.getDefault().getPath(localPathStr);
         } catch(InvalidPathException e) {
             throw new ResourceRuntimeException(
                 "Creating local path from string '" + localPathStr + "' failed unexpectedly", e);
         }
+    }
+
+
+    /**
+     * @return "java" as the {@link ResourceKey} qualifier, indicating it belongs to the java.nio.file filesystem.
+     */
+    @Override public String qualifier() {
+        return "java";
+    }
+
+    /**
+     * @return this path as the {@link ResourceKey} identifier.
+     */
+    @Override public FSPath id() {
+        return this;
+    }
+
+
+    @Override public int compareTo(FSPath other) {
+        return this.javaPath.compareTo(other.javaPath);
     }
 
 
@@ -332,19 +343,6 @@ public class FSPath implements Path {
 
     @Override public String toString() {
         return javaPath.toString();
-    }
-
-
-    @Override public int compareTo(Path other) {
-        if(!(other instanceof FSPath)) {
-            throw new ResourceRuntimeException(
-                "Cannot compare to path '" + other + "', it is not a file system path");
-        }
-        return compareTo((FSPath) other);
-    }
-
-    public int compareTo(FSPath other) {
-        return this.javaPath.compareTo(other.javaPath);
     }
 
 

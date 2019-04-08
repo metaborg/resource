@@ -2,7 +2,7 @@ package mb.resource;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface Resource extends IORead {
+public interface Resource {
     ResourceKey getKey();
 
 

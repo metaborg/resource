@@ -1,12 +1,10 @@
-package mb.resource.match;
+package mb.resource.fs.match;
 
-import mb.resource.TreeResource;
+import mb.resource.fs.FSResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.IOException;
-
 public class DirectoryResourceMatcher implements ResourceMatcher {
-    @Override public boolean matches(TreeResource resource, TreeResource rootDirectory) throws IOException {
+    @Override public boolean matches(FSResource resource, FSResource rootDirectory) {
         return resource.isDirectory();
     }
 

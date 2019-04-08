@@ -8,7 +8,11 @@ import java.util.HashMap;
 public class SimpleResourceRegistry implements ResourceRegistry {
     private final HashMap<Serializable, Resource> resources = new HashMap<>();
 
-    @Override public @Nullable Resource getResource(ResourceKey key) {
+    @Override public Resource getResource(ResourceKey key) {
+        final @Nullable Resource resource = resources.get(key);
+        if(resource == null) {
+            throw new ResourceRuntimeException("Resource with key '" + key + "' was not found");
+        }
         return resources.get(key);
     }
 

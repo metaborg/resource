@@ -1,24 +1,24 @@
-package mb.resource.walk;
+package mb.resource.fs.match;
 
-import mb.resource.TreeResource;
-import mb.resource.path.match.PathMatcher;
+import mb.resource.fs.FSResource;
+import mb.resource.fs.path.match.PathMatcher;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class PathResourceWalker implements ResourceWalker {
+public class PathResourceMatcher implements ResourceMatcher {
     private final PathMatcher matcher;
 
-    public PathResourceWalker(PathMatcher matcher) {
+    public PathResourceMatcher(PathMatcher matcher) {
         this.matcher = matcher;
     }
 
-    @Override public boolean traverse(TreeResource resource, TreeResource rootDirectory) {
+    @Override public boolean matches(FSResource resource, FSResource rootDirectory) {
         return matcher.matches(resource.getPath(), rootDirectory.getPath());
     }
 
     @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final PathResourceWalker that = (PathResourceWalker) o;
+        final PathResourceMatcher that = (PathResourceMatcher) o;
         return matcher.equals(that.matcher);
     }
 
@@ -27,6 +27,6 @@ public class PathResourceWalker implements ResourceWalker {
     }
 
     @Override public String toString() {
-        return "PathResourceWalker(" + matcher + ")";
+        return "PathResourceMatcher(" + matcher + ")";
     }
 }

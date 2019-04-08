@@ -3,18 +3,12 @@ package mb.resource.string;
 import mb.resource.Resource;
 import mb.resource.ResourceKey;
 
-import java.nio.charset.Charset;
+public class StringResource implements Resource {
+    public final String str;
+    public final ResourceKey key;
 
-public class StringResource extends StringIORead implements Resource {
-    private final ResourceKey key;
-
-    public StringResource(String text, ResourceKey key) {
-        super(text);
-        this.key = key;
-    }
-
-    public StringResource(String text, Charset charset, ResourceKey key) {
-        super(text, charset);
+    public StringResource(String str, ResourceKey key) {
+        this.str = str;
         this.key = key;
     }
 
