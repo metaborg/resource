@@ -1,6 +1,6 @@
-package mb.resource.path.match;
+package mb.resource.fs.path.match;
 
-import mb.resource.path.Path;
+import mb.resource.fs.FSPath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class RegexPathMatcher implements PathMatcher {
         this.compiledPattern = Pattern.compile(pattern);
     }
 
-    @Override public boolean matches(Path path, Path rootDir) {
+    @Override public boolean matches(FSPath path, FSPath rootDir) {
         final String relative = rootDir.relativize(path).toString();
         return compiledPattern.matcher(relative).matches();
     }

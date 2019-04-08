@@ -1,15 +1,15 @@
-package mb.resource.path;
+package mb.resource.fs;
 
 import java.util.ArrayList;
 
-public class PathNormalizerUtil {
-    public static ArrayList<String> normalize(Iterable<String> segments, int segmentsSize) throws PathNormalizationException {
+class PathNormalizerUtil {
+    public static ArrayList<String> normalize(Iterable<String> segments, int segmentsSize) throws FSPathNormalizationException {
         final ArrayList<String> newSegments = new ArrayList<>(segmentsSize);
         for(String segment : segments) {
             if(segment.equals("..")) {
                 final int newSegmentsSize = newSegments.size();
                 if(newSegmentsSize == 0) {
-                    throw new PathNormalizationException();
+                    throw new FSPathNormalizationException();
                 } else {
                     newSegments.remove(newSegmentsSize - 1);
                 }

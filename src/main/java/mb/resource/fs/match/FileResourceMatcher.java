@@ -1,11 +1,11 @@
-package mb.resource.walk;
+package mb.resource.fs.match;
 
-import mb.resource.TreeResource;
+import mb.resource.fs.FSResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class AllResourceWalker implements ResourceWalker {
-    @Override public boolean traverse(TreeResource directory, TreeResource rootDirectory) {
-        return true;
+public class FileResourceMatcher implements ResourceMatcher {
+    @Override public boolean matches(FSResource resource, FSResource rootDirectory) {
+        return resource.isFile();
     }
 
     @Override public boolean equals(@Nullable Object o) {
@@ -17,6 +17,6 @@ public class AllResourceWalker implements ResourceWalker {
     }
 
     @Override public String toString() {
-        return "AllResourceWalker()";
+        return "FileResourceMatcher()";
     }
 }

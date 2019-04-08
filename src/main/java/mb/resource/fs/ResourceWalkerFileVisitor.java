@@ -1,8 +1,7 @@
 package mb.resource.fs;
 
-import mb.resource.TreeResourceAccess;
-import mb.resource.match.ResourceMatcher;
-import mb.resource.walk.ResourceWalker;
+import mb.resource.fs.match.ResourceMatcher;
+import mb.resource.fs.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -18,10 +17,10 @@ class ResourceWalkerFileVisitor implements FileVisitor<Path> {
     private final ResourceWalker walker;
     private final FSResource rootDirectory;
     private final Builder<FSResource> streamBuilder;
-    private final @Nullable TreeResourceAccess access;
+    private final @Nullable FSResourceAccess access;
 
     ResourceWalkerFileVisitor(ResourceWalker walker, ResourceMatcher matcher, FSResource rootDirectory, Builder<FSResource> streamBuilder,
-        @Nullable TreeResourceAccess access) {
+        @Nullable FSResourceAccess access) {
         this.matcher = matcher;
         this.walker = walker;
         this.rootDirectory = rootDirectory;
