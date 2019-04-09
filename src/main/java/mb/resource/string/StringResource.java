@@ -1,9 +1,15 @@
 package mb.resource.string;
 
-import mb.resource.Resource;
+import mb.resource.ReadableResource;
 import mb.resource.ResourceKey;
 
-public class StringResource implements Resource {
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+
+public class StringResource implements ReadableResource {
     public final String str;
     public final ResourceKey key;
 
@@ -14,6 +20,34 @@ public class StringResource implements Resource {
 
     @Override public ResourceKey getKey() {
         return key;
+    }
+
+    @Override public boolean exists() {
+        return true; // Always exists.
+    }
+
+    @Override public boolean isReadable() {
+        return true; // Always readable.
+    }
+
+    @Override public Instant getLastModifiedTime() {
+        return Instant.MIN; // Never modified.
+    }
+
+    @Override public long getSize() {
+        return str.length() * 2; // UTF-16 is 2 bytes per character.
+    }
+
+    @Override public InputStream newInputStream() {
+        return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)); // Encode as UTF-8 bytes.
+    }
+
+    @Override public byte[] readBytes() {
+        return str.getBytes(StandardCharsets.UTF_8); // Encode as UTF-8 bytes.
+    }
+
+    @Override public String readString(Charset fromBytesCharset) {
+        return str; // Ignore fromBytesCharset, we do not need to decode from bytes.
     }
 
     @Override public boolean equals(Object o) {
