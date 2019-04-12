@@ -1,21 +1,21 @@
 package mb.resource;
 
 import mb.resource.string.StringResource;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SimpleResourceRegistryTest {
+class DefaultResourceRegistryTest {
+    private final String qualifier = "String";
+
     @Test
-    void addAndGetResource() throws IOException {
-        final SimpleResourceRegistry registry = new SimpleResourceRegistry();
-        final SimpleResourceKey key = new SimpleResourceKey("String", 1);
+    void addAndGetResource() {
+        final DefaultResourceRegistry registry = new DefaultResourceRegistry(qualifier);
+        final int id = 1;
+        final DefaultResourceKey key = new DefaultResourceKey(qualifier, id);
         final StringResource resource = new StringResource("Hello world!", key);
         registry.addResource(resource);
-        final StringResource getResource = (StringResource) registry.getResource(key);
+        final StringResource getResource = (StringResource) registry.getResource(id);
         assertNotNull(getResource);
         assertEquals(resource, getResource);
         assertEquals(resource.getKey().qualifier(), getResource.getKey().qualifier());
@@ -25,15 +25,15 @@ class SimpleResourceRegistryTest {
 
     @Test
     void addAndGetMultipleResources() {
-        final SimpleResourceRegistry registry = new SimpleResourceRegistry();
-        final SimpleResourceKey key1 = new SimpleResourceKey("String", 1);
+        final DefaultResourceRegistry registry = new DefaultResourceRegistry(qualifier);
+        final DefaultResourceKey key1 = new DefaultResourceKey(qualifier, 1);
         final StringResource resource1 = new StringResource("Hello world!", key1);
         registry.addResource(resource1);
-        final @Nullable Resource getResource1 = registry.getResource(key1);
-        final SimpleResourceKey key2 = new SimpleResourceKey("String", 2);
+        final Resource getResource1 = registry.getResource(1);
+        final DefaultResourceKey key2 = new DefaultResourceKey(qualifier, 2);
         final StringResource resource2 = new StringResource("World hello!", key2);
         registry.addResource(resource2);
-        final @Nullable Resource getResource2 = registry.getResource(key2);
+        final Resource getResource2 = registry.getResource(2);
         assertEquals(resource1, getResource1);
         assertEquals(resource2, getResource2);
         assertNotEquals(resource1, getResource2);
@@ -41,16 +41,17 @@ class SimpleResourceRegistryTest {
     }
 
     @Test
-    void overwriteResource() throws IOException {
-        final SimpleResourceRegistry registry = new SimpleResourceRegistry();
-        final SimpleResourceKey key = new SimpleResourceKey("String", 1);
+    void overwriteResource() {
+        final DefaultResourceRegistry registry = new DefaultResourceRegistry(qualifier);
+        final int id = 1;
+        final DefaultResourceKey key = new DefaultResourceKey(qualifier, id);
         final StringResource resource1 = new StringResource("Hello world!", key);
         registry.addResource(resource1);
-        final @Nullable StringResource getResource1 = (StringResource) registry.getResource(key);
+        final StringResource getResource1 = (StringResource) registry.getResource(id);
         assertEquals(resource1, getResource1);
         final StringResource resource2 = new StringResource("World hello!", key);
         registry.addResource(resource2);
-        final @Nullable StringResource getResource2 = (StringResource) registry.getResource(key);
+        final StringResource getResource2 = (StringResource) registry.getResource(id);
         assertNotNull(getResource2);
         assertEquals(resource2, getResource2);
         assertNotEquals(resource1.str, getResource2.str);
@@ -58,12 +59,12 @@ class SimpleResourceRegistryTest {
 
     @Test
     void removeResource() {
-        final SimpleResourceRegistry registry = new SimpleResourceRegistry();
-        final SimpleResourceKey key = new SimpleResourceKey("String", 1);
+        final DefaultResourceRegistry registry = new DefaultResourceRegistry(qualifier);
+        final DefaultResourceKey key = new DefaultResourceKey("String", 1);
         final StringResource resource = new StringResource("Hello world!", key);
         registry.addResource(resource);
         assertNotNull(registry.getResource(key));
-        registry.removeResource(resource);
+        registry.removeResource((Resource)resource);
         assertThrows(ResourceRuntimeException.class, () -> {
             registry.getResource(key);
         });
@@ -71,8 +72,8 @@ class SimpleResourceRegistryTest {
 
     @Test
     void removeResourceByKey() {
-        final SimpleResourceRegistry registry = new SimpleResourceRegistry();
-        final SimpleResourceKey key = new SimpleResourceKey("String", 1);
+        final DefaultResourceRegistry registry = new DefaultResourceRegistry(qualifier);
+        final DefaultResourceKey key = new DefaultResourceKey("String", 1);
         final StringResource resource = new StringResource("Hello world!", key);
         registry.addResource(resource);
         assertNotNull(registry.getResource(key));

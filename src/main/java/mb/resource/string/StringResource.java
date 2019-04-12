@@ -1,21 +1,25 @@
 package mb.resource.string;
 
+import mb.resource.DefaultResourceKey;
 import mb.resource.ReadableResource;
 import mb.resource.ResourceKey;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
-public class StringResource implements ReadableResource {
+public class StringResource implements ReadableResource, Serializable {
+    public static final String qualifier = "string";
+
     public final String str;
     public final ResourceKey key;
 
-    public StringResource(String str, ResourceKey key) {
+    public StringResource(String str, Serializable id) {
         this.str = str;
-        this.key = key;
+        this.key = new DefaultResourceKey(qualifier, id);
     }
 
     @Override public ResourceKey getKey() {
@@ -31,7 +35,7 @@ public class StringResource implements ReadableResource {
     }
 
     @Override public Instant getLastModifiedTime() {
-        return Instant.MIN; // Never modified.
+        return Instant.EPOCH; // Never modified.
     }
 
     @Override public long getSize() {
