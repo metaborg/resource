@@ -17,6 +17,13 @@ public class DefaultResourceService implements ResourceService {
         }
     }
 
+    public DefaultResourceService(ResourceRegistry... registries) {
+        this.registries = new HashMap<>();
+        for(ResourceRegistry registry : registries) {
+            this.registries.put(registry.qualifier(), registry);
+        }
+    }
+
     public DefaultResourceService(HashMap<Serializable, ResourceRegistry> registries) {
         this.registries = registries;
     }
