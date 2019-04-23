@@ -1,7 +1,9 @@
 package mb.resource.fs;
 
+import mb.resource.ReadableResource;
 import mb.resource.Resource;
 import mb.resource.ResourceRuntimeException;
+import mb.resource.WritableResource;
 import mb.resource.fs.match.ResourceMatcher;
 import mb.resource.fs.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -25,7 +27,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class FSResource implements Resource, Serializable {
+public class FSResource implements Resource, ReadableResource, WritableResource, Serializable {
     final FSPath path;
 
 
@@ -179,27 +181,27 @@ public class FSResource implements Resource, Serializable {
         return Files.isDirectory(path.javaPath);
     }
 
-    public boolean exists() {
+    @Override public boolean exists() {
         return Files.exists(path.javaPath);
     }
 
-    public boolean isReadable() {
+    @Override public boolean isReadable() {
         return Files.isReadable(path.javaPath);
     }
 
-    public boolean isWritable() {
+    @Override public boolean isWritable() {
         return Files.isWritable(path.javaPath);
     }
 
-    public Instant getLastModifiedTime() throws IOException {
+    @Override public Instant getLastModifiedTime() throws IOException {
         return Files.getLastModifiedTime(path.javaPath).toInstant();
     }
 
-    public void setLastModifiedTime(Instant time) throws IOException {
+    @Override public void setLastModifiedTime(Instant time) throws IOException {
         Files.setLastModifiedTime(path.javaPath, FileTime.from(time));
     }
 
-    public long getSize() throws IOException {
+    @Override public long getSize() throws IOException {
         return Files.size(path.javaPath);
     }
 
@@ -240,11 +242,11 @@ public class FSResource implements Resource, Serializable {
     }
 
 
-    public InputStream newInputStream() throws IOException {
+    @Override public InputStream newInputStream() throws IOException {
         return Files.newInputStream(path.javaPath, StandardOpenOption.READ);
     }
 
-    public byte[] readBytes() throws IOException {
+    @Override public byte[] readBytes() throws IOException {
         return Files.readAllBytes(path.javaPath);
     }
 
@@ -252,17 +254,17 @@ public class FSResource implements Resource, Serializable {
         return Files.readAllLines(path.javaPath, charset);
     }
 
-    public String readString(Charset charset) throws IOException {
+    @Override public String readString(Charset charset) throws IOException {
         return new String(readBytes(), charset);
     }
 
 
-    public OutputStream newOutputStream() throws IOException {
+    @Override public OutputStream newOutputStream() throws IOException {
         return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE,
             StandardOpenOption.TRUNCATE_EXISTING);
     }
 
-    public void writeBytes(byte[] bytes) throws IOException {
+    @Override public void writeBytes(byte[] bytes) throws IOException {
         Files.write(path.javaPath, bytes);
     }
 
@@ -270,7 +272,7 @@ public class FSResource implements Resource, Serializable {
         Files.write(path.javaPath, lines, charset);
     }
 
-    public void writeString(String string, Charset charset) throws IOException {
+    @Override public void writeString(String string, Charset charset) throws IOException {
         Files.write(path.javaPath, string.getBytes(charset));
     }
 

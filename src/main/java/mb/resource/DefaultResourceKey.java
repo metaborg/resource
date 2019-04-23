@@ -2,13 +2,13 @@ package mb.resource;
 
 import java.io.Serializable;
 
-public class SimpleResourceKey implements ResourceKey {
+public class DefaultResourceKey implements ResourceKey {
     private final Serializable qualifier;
-    private final Serializable key;
+    private final Serializable id;
 
-    public SimpleResourceKey(Serializable qualifier, Serializable key) {
+    public DefaultResourceKey(Serializable qualifier, Serializable id) {
         this.qualifier = qualifier;
-        this.key = key;
+        this.id = id;
     }
 
     @Override public Serializable qualifier() {
@@ -16,24 +16,24 @@ public class SimpleResourceKey implements ResourceKey {
     }
 
     @Override public Serializable id() {
-        return key;
+        return id;
     }
 
     @Override public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final SimpleResourceKey that = (SimpleResourceKey) o;
+        final DefaultResourceKey that = (DefaultResourceKey) o;
         if(!qualifier.equals(that.qualifier)) return false;
-        return key.equals(that.key);
+        return id.equals(that.id);
     }
 
     @Override public int hashCode() {
         int result = qualifier.hashCode();
-        result = 31 * result + key.hashCode();
+        result = 31 * result + id.hashCode();
         return result;
     }
 
     @Override public String toString() {
-        return "#" + qualifier + ":" + key;
+        return "#" + qualifier + ":" + id;
     }
 }

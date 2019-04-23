@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
+    static final String qualifier = "java";
+
     // URI version of the path which can be serialized and deserialized.
     final URI uri;
     // Transient and non-final for deserialization in readObject. Invariant: always nonnull.
@@ -314,7 +316,7 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
      * @return "java" as the {@link ResourceKey} qualifier, indicating it belongs to the java.nio.file filesystem.
      */
     @Override public String qualifier() {
-        return "java";
+        return qualifier;
     }
 
     /**
