@@ -1,5 +1,7 @@
 package mb.resource;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.io.Serializable;
 import java.util.HashMap;
 
@@ -30,7 +32,10 @@ public class DefaultResourceService implements ResourceService {
 
     @Override public Resource getResource(ResourceKey key) {
         final Serializable qualifier = key.qualifier();
-        final ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        if(registry == null) {
+            throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
+        }
         return registry.getResource(key);
     }
 
