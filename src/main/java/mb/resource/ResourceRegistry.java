@@ -24,8 +24,17 @@ public interface ResourceRegistry {
      *
      * @param key Key to get resource for.
      * @return Resource for {@code key}.
-     * @throws ResourceRuntimeException when given {@link ResourceKey#qualifier()} does not equate {@link #qualifier()}.
+     * @throws ResourceRuntimeException when given {@link ResourceKey#qualifier()} does not equate {@link
+     *                                  #qualifier()}.
      * @throws ResourceRuntimeException when retrieving resource failed unexpectedly.
      */
-    Resource getResource(ResourceKey key);
+    default Resource getResource(ResourceKey key) {
+        final Serializable qualifier = key.qualifier();
+        final Serializable expectedQualifier = this.qualifier();
+        if(!expectedQualifier.equals(qualifier)) {
+            throw new ResourceRuntimeException(
+                "Cannot get resource with key '" + key + "'; its qualifier '" + qualifier + "' is not '" + expectedQualifier + "'");
+        }
+        return getResource(key.id());
+    }
 }
