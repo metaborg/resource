@@ -1,4 +1,4 @@
-package mb.resource.fs.path.match;
+package mb.resource.hierarchical.match.path;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 

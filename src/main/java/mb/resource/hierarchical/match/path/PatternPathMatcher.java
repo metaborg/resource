@@ -1,6 +1,6 @@
-package mb.resource.fs.path.match;
+package mb.resource.hierarchical.match.path;
 
-import mb.resource.fs.FSPath;
+import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PatternPathMatcher implements PathMatcher {
@@ -10,7 +10,7 @@ public class PatternPathMatcher implements PathMatcher {
         this.pattern = pattern;
     }
 
-    @Override public boolean matches(FSPath path, FSPath rootDir) {
+    @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
         final String relative = rootDir.relativize(path).toString();
         return pattern.match(relative);
     }

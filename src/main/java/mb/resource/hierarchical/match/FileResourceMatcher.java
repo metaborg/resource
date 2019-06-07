@@ -1,10 +1,13 @@
-package mb.resource.fs.match;
+package mb.resource.hierarchical.match;
 
-import mb.resource.fs.FSResource;
+import mb.resource.hierarchical.HierarchicalResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.IOException;
+
 public class FileResourceMatcher implements ResourceMatcher {
-    @Override public boolean matches(FSResource resource, FSResource rootDirectory) {
+    @Override
+    public boolean matches(HierarchicalResource resource, HierarchicalResource rootDirectory) throws IOException {
         return resource.isFile();
     }
 

@@ -1,5 +1,7 @@
 package mb.resource;
 
+import mb.resource.hierarchical.HierarchicalResource;
+import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
@@ -55,6 +57,15 @@ public class DefaultResourceService implements ResourceService {
                 "Found resource '" + resource + "' for key '" + key + "', but it does not implement WritableResource");
         }
         return (WritableResource) resource;
+    }
+
+    @Override public HierarchicalResource getHierarchicalResource(ResourcePath path) {
+        final Resource resource = getResource(path);
+        if(!(resource instanceof HierarchicalResource)) {
+            throw new ResourceRuntimeException(
+                "Found resource '" + resource + "' for path '" + path + "', but it does not implement HierarchicalResource");
+        }
+        return (HierarchicalResource) resource;
     }
 
     public void addRegistry(ResourceRegistry registry) {

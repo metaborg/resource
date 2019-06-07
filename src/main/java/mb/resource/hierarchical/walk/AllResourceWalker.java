@@ -1,10 +1,10 @@
-package mb.resource.fs.match;
+package mb.resource.hierarchical.walk;
 
-import mb.resource.fs.FSResource;
+import mb.resource.hierarchical.HierarchicalResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class AllResourceMatcher implements ResourceMatcher {
-    @Override public boolean matches(FSResource resource, FSResource rootDirectory) {
+public class AllResourceWalker implements ResourceWalker {
+    @Override public boolean traverse(HierarchicalResource directory, HierarchicalResource rootDirectory) {
         return true;
     }
 
@@ -17,6 +17,6 @@ public class AllResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "AllResourceMatcher()";
+        return "AllResourceWalker()";
     }
 }
