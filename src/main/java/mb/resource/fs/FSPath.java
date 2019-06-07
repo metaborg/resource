@@ -370,15 +370,19 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     /**
      * @return "java" as the {@link ResourceKey} qualifier, indicating it belongs to the java.nio.file filesystem.
      */
-    @Override public String qualifier() {
+    @Override public String getQualifier() {
         return qualifier;
     }
 
     /**
      * @return this path as the {@link ResourceKey} identifier.
      */
-    @Override public FSPath id() {
+    @Override public FSPath getId() {
         return this;
+    }
+
+    @Override public String getIdStringRepresentation() {
+        return javaPath.toString();
     }
 
 
@@ -399,7 +403,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     }
 
     @Override public String toString() {
-        return javaPath.toString();
+        return ResourceKey.toStringRepresentation(this);
     }
 
 

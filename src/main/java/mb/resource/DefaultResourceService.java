@@ -33,7 +33,7 @@ public class DefaultResourceService implements ResourceService {
     }
 
     @Override public Resource getResource(ResourceKey key) {
-        final Serializable qualifier = key.qualifier();
+        final Serializable qualifier = key.getQualifier();
         final @Nullable ResourceRegistry registry = registries.get(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");

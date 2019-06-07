@@ -2,7 +2,6 @@ package mb.resource.url;
 
 import mb.resource.ResourceKey;
 
-import java.io.Serializable;
 import java.net.URL;
 
 public class URLResourceKey implements ResourceKey {
@@ -14,12 +13,16 @@ public class URLResourceKey implements ResourceKey {
     }
 
 
-    @Override public Serializable qualifier() {
+    @Override public String getQualifier() {
         return "url";
     }
 
-    @Override public Serializable id() {
+    @Override public URL getId() {
         return url;
+    }
+
+    @Override public String getIdStringRepresentation() {
+        return url.toString();
     }
 
 
@@ -35,6 +38,6 @@ public class URLResourceKey implements ResourceKey {
     }
 
     @Override public String toString() {
-        return url.toString();
+        return ResourceKey.toStringRepresentation(this);
     }
 }

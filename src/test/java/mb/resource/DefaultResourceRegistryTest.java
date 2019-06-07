@@ -18,8 +18,8 @@ class DefaultResourceRegistryTest {
         final StringResource getResource = (StringResource) registry.getResource(1);
         assertNotNull(getResource);
         assertEquals(resource, getResource);
-        assertEquals(resource.getKey().qualifier(), getResource.getKey().qualifier());
-        assertEquals(resource.getKey().id(), getResource.getKey().id());
+        assertEquals(resource.getKey().getQualifier(), getResource.getKey().getQualifier());
+        assertEquals(resource.getKey().getId(), getResource.getKey().getId());
         assertEquals(resource.str, getResource.str);
     }
 

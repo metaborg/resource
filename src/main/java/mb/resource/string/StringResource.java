@@ -17,7 +17,7 @@ public class StringResource implements ReadableResource, Serializable {
     public final String str;
     public final ResourceKey key;
 
-    public StringResource(String str, Serializable id) {
+    public StringResource(String str, String id) {
         this.str = str;
         this.key = new DefaultResourceKey(qualifier, id);
     }

@@ -6,14 +6,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 public class DefaultResourceRegistry implements ResourceRegistry {
-    private final Serializable qualifier;
-    private final HashMap<Serializable, Resource> resources = new HashMap<>();
+    private final String qualifier;
+    private final HashMap<String, Resource> resources = new HashMap<>();
 
-    public DefaultResourceRegistry(Serializable qualifier) {
+
+    public DefaultResourceRegistry(String qualifier) {
         this.qualifier = qualifier;
     }
 
-    @Override public Serializable qualifier() {
+
+    @Override public String qualifier() {
         return qualifier;
     }
 
@@ -26,13 +28,7 @@ public class DefaultResourceRegistry implements ResourceRegistry {
         return resource;
     }
 
-    @Override public Resource getResource(ResourceKey key) {
-        final Serializable qualifier = key.qualifier();
-        if(!this.qualifier.equals(qualifier)) {
-            throw new ResourceRuntimeException(
-                "Cannot get resource with key '" + key + "' from registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
-        }
-        final Serializable id = key.id();
+    @Override public Resource getResource(String id) {
         final @Nullable Resource resource = resources.get(id);
         if(resource == null) {
             throw new ResourceRuntimeException(
@@ -41,36 +37,52 @@ public class DefaultResourceRegistry implements ResourceRegistry {
         return resource;
     }
 
+    @Override public Resource getResource(ResourceKey key) {
+        final Serializable qualifier = key.getQualifier();
+        if(!this.qualifier.equals(qualifier)) {
+            throw new ResourceRuntimeException(
+                "Cannot get resource with key '" + key + "' from registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
+        }
+        final Serializable id = key.getId();
+        final @Nullable Resource resource = resources.get(id);
+        if(resource == null) {
+            throw new ResourceRuntimeException(
+                "Cannot get resource with identifier '" + id + "'; it was not found in this registry");
+        }
+        return resource;
+    }
+
+
     public void addResource(Resource resource) {
         final ResourceKey key = resource.getKey();
-        final Serializable qualifier = key.qualifier();
+        final Serializable qualifier = key.getQualifier();
         if(!this.qualifier.equals(qualifier)) {
             throw new ResourceRuntimeException(
                 "Cannot add resource '" + resource + "' to registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
         }
-        resources.put(key.id(), resource);
+        resources.put(key.getIdStringRepresentation(), resource);
     }
 
     public void removeResource(Resource resource) {
         final ResourceKey key = resource.getKey();
-        final Serializable qualifier = key.qualifier();
+        final Serializable qualifier = key.getQualifier();
         if(!this.qualifier.equals(qualifier)) {
             throw new ResourceRuntimeException(
                 "Cannot remove resource '" + resource + "' from registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
         }
-        resources.remove(key.id());
+        resources.remove(key.getIdStringRepresentation());
     }
 
     public void removeResource(ResourceKey key) {
-        final Serializable qualifier = key.qualifier();
+        final Serializable qualifier = key.getQualifier();
         if(!this.qualifier.equals(qualifier)) {
             throw new ResourceRuntimeException(
                 "Cannot remove resource with key '" + key + "' from registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
         }
-        resources.remove(key.id());
+        resources.remove(key.getIdStringRepresentation());
     }
 
-    public void removeResource(Serializable id) {
+    public void removeResource(String id) {
         resources.remove(id);
     }
 }
