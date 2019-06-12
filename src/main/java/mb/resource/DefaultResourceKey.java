@@ -21,10 +21,6 @@ public class DefaultResourceKey implements ResourceKey {
         return id;
     }
 
-    @Override public String getIdStringRepresentation() {
-        return id;
-    }
-
 
     @Override public boolean equals(Object o) {
         if(this == o) return true;
@@ -41,6 +37,6 @@ public class DefaultResourceKey implements ResourceKey {
     }
 
     @Override public String toString() {
-        return ResourceKey.toStringRepresentation(this);
+        return ResourceKeyConverter.toString(qualifier, id);
     }
 }

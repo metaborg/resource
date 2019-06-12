@@ -1,6 +1,7 @@
 package mb.resource.fs;
 
 import mb.resource.ResourceKey;
+import mb.resource.ResourceKeyConverter;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -70,19 +71,18 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     }
 
 
-    /**
-     * @return {@link Path} corresponding to this path.
-     */
     public Path getJavaPath() {
         return javaPath;
     }
 
-    /**
-     * @return {@link URI} corresponding to this path.
-     */
     public URI getURI() {
         return uri;
     }
+
+    public String getStringRepresentation() {
+        return uri.toString();
+    }
+
 
     /**
      * @return true if this path is a local file system path, false otherwise.
@@ -381,10 +381,6 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
         return this;
     }
 
-    @Override public String getIdStringRepresentation() {
-        return javaPath.toString();
-    }
-
 
     @Override public int compareTo(FSPath other) {
         return this.javaPath.compareTo(other.javaPath);
@@ -403,7 +399,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     }
 
     @Override public String toString() {
-        return ResourceKey.toStringRepresentation(this);
+        return ResourceKeyConverter.toString(qualifier, getStringRepresentation());
     }
 
 

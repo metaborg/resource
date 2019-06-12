@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.Instant;
 
-public interface ReadableResource extends Resource {
+public interface ReadableResource extends Resource, AutoCloseable {
     boolean exists() throws IOException;
 
     boolean isReadable() throws IOException;
@@ -32,5 +32,8 @@ public interface ReadableResource extends Resource {
     default String readString(Charset fromBytesCharset) throws IOException {
         return new String(readBytes(), fromBytesCharset);
     }
+
+
+    @Override void close() throws IOException;
 }
 

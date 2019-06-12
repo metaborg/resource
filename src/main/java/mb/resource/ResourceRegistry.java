@@ -4,14 +4,7 @@ import java.io.Serializable;
 
 public interface ResourceRegistry {
     /**
-     * Gets the qualifier (corresponding to {@link ResourceKey#getQualifier()}) this resource registry handles.
-     *
-     * @return Qualifier this resource registry handles resources for.
-     */
-    String qualifier();
-
-    /**
-     * Gets resource for given identifier (corresponding to {@link ResourceKey#getId()}).
+     * Gets resource for given identifier..
      *
      * @param id Identifier to get resource for.
      * @return Resource for {@code id}.
@@ -20,31 +13,26 @@ public interface ResourceRegistry {
     Resource getResource(Serializable id);
 
     /**
-     * Gets resource for given string representation of identifier (corresponding to {@link
-     * ResourceKey#getIdStringRepresentation()}).
+     * Gets resource for given string representation of identifier.
      *
-     * @param id String representation of identifier to get resource for.
+     * @param idStr String representation of identifier to get resource for.
      * @return Resource for {@code id}.
      * @throws ResourceRuntimeException when retrieving resource failed unexpectedly.
      */
-    Resource getResource(String id);
+    Resource getResource(String idStr);
 
     /**
-     * Gets resource for given {@link ResourceKey#getId()}.
+     * Gets the qualifier this resource registry handles.
      *
-     * @param key Key to get resource for.
-     * @return Resource for {@code key}.
-     * @throws ResourceRuntimeException when given {@link ResourceKey#getQualifier()} does not equate {@link
-     *                                  #qualifier()}.
-     * @throws ResourceRuntimeException when retrieving resource failed unexpectedly.
+     * @return Qualifier this resource registry handles resources for.
      */
-    default Resource getResource(ResourceKey key) {
-        final String qualifier = key.getQualifier();
-        final Serializable expectedQualifier = this.qualifier();
-        if(!expectedQualifier.equals(qualifier)) {
-            throw new ResourceRuntimeException(
-                "Cannot get resource with key '" + key + "'; its qualifier '" + qualifier + "' is not '" + expectedQualifier + "'");
-        }
-        return getResource(key.getId());
-    }
+    String qualifier();
+
+    /**
+     * Converts given identifier to its string representation.
+     *
+     * @param id Identifier.
+     * @return String representation for given identifier.
+     */
+    String toStringRepresentation(Serializable id);
 }

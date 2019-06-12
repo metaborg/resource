@@ -12,17 +12,21 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 public class StringResource implements ReadableResource, Serializable {
-    public static final String qualifier = "string";
-
     public final String str;
-    public final ResourceKey key;
+    public final DefaultResourceKey key;
+
 
     public StringResource(String str, String id) {
         this.str = str;
-        this.key = new DefaultResourceKey(qualifier, id);
+        this.key = new DefaultResourceKey(StringResourceRegistry.qualifier, id);
     }
 
-    @Override public ResourceKey getKey() {
+    @Override public void close() {
+        // Nothing to close.
+    }
+
+
+    @Override public DefaultResourceKey getKey() {
         return key;
     }
 
@@ -53,6 +57,7 @@ public class StringResource implements ReadableResource, Serializable {
     @Override public String readString(Charset fromBytesCharset) {
         return str; // Ignore fromBytesCharset, we do not need to decode from bytes.
     }
+
 
     @Override public boolean equals(Object o) {
         if(this == o) return true;

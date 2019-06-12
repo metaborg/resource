@@ -13,7 +13,17 @@ public interface WritableResource extends ReadableResource {
 
     OutputStream newOutputStream() throws IOException;
 
-    void writeBytes(byte[] bytes) throws IOException;
+    default void writeBytes(byte[] bytes) throws IOException {
+        try(final OutputStream outputStream = newOutputStream()) {
+            outputStream.write(bytes);
+            outputStream.flush();
+        }
+    }
 
-    void writeString(String string, Charset toBytesCharset) throws IOException;
+    default void writeString(String string, Charset toBytesCharset) throws IOException {
+        try(final OutputStream outputStream = newOutputStream()) {
+            outputStream.write(string.getBytes(toBytesCharset));
+            outputStream.flush();
+        }
+    }
 }

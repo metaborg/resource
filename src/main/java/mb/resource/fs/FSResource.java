@@ -56,6 +56,10 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         this.path = new FSPath(localPathStr);
     }
 
+    @Override public void close() {
+        // Nothing to close.
+    }
+
 
     /**
      * Creates a resource for the current working directory.
