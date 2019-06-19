@@ -1,9 +1,33 @@
 package mb.resource.string;
 
-import mb.resource.DefaultResourceRegistry;
+import mb.resource.HashMapResourceRegistry;
 
-public class StringResourceRegistry extends DefaultResourceRegistry {
+import java.io.Serializable;
+
+public class StringResourceRegistry extends HashMapResourceRegistry {
+    public static final String qualifier = "string";
+
     public StringResourceRegistry() {
-        super(StringResource.qualifier);
+        super(qualifier);
+    }
+
+
+    @Override public String toStringRepresentation(Serializable id) {
+        return (String) id; // Assuming String id's from DefaultResourceKey
+    }
+
+    @Override protected Serializable toId(String idStr) {
+        return idStr;
+    }
+
+
+    public StringResource createResource(String str, String id) {
+        final StringResource resource = new StringResource(str, id);
+        addResource(resource);
+        return resource;
+    }
+
+    public void removeResource(String id) {
+        super.removeResource(id);
     }
 }

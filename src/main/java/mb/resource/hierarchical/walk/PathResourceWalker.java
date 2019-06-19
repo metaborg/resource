@@ -1,7 +1,7 @@
-package mb.resource.fs.walk;
+package mb.resource.hierarchical.walk;
 
-import mb.resource.fs.FSResource;
-import mb.resource.fs.path.match.PathMatcher;
+import mb.resource.hierarchical.HierarchicalResource;
+import mb.resource.hierarchical.match.path.PathMatcher;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PathResourceWalker implements ResourceWalker {
@@ -11,8 +11,8 @@ public class PathResourceWalker implements ResourceWalker {
         this.pathMatcher = pathMatcher;
     }
 
-    @Override public boolean traverse(FSResource resource, FSResource rootDirectory) {
-        return pathMatcher.matches(resource.getPath(), rootDirectory.getPath());
+    @Override public boolean traverse(HierarchicalResource resource, HierarchicalResource rootDirectory) {
+        return pathMatcher.matches(resource.getKey(), rootDirectory.getKey());
     }
 
     @Override public boolean equals(@Nullable Object o) {

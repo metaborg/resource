@@ -5,7 +5,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.function.Function;
 
 class FilenameExtensionUtil {
-    public static @Nullable String extension(String filename) {
+    public static @Nullable String getExtension(String filename) {
         final int i = filename.lastIndexOf('.');
         if(i > 0) {
             return filename.substring(i + 1);
@@ -17,6 +17,15 @@ class FilenameExtensionUtil {
         final int i = filename.lastIndexOf('.');
         if(i < 0) {
             return filename;
+        }
+        final String leafNoExtension = filename.substring(0, i);
+        return leafNoExtension + "." + extension;
+    }
+
+    public static String ensureExtension(String filename, String extension) {
+        final int i = filename.lastIndexOf('.');
+        if(i < 0) {
+            return filename + "." + extension;
         }
         final String leafNoExtension = filename.substring(0, i);
         return leafNoExtension + "." + extension;

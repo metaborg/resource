@@ -5,15 +5,17 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class DefaultResourceRegistry implements ResourceRegistry {
-    private final Serializable qualifier;
+abstract public class HashMapResourceRegistry implements ResourceRegistry {
+    private final String qualifier;
     private final HashMap<Serializable, Resource> resources = new HashMap<>();
 
-    public DefaultResourceRegistry(Serializable qualifier) {
+
+    public HashMapResourceRegistry(String qualifier) {
         this.qualifier = qualifier;
     }
 
-    @Override public Serializable qualifier() {
+
+    @Override public String qualifier() {
         return qualifier;
     }
 
@@ -26,13 +28,8 @@ public class DefaultResourceRegistry implements ResourceRegistry {
         return resource;
     }
 
-    @Override public Resource getResource(ResourceKey key) {
-        final Serializable qualifier = key.qualifier();
-        if(!this.qualifier.equals(qualifier)) {
-            throw new ResourceRuntimeException(
-                "Cannot get resource with key '" + key + "' from registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
-        }
-        final Serializable id = key.id();
+    @Override public Resource getResource(String idStr) {
+        final Serializable id = toId(idStr);
         final @Nullable Resource resource = resources.get(id);
         if(resource == null) {
             throw new ResourceRuntimeException(
@@ -41,36 +38,36 @@ public class DefaultResourceRegistry implements ResourceRegistry {
         return resource;
     }
 
-    public void addResource(Resource resource) {
+    /**
+     * Converts given string representation of identifier to its canonical form.
+     *
+     * @param idStr String representation of identifier.
+     * @return Identifier in its canonical form.
+     */
+    protected abstract Serializable toId(String idStr);
+
+
+    protected void addResource(Resource resource) {
         final ResourceKey key = resource.getKey();
-        final Serializable qualifier = key.qualifier();
+        final Serializable qualifier = key.getQualifier();
         if(!this.qualifier.equals(qualifier)) {
             throw new ResourceRuntimeException(
                 "Cannot add resource '" + resource + "' to registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
         }
-        resources.put(key.id(), resource);
+        resources.put(key.getId(), resource);
     }
 
-    public void removeResource(Resource resource) {
+    protected void removeResource(Resource resource) {
         final ResourceKey key = resource.getKey();
-        final Serializable qualifier = key.qualifier();
+        final Serializable qualifier = key.getQualifier();
         if(!this.qualifier.equals(qualifier)) {
             throw new ResourceRuntimeException(
                 "Cannot remove resource '" + resource + "' from registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
         }
-        resources.remove(key.id());
+        resources.remove(key.getId());
     }
 
-    public void removeResource(ResourceKey key) {
-        final Serializable qualifier = key.qualifier();
-        if(!this.qualifier.equals(qualifier)) {
-            throw new ResourceRuntimeException(
-                "Cannot remove resource with key '" + key + "' from registry; its qualifier '" + qualifier + "' does not match qualifier '" + this.qualifier + "' of the registry");
-        }
-        resources.remove(key.id());
-    }
-
-    public void removeResource(Serializable id) {
+    protected void removeResource(Serializable id) {
         resources.remove(id);
     }
 }

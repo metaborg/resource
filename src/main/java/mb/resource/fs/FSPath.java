@@ -1,7 +1,9 @@
 package mb.resource.fs;
 
 import mb.resource.ResourceKey;
+import mb.resource.ResourceKeyConverter;
 import mb.resource.ResourceRuntimeException;
+import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -19,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
+public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Serializable {
     static final String qualifier = "java";
 
     // URI version of the path which can be serialized and deserialized.
@@ -61,20 +63,26 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
         return new FSPath(System.getProperty("user.home"));
     }
 
-
     /**
-     * @return {@link Path} corresponding to this path.
+     * @return absolute path of the system's temporary directory (given by {@code System.getProperty("java.io.tmpdir")}.
      */
+    public static FSPath temporaryDirectory() {
+        return new FSPath(System.getProperty("java.io.tmpdir"));
+    }
+
+
     public Path getJavaPath() {
         return javaPath;
     }
 
-    /**
-     * @return {@link URI} corresponding to this path.
-     */
     public URI getURI() {
         return uri;
     }
+
+    public String getStringRepresentation() {
+        return uri.toString();
+    }
+
 
     /**
      * @return true if this path is a local file system path, false otherwise.
@@ -84,12 +92,13 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
     }
 
 
-    public boolean isAbsolute() {
+    @Override public boolean isAbsolute() {
         return javaPath.isAbsolute();
     }
 
     /**
-     * @return this path if it {@link #isAbsolute()}, or returns an absolute path by appending this path to {@link #workingDirectory()}.
+     * @return this path if it {@link #isAbsolute()}, or returns an absolute path by appending this path to {@link
+     * #workingDirectory()}.
      */
     public FSPath toAbsoluteFromWorkingDirectory() {
         if(javaPath.isAbsolute()) {
@@ -100,7 +109,8 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
     }
 
     /**
-     * @return this path if it {@link #isAbsolute()}, or returns an absolute path by appending this path to {@link #homeDirectory()}.
+     * @return this path if it {@link #isAbsolute()}, or returns an absolute path by appending this path to {@link
+     * #homeDirectory()}.
      */
     public FSPath toAbsoluteFromHomeDirectory() {
         if(javaPath.isAbsolute()) {
@@ -111,16 +121,16 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
     }
 
 
-    public int getSegmentCount() {
+    @Override public int getSegmentCount() {
         return javaPath.getNameCount();
     }
 
-    public Iterable<String> getSegments() {
+    @Override public Iterable<String> getSegments() {
         return () -> new PathIterator(javaPath.iterator());
     }
 
 
-    public @Nullable FSPath getParent() {
+    @Override public @Nullable FSPath getParent() {
         final @Nullable Path parentJavaPath = this.javaPath.getParent();
         if(parentJavaPath == null) {
             return null;
@@ -128,7 +138,7 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
         return new FSPath(parentJavaPath);
     }
 
-    public @Nullable FSPath getRoot() {
+    @Override public @Nullable FSPath getRoot() {
         final @Nullable Path rootJavaPath = this.javaPath.getRoot();
         if(rootJavaPath == null) {
             return null;
@@ -136,7 +146,7 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
         return new FSPath(rootJavaPath);
     }
 
-    public @Nullable String getLeaf() {
+    @Override public @Nullable String getLeaf() {
         final @Nullable Path fileName = this.javaPath.getFileName();
         if(fileName == null) {
             return null;
@@ -144,17 +154,24 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
         return fileName.toString();
     }
 
-    public @Nullable String getLeafExtension() {
+    @Override public @Nullable String getLeafExtension() {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return null;
         }
-        return FilenameExtensionUtil.extension(leaf);
+        return FilenameExtensionUtil.getExtension(leaf);
     }
 
-    public FSPath getNormalized() {
+    @Override public FSPath getNormalized() {
         final Path normalizedJavaPath = this.javaPath.normalize();
         return new FSPath(normalizedJavaPath);
+    }
+
+    @Override public FSPath relativize(ResourcePath other) {
+        if(!(other instanceof FSPath)) {
+            throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an FSPath");
+        }
+        return relativize((FSPath) other);
     }
 
     public FSPath relativize(FSPath other) {
@@ -163,39 +180,56 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
     }
 
 
-    public FSPath appendSegment(String segment) {
+    @Override public FSPath appendSegment(String segment) {
         final Path javaPath = this.javaPath.resolve(segment);
         return new FSPath(javaPath);
     }
 
-    public FSPath appendSegments(Iterable<String> segments) {
+    @Override public FSPath appendSegments(Iterable<String> segments) {
         final ArrayList<String> segmentsList = new ArrayList<>();
         segments.forEach(segmentsList::add);
         return appendSegments(segmentsList);
     }
 
-    public FSPath appendSegments(Collection<String> segments) {
+    @Override public FSPath appendSegments(Collection<String> segments) {
         final Path relJavaPath = createLocalPath(segments);
         final Path javaPath = this.javaPath.resolve(relJavaPath);
         return new FSPath(javaPath);
     }
 
-    public FSPath appendSegments(List<String> segments) {
+    @Override public FSPath appendSegments(List<String> segments) {
         final Path relJavaPath = createLocalPath(segments);
         final Path javaPath = this.javaPath.resolve(relJavaPath);
         return new FSPath(javaPath);
     }
 
-    public FSPath appendSegments(String... segments) {
+    @Override public FSPath appendSegments(String... segments) {
         final Path relJavaPath = createLocalPath(segments);
         final Path javaPath = this.javaPath.resolve(relJavaPath);
         return new FSPath(javaPath);
     }
 
 
-    /**
-     * @throws ResourceRuntimeException when relativePath is not a relative path (but instead an absolute one).
-     */
+    @Override public FSPath appendRelativePath(String relativePath) {
+        final Path other = javaPath.getFileSystem().getPath(relativePath);
+        if(other.isAbsolute()) {
+            throw new ResourceRuntimeException(
+                "Cannot append path '" + relativePath + "', it is an absolute path");
+        }
+        return appendOrReplaceWithPath(other);
+    }
+
+    @Override public FSPath appendOrReplaceWithPath(String other) {
+        return appendOrReplaceWithPath(javaPath.getFileSystem().getPath(other));
+    }
+
+    @Override public FSPath appendRelativePath(ResourcePath relativePath) {
+        if(!(relativePath instanceof FSPath)) {
+            throw new ResourceRuntimeException("Cannot append '" + relativePath + "', it is not an FSPath");
+        }
+        return appendRelativePath((FSPath) relativePath);
+    }
+
     public FSPath appendRelativePath(FSPath relativePath) {
         if(relativePath.isAbsolute()) {
             throw new ResourceRuntimeException(
@@ -205,31 +239,44 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
         return new FSPath(javaPath);
     }
 
-    public FSPath appendJavaPath(Path segments) {
-        final Path javaPath = this.javaPath.resolve(segments);
+    @Override public FSPath appendOrReplaceWithPath(ResourcePath other) {
+        if(!(other instanceof FSPath)) {
+            throw new ResourceRuntimeException("Cannot append or replace from '" + other + "', it is not an FSPath");
+        }
+        return appendOrReplaceWithPath((FSPath) other);
+    }
+
+    public FSPath appendOrReplaceWithPath(FSPath other) {
+        final Path javaPath = this.javaPath.resolve(other.javaPath);
+        return new FSPath(javaPath);
+    }
+
+    public FSPath appendOrReplaceWithPath(Path other) {
+        final Path javaPath = this.javaPath.resolve(other);
         return new FSPath(javaPath);
     }
 
 
-    public FSPath appendToLeaf(String str) {
-        final String fileName = this.javaPath.getFileName().toString();
-        final String newFileName = fileName + str;
-        final Path javaPath = this.javaPath.resolveSibling(newFileName);
-        return new FSPath(javaPath);
-    }
-
-    public FSPath replaceLeaf(String segment) {
+    @Override public FSPath replaceLeaf(String segment) {
         final Path javaPath = this.javaPath.resolveSibling(segment);
         return new FSPath(javaPath);
     }
 
-    public FSPath applyToLeaf(Function<String, String> func) {
+    @Override public FSPath appendToLeaf(String segment) {
+        final String fileName = this.javaPath.getFileName().toString();
+        final String newFileName = fileName + segment;
+        final Path javaPath = this.javaPath.resolveSibling(newFileName);
+        return new FSPath(javaPath);
+    }
+
+    @Override public FSPath applyToLeaf(Function<String, String> func) {
         final String fileName = this.javaPath.getFileName().toString();
         final Path javaPath = this.javaPath.resolveSibling(func.apply(fileName));
         return new FSPath(javaPath);
     }
 
-    public FSPath replaceLeafExtension(String extension) {
+
+    @Override public FSPath replaceLeafExtension(String extension) {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return this;
@@ -237,7 +284,15 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
         return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
     }
 
-    public FSPath appendExtensionToLeaf(String extension) {
+    @Override public FSPath ensureLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
+    }
+
+    @Override public FSPath appendExtensionToLeaf(String extension) {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return this;
@@ -245,7 +300,7 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
         return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
     }
 
-    public FSPath applyToLeafExtension(Function<String, String> func) {
+    @Override public FSPath applyToLeafExtension(Function<String, String> func) {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return this;
@@ -315,14 +370,14 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
     /**
      * @return "java" as the {@link ResourceKey} qualifier, indicating it belongs to the java.nio.file filesystem.
      */
-    @Override public String qualifier() {
+    @Override public String getQualifier() {
         return qualifier;
     }
 
     /**
      * @return this path as the {@link ResourceKey} identifier.
      */
-    @Override public FSPath id() {
+    @Override public FSPath getId() {
         return this;
     }
 
@@ -344,7 +399,7 @@ public class FSPath implements ResourceKey, Comparable<FSPath>, Serializable {
     }
 
     @Override public String toString() {
-        return javaPath.toString();
+        return ResourceKeyConverter.toString(qualifier, getStringRepresentation());
     }
 
 

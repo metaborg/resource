@@ -1,7 +1,7 @@
-package mb.resource.fs.match;
+package mb.resource.hierarchical.match;
 
-import mb.resource.fs.FSResource;
-import mb.resource.fs.path.match.PathMatcher;
+import mb.resource.hierarchical.HierarchicalResource;
+import mb.resource.hierarchical.match.path.PathMatcher;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PathResourceMatcher implements ResourceMatcher {
@@ -11,8 +11,8 @@ public class PathResourceMatcher implements ResourceMatcher {
         this.matcher = matcher;
     }
 
-    @Override public boolean matches(FSResource resource, FSResource rootDirectory) {
-        return matcher.matches(resource.getPath(), rootDirectory.getPath());
+    @Override public boolean matches(HierarchicalResource resource, HierarchicalResource rootDirectory) {
+        return matcher.matches(resource.getKey(), rootDirectory.getKey());
     }
 
     @Override public boolean equals(@Nullable Object o) {

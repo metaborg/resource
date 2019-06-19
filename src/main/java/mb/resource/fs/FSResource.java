@@ -4,8 +4,12 @@ import mb.resource.ReadableResource;
 import mb.resource.Resource;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.WritableResource;
-import mb.resource.fs.match.ResourceMatcher;
-import mb.resource.fs.walk.ResourceWalker;
+import mb.resource.hierarchical.HierarchicalResource;
+import mb.resource.hierarchical.HierarchicalResourceAccess;
+import mb.resource.hierarchical.HierarchicalResourceType;
+import mb.resource.hierarchical.ResourcePath;
+import mb.resource.hierarchical.match.ResourceMatcher;
+import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -19,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.Collection;
@@ -27,7 +32,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class FSResource implements Resource, ReadableResource, WritableResource, Serializable {
+public class FSResource implements Resource, ReadableResource, WritableResource, HierarchicalResource, Serializable {
     final FSPath path;
 
 
@@ -51,10 +56,70 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         this.path = new FSPath(localPathStr);
     }
 
+    @Override public void close() {
+        // Nothing to close.
+    }
 
-    public FSPath getPath() {
+
+    /**
+     * Creates a resource for the current working directory.
+     */
+    public static FSResource workingDirectory() {
+        return new FSResource(FSPath.workingDirectory());
+    }
+
+    /**
+     * Creates a resource for the user's home directory.
+     */
+    public static FSResource homeDirectory() {
+        return new FSResource(FSPath.homeDirectory());
+    }
+
+    /**
+     * Creates a resource for the system's temporary directory.
+     */
+    public static FSResource temporaryDirectory() {
+        return new FSResource(FSPath.temporaryDirectory());
+    }
+
+
+    /**
+     * Creates a temporary directory with given {@code prefix}.
+     */
+    public static FSResource createTemporaryDirectory(String prefix) throws IOException {
+        return new FSResource(Files.createTempDirectory(prefix));
+    }
+
+    /**
+     * Creates a temporary directory inside given {@code directory} with given {@code prefix}.
+     */
+    public static FSResource createTemporaryDirectory(FSResource directory, String prefix) throws IOException {
+        return new FSResource(Files.createTempDirectory(directory.path.javaPath, prefix));
+    }
+
+    /**
+     * Creates a temporary file with given {@code prefix} and {@code suffix}.
+     */
+    public static FSResource createTemporaryFile(String prefix, String suffix) throws IOException {
+        return new FSResource(Files.createTempFile(prefix, suffix));
+    }
+
+    /**
+     * Creates a temporary file inside given {@code directory} with given {@code prefix} and {@code suffix}.
+     */
+    public static FSResource createTemporaryFile(FSResource directory, String prefix, String suffix) throws IOException {
+        return new FSResource(Files.createTempFile(directory.path.javaPath, prefix, suffix));
+    }
+
+
+    @Override public FSPath getPath() {
         return path;
     }
+
+    @Override public FSPath getKey() {
+        return path;
+    }
+
 
     public java.nio.file.Path getJavaPath() {
         return path.javaPath;
@@ -69,7 +134,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
-    public @Nullable FSResource getParent() {
+    @Override public @Nullable FSResource getParent() {
         final @Nullable FSPath newPath = path.getParent();
         if(newPath == null) {
             return null;
@@ -77,7 +142,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return new FSResource(newPath);
     }
 
-    public @Nullable FSResource getRoot() {
+    @Override public @Nullable FSResource getRoot() {
         final @Nullable FSPath newPath = path.getRoot();
         if(newPath == null) {
             return null;
@@ -85,101 +150,129 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return new FSResource(newPath);
     }
 
-    public @Nullable String getLeaf() {
+    @Override public @Nullable String getLeaf() {
         return path.getLeaf();
     }
 
-    public @Nullable String getLeafExtension() {
+    @Override public @Nullable String getLeafExtension() {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return null;
         }
-        return FilenameExtensionUtil.extension(leaf);
+        return FilenameExtensionUtil.getExtension(leaf);
     }
 
 
-    public FSResource appendSegment(String segment) {
+    @Override public FSResource appendSegment(String segment) {
         final FSPath newPath = path.appendSegment(segment);
         return new FSResource(newPath);
     }
 
-    public FSResource appendSegments(Iterable<String> segments) {
+    @Override public FSResource appendSegments(Iterable<String> segments) {
         final FSPath newPath = path.appendSegments(segments);
         return new FSResource(newPath);
     }
 
-    public FSResource appendSegments(Collection<String> segments) {
+    @Override public FSResource appendSegments(Collection<String> segments) {
         final FSPath newPath = path.appendSegments(segments);
         return new FSResource(newPath);
     }
 
-    public FSResource appendSegments(List<String> segments) {
+    @Override public FSResource appendSegments(List<String> segments) {
         final FSPath newPath = path.appendSegments(segments);
         return new FSResource(newPath);
     }
 
-    public FSResource appendSegments(String... segments) {
+    @Override public FSResource appendSegments(String... segments) {
         final FSPath newPath = path.appendSegments(segments);
         return new FSResource(newPath);
     }
 
-    /**
-     * @throws ResourceRuntimeException when relativePath is not a relative path (but instead an absolute one).
-     */
+
+    @Override public HierarchicalResource appendRelativePath(String relativePath) {
+        final FSPath newPath = path.appendRelativePath(relativePath);
+        return new FSResource(newPath);
+    }
+
+    @Override public HierarchicalResource appendOrReplaceWithPath(String other) {
+        final FSPath newPath = path.appendOrReplaceWithPath(other);
+        return new FSResource(newPath);
+    }
+
+    @Override public FSResource appendRelativePath(ResourcePath relativePath) {
+        final FSPath newPath = path.appendRelativePath(relativePath);
+        return new FSResource(newPath);
+    }
+
+    @Override public HierarchicalResource appendOrReplaceWithPath(ResourcePath other) {
+        final FSPath newPath = path.appendOrReplaceWithPath(other);
+        return new FSResource(newPath);
+    }
+
     public FSResource appendRelativePath(FSPath relativePath) {
         final FSPath newPath = path.appendRelativePath(relativePath);
         return new FSResource(newPath);
     }
 
 
-    public FSResource replaceLeaf(String str) {
-        final FSPath newPath = path.replaceLeaf(str);
+    @Override public FSResource replaceLeaf(String segment) {
+        final FSPath newPath = path.replaceLeaf(segment);
         return new FSResource(newPath);
     }
 
-    public FSResource appendToLeaf(String str) {
-        final FSPath newPath = path.appendToLeaf(str);
+    @Override public FSResource appendToLeaf(String segment) {
+        final FSPath newPath = path.appendToLeaf(segment);
         return new FSResource(newPath);
     }
 
-    public FSResource applyToLeaf(Function<String, String> func) {
+    @Override public FSResource applyToLeaf(Function<String, String> func) {
         final FSPath newPath = path.applyToLeaf(func);
         return new FSResource(newPath);
     }
 
-    public FSResource replaceLeafExtension(String extension) {
+
+    @Override public FSResource replaceLeafExtension(String extension) {
         final FSPath newPath = path.replaceLeafExtension(extension);
         return new FSResource(newPath);
     }
 
-    public FSResource appendExtensionToLeaf(String extension) {
+    @Override public HierarchicalResource ensureLeafExtension(String extension) {
+        final FSPath newPath = path.ensureLeafExtension(extension);
+        return new FSResource(newPath);
+    }
+
+    @Override public FSResource appendExtensionToLeaf(String extension) {
         final FSPath newPath = path.appendExtensionToLeaf(extension);
         return new FSResource(newPath);
     }
 
-    public FSResource applyToLeafExtension(Function<String, String> func) {
+    @Override public FSResource applyToLeafExtension(Function<String, String> func) {
         final FSPath newPath = path.applyToLeafExtension(func);
         return new FSResource(newPath);
     }
 
 
-    public FSResourceType getType() {
-        if(!Files.exists(path.javaPath)) {
-            return FSResourceType.NonExistent;
-        } else if(Files.isDirectory(path.javaPath)) {
-            return FSResourceType.Directory;
+    @Override public HierarchicalResourceType getType() throws IOException {
+        final BasicFileAttributes attributes = Files.readAttributes(getJavaPath(), BasicFileAttributes.class);
+        if(attributes.isRegularFile()) {
+            return HierarchicalResourceType.File;
+        } else if(attributes.isDirectory()) {
+            return HierarchicalResourceType.Directory;
         } else {
-            return FSResourceType.File;
+            return HierarchicalResourceType.Unknown;
         }
     }
 
-    public boolean isFile() {
-        return Files.isRegularFile(path.javaPath);
+    @Override public boolean isFile() throws IOException {
+        final BasicFileAttributes attributes = Files.readAttributes(getJavaPath(), BasicFileAttributes.class);
+        return attributes.isRegularFile();
     }
 
-    public boolean isDirectory() {
-        return Files.isDirectory(path.javaPath);
+    @Override public boolean isDirectory() throws IOException {
+        final BasicFileAttributes attributes = Files.readAttributes(getJavaPath(), BasicFileAttributes.class);
+        return attributes.isDirectory();
     }
+
 
     @Override public boolean exists() {
         return Files.exists(path.javaPath);
@@ -206,11 +299,11 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
-    public Stream<FSResource> list() throws IOException {
+    @Override public Stream<FSResource> list() throws IOException {
         return Files.list(path.javaPath).map(FSResource::new);
     }
 
-    public Stream<FSResource> list(ResourceMatcher matcher) throws IOException {
+    @Override public Stream<FSResource> list(ResourceMatcher matcher) throws IOException {
         try {
             return Files.list(path.javaPath).map(FSResource::new).filter((n) -> {
                 try {
@@ -225,15 +318,16 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
-    public Stream<FSResource> walk() throws IOException {
+    @Override public Stream<FSResource> walk() throws IOException {
         return Files.walk(path.javaPath).map(FSResource::new);
     }
 
-    public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+    @Override public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         return walk(walker, matcher, null);
     }
 
-    public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable FSResourceAccess access) throws IOException {
+    @Override
+    public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
         final Stream.Builder<FSResource> streamBuilder = Stream.builder();
         final ResourceWalkerFileVisitor
             visitor = new ResourceWalkerFileVisitor(walker, matcher, this, streamBuilder, access);
@@ -277,8 +371,22 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
+    @Override public void copyTo(HierarchicalResource other) throws IOException {
+        if(!(other instanceof FSResource)) {
+            throw new ResourceRuntimeException("Cannot copy to '" + other + "', it is not an FSResource");
+        }
+        copyTo((FSResource) other);
+    }
+
     public void copyTo(FSResource other) throws IOException {
         Files.copy(path.javaPath, other.path.javaPath);
+    }
+
+    @Override public void moveTo(HierarchicalResource other) throws IOException {
+        if(!(other instanceof FSResource)) {
+            throw new ResourceRuntimeException("Cannot move to '" + other + "', it is not an FSResource");
+        }
+        moveTo((FSResource) other);
     }
 
     public void moveTo(FSResource other) throws IOException {
@@ -286,18 +394,14 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
-    public void createFile(boolean createParents) throws IOException {
+    @Override public void createFile(boolean createParents) throws IOException {
         if(createParents) {
             createParents();
         }
         Files.createFile(path.javaPath);
     }
 
-    public void createFile() throws IOException {
-        createFile(false);
-    }
-
-    public void createDirectory(boolean createParents) throws IOException {
+    @Override public void createDirectory(boolean createParents) throws IOException {
         if(createParents) {
             Files.createDirectories(path.javaPath);
         }
@@ -306,11 +410,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         }
     }
 
-    public void createDirectory() throws IOException {
-        createDirectory(false);
-    }
-
-    public void createParents() throws IOException {
+    @Override public void createParents() throws IOException {
         final @Nullable FSResource parent = getParent();
         if(parent != null) {
             Files.createDirectories(parent.path.javaPath);
@@ -318,7 +418,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
-    public void delete(boolean deleteContents) throws IOException {
+    @Override public void delete(boolean deleteContents) throws IOException {
         if(deleteContents) {
             try {
                 if(!Files.exists(path.javaPath)) {
@@ -339,15 +439,6 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         } else {
             Files.deleteIfExists(path.javaPath);
         }
-    }
-
-    public void delete() throws IOException {
-        delete(false);
-    }
-
-
-    @Override public FSPath getKey() {
-        return path;
     }
 
 

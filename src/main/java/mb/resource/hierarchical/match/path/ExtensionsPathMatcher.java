@@ -1,6 +1,6 @@
-package mb.resource.fs.path.match;
+package mb.resource.hierarchical.match.path;
 
-import mb.resource.fs.FSPath;
+import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class ExtensionsPathMatcher implements PathMatcher {
         this.extensionsHashSet = new HashSet<>(this.extensions);
     }
 
-    @Override public boolean matches(FSPath path, FSPath rootDir) {
+    @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
         final @Nullable String extension = path.getLeafExtension();
         if(extension == null) {
             return false;

@@ -5,9 +5,19 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.Serializable;
 
 public interface ResourceKey extends Serializable {
-    Serializable qualifier();
+    /**
+     * Gets the qualifier of the key.
+     *
+     * @return Qualifier of the key.
+     */
+    String getQualifier();
 
-    Serializable id();
+    /**
+     * Gets the identifier of the key.
+     *
+     * @return Identifier of the key.
+     */
+    Serializable getId();
 
 
     @Override boolean equals(@Nullable Object other);

@@ -3,21 +3,24 @@ package mb.resource;
 import java.io.Serializable;
 
 public class DefaultResourceKey implements ResourceKey {
-    private final Serializable qualifier;
-    private final Serializable id;
+    private final String qualifier;
+    private final String id;
 
-    public DefaultResourceKey(Serializable qualifier, Serializable id) {
+
+    public DefaultResourceKey(String qualifier, String id) {
         this.qualifier = qualifier;
         this.id = id;
     }
 
-    @Override public Serializable qualifier() {
+
+    @Override public String getQualifier() {
         return qualifier;
     }
 
-    @Override public Serializable id() {
+    @Override public String getId() {
         return id;
     }
+
 
     @Override public boolean equals(Object o) {
         if(this == o) return true;
@@ -34,6 +37,6 @@ public class DefaultResourceKey implements ResourceKey {
     }
 
     @Override public String toString() {
-        return "#" + qualifier + ":" + id;
+        return ResourceKeyConverter.toString(qualifier, id);
     }
 }
