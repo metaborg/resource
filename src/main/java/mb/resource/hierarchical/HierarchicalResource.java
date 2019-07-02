@@ -7,6 +7,7 @@ import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -49,7 +50,9 @@ public interface HierarchicalResource extends WritableResource {
      *
      * @return Leaf segment of this resource, or {@code null} it it has none.
      */
-    @Nullable String getLeaf();
+    default @Nullable String getLeaf() {
+        return getPath().getLeaf();
+    }
 
     /**
      * Gets the file extension of the leaf segment of this resource, or {@code null} if it has no leaf segment (e.g., it
@@ -57,7 +60,9 @@ public interface HierarchicalResource extends WritableResource {
      *
      * @return File extension of the leaf segment of this resource, or {@code null} it it has none.
      */
-    @Nullable String getLeafExtension();
+    default @Nullable String getLeafExtension() {
+        return getPath().getLeafExtension();
+    }
 
 
     /**
@@ -94,7 +99,9 @@ public interface HierarchicalResource extends WritableResource {
      * @param segments Segments to append.
      * @return Appended resource.
      */
-    HierarchicalResource appendSegments(List<String> segments);
+    default HierarchicalResource appendSegments(List<String> segments) {
+        return appendSegments((Collection<String>)segments);
+    }
 
     /**
      * Returns a resource where {@code segments} are appended to the current resource in order. A segment should be a
@@ -103,7 +110,9 @@ public interface HierarchicalResource extends WritableResource {
      * @param segments Segments to append.
      * @return Appended resource.
      */
-    HierarchicalResource appendSegments(String... segments);
+    default HierarchicalResource appendSegments(String... segments) {
+        return appendSegments(Arrays.asList(segments));
+    }
 
 
     /**
@@ -164,7 +173,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param segment Segment to append.
      * @return Resource with leaf segment appended.
      */
-    HierarchicalResource appendToLeaf(String segment);
+    default HierarchicalResource appendToLeaf(String segment) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(leaf + segment);
+    }
 
     /**
      * Returns a resource where the leaf segment of the current resource is replaced by applying {@code func} to it. If
@@ -173,7 +188,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param func Function to apply to the leaf segment.
      * @return Resource with leaf segment replaced.
      */
-    HierarchicalResource applyToLeaf(Function<String, String> func);
+    default HierarchicalResource applyToLeaf(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(func.apply(leaf));
+    }
 
 
     /**
@@ -183,7 +204,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to replace.
      * @return Resource with file extension replaced.
      */
-    HierarchicalResource replaceLeafExtension(String extension);
+    default HierarchicalResource replaceLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
+    }
 
     /**
      * Returns a resource where the file extension of the current resource is ensured to be {@code extension}. That is,
@@ -194,7 +221,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to ensure.
      * @return Resource with file extension ensured.
      */
-    HierarchicalResource ensureLeafExtension(String extension);
+    default HierarchicalResource ensureLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
+    }
 
     /**
      * Returns a resource where the leaf segment of the current resource is appended with a '.' and {@code extension}.
@@ -203,7 +236,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to append.
      * @return Resource with file extension appended.
      */
-    HierarchicalResource appendExtensionToLeaf(String extension);
+    default HierarchicalResource appendExtensionToLeaf(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
+    }
 
     /**
      * Returns a resource where the file extension of the leaf segment of the current resource is replaced by applying
@@ -212,14 +251,24 @@ public interface HierarchicalResource extends WritableResource {
      * @param func Function to apply to the file extension.
      * @return Resource with file extension replaced.
      */
-    HierarchicalResource applyToLeafExtension(Function<String, String> func);
+    default HierarchicalResource applyToLeafExtension(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
+    }
 
 
     HierarchicalResourceType getType() throws IOException;
 
-    boolean isFile() throws IOException;
+    default boolean isFile() throws IOException {
+        return getType() == HierarchicalResourceType.File;
+    }
 
-    boolean isDirectory() throws IOException;
+    default boolean isDirectory() throws IOException {
+        return getType() == HierarchicalResourceType.Directory;
+    }
 
 
     Stream<? extends HierarchicalResource> list() throws IOException;
@@ -228,7 +277,9 @@ public interface HierarchicalResource extends WritableResource {
 
     Stream<? extends HierarchicalResource> walk() throws IOException;
 
-    Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException;
+    default Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+        return walk(walker, matcher, null);
+    }
 
     Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
 
