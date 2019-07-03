@@ -277,6 +277,10 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return Files.walk(path.javaPath).map(FSResource::new);
     }
 
+    @Override public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+        return walk(walker, matcher, null);
+    }
+
     @Override
     public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
         final Stream.Builder<FSResource> streamBuilder = Stream.builder();
