@@ -7,15 +7,26 @@ public interface ResourceService {
      * Gets {@link Resource resource} for given {@link ResourceKey resource key}.
      *
      * @param key {@link ResourceKey Key} to get resource for.
-     * @param <R> Type of resource to retrieve.
      * @return Resource.
      * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
      *                                  ResourceKey#getQualifier() qualifier}.
      * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to get
      *                                  the resource.
-     * @throws ClassCastException       when the {@link Resource resource} cannot be casted to {@code R}.
      */
-    <R extends Resource> R getResource(ResourceKey key);
+    Resource getResource(ResourceKey key);
+
+
+    /**
+     * Gets {@link ResourceKey resource key} for given string representation of the resource key.
+     *
+     * @param keyStr String representation of the {@link ResourceKey resource key}.
+     * @return Resource key.
+     * @throws ResourceRuntimeException when {@code keyStr} is not a valid string representation of a {@link ResourceKey
+     *                                  resource key}.
+     * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
+     *                                  ResourceKey#getQualifier() qualifier}.
+     */
+    ResourceKey getResourceKey(String keyStr);
 
     /**
      * Gets {@link Resource resource} for given string representation of a {@link ResourceKey resource key}.
@@ -28,9 +39,8 @@ public interface ResourceService {
      *                                  ResourceKey#getQualifier() qualifier}.
      * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to get
      *                                  the resource.
-     * @throws ClassCastException       when the {@link Resource resource} cannot be casted to {@code R}.
      */
-    <R extends Resource> R getResource(String keyStr);
+    Resource getResource(String keyStr);
 
     /**
      * If {@code pathOrKey} is a string representation of a {@link ResourceKey resource key}, returns a (replaced)
@@ -47,9 +57,8 @@ public interface ResourceService {
      *                                  registry} unexpectedly fails to get the resource.
      * @throws ResourceRuntimeException when {@code keyStrOrPath} is a path and appending the path to {@code resource}
      *                                  fails unexpectedly.
-     * @throws ClassCastException       when the {@link Resource resource} cannot be casted to {@code R}.
      */
-    <R extends Resource> R appendOrReplaceWith(HierarchicalResource resource, String keyStrOrPath);
+    Resource appendOrReplaceWith(HierarchicalResource resource, String keyStrOrPath);
 
     /**
      * Converts given {@link ResourceKey resource key} into its string representation.

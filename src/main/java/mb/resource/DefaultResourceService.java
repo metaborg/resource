@@ -32,18 +32,17 @@ public class DefaultResourceService implements ResourceService {
     }
 
 
-    @Override public <R extends Resource> R getResource(ResourceKey key) {
+    @Override public Resource getResource(ResourceKey key) {
         final String qualifier = key.getQualifier();
         final @Nullable ResourceRegistry registry = registries.get(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
-        final Resource resource = registry.getResource(key.getId());
-        @SuppressWarnings("unchecked") final R casted = (R) resource;
-        return casted;
+        return registry.getResource(key.getId());
     }
 
-    @Override public <R extends Resource> R getResource(String keyStr) {
+
+    @Override public ResourceKey getResourceKey(String keyStr) {
         final ResourceKeyConverter.@Nullable Parsed parsedResourceKey = ResourceKeyConverter.parse(keyStr);
         if(parsedResourceKey == null) {
             throw new ResourceRuntimeException(
@@ -55,12 +54,25 @@ public class DefaultResourceService implements ResourceService {
             throw new ResourceRuntimeException(
                 "No resource registry was found for qualifier '" + qualifier + "'");
         }
-        final Resource resource = registry.getResource(parsedResourceKey.idStr);
-        @SuppressWarnings("unchecked") final R casted = (R) resource;
-        return casted;
+        return registry.getResourceKey(parsedResourceKey.idStr);
     }
 
-    @Override public <R extends Resource> R appendOrReplaceWith(HierarchicalResource resource, String keyStrOrPath) {
+    @Override public Resource getResource(String keyStr) {
+        final ResourceKeyConverter.@Nullable Parsed parsedResourceKey = ResourceKeyConverter.parse(keyStr);
+        if(parsedResourceKey == null) {
+            throw new ResourceRuntimeException(
+                "No qualifier was found in string representation of resource key '" + keyStr + "'");
+        }
+        final String qualifier = parsedResourceKey.qualifier;
+        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        if(registry == null) {
+            throw new ResourceRuntimeException(
+                "No resource registry was found for qualifier '" + qualifier + "'");
+        }
+        return registry.getResource(parsedResourceKey.idStr);
+    }
+
+    @Override public Resource appendOrReplaceWith(HierarchicalResource resource, String keyStrOrPath) {
         final ResourceKeyConverter.@Nullable Parsed parsedResourceKey = ResourceKeyConverter.parse(keyStrOrPath);
         if(parsedResourceKey != null) {
             final String qualifier = parsedResourceKey.qualifier;
@@ -68,13 +80,9 @@ public class DefaultResourceService implements ResourceService {
             if(registry == null) {
                 throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
             }
-            final Resource replacedResource = registry.getResource(parsedResourceKey.idStr);
-            @SuppressWarnings("unchecked") final R casted = (R) replacedResource;
-            return casted;
+            return registry.getResource(parsedResourceKey.idStr);
         }
-        final HierarchicalResource appendedResource = resource.appendOrReplaceWithPath(keyStrOrPath);
-        @SuppressWarnings("unchecked") final R casted = (R) appendedResource;
-        return casted;
+        return resource.appendOrReplaceWithPath(keyStrOrPath);
     }
 
     @Override public String toStringRepresentation(ResourceKey key) {

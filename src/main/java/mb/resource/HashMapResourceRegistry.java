@@ -19,6 +19,7 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
         return qualifier;
     }
 
+
     @Override public Resource getResource(Serializable id) {
         final @Nullable Resource resource = resources.get(id);
         if(resource == null) {
@@ -27,6 +28,7 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
         }
         return resource;
     }
+
 
     @Override public Resource getResource(String idStr) {
         final Serializable id = toId(idStr);
@@ -37,6 +39,7 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
         }
         return resource;
     }
+
 
     /**
      * Converts given string representation of identifier to its canonical form.

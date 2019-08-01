@@ -11,6 +11,7 @@ public class FSRegistry implements ResourceRegistry {
         return FSPath.qualifier;
     }
 
+
     @Override public FSResource getResource(Serializable id) {
         if(!(id instanceof FSPath)) {
             throw new ResourceRuntimeException(
@@ -18,6 +19,11 @@ public class FSRegistry implements ResourceRegistry {
         }
         final FSPath path = (FSPath) id;
         return new FSResource(path);
+    }
+
+
+    @Override public FSPath getResourceKey(String idStr) {
+        return new FSPath(idStr);
     }
 
     @Override public Resource getResource(String idStr) {

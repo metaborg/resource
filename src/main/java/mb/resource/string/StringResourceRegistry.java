@@ -1,5 +1,6 @@
 package mb.resource.string;
 
+import mb.resource.DefaultResourceKey;
 import mb.resource.HashMapResourceRegistry;
 
 import java.io.Serializable;
@@ -12,9 +13,14 @@ public class StringResourceRegistry extends HashMapResourceRegistry {
     }
 
 
+    @Override public DefaultResourceKey getResourceKey(String idStr) {
+        return new DefaultResourceKey(StringResourceRegistry.qualifier, idStr);
+    }
+
     @Override public String toStringRepresentation(Serializable id) {
         return (String) id; // Assuming String id's from DefaultResourceKey
     }
+
 
     @Override protected Serializable toId(String idStr) {
         return idStr;
