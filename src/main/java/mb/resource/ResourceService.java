@@ -60,54 +60,69 @@ public interface ResourceService {
 
 
     /**
-     * Gets {@link ResourceKey resource key} for given string representation of the resource key.
+     * Gets the {@link ResourceKey resource key} for given string representation of a resource key, or string
+     * representation of the {@link ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     * resource registry}.
      *
-     * @param keyStr String representation of the resource key.
+     * @param keyOrIdStr String representation of the resource key.
      * @return Resource key.
-     * @throws ResourceRuntimeException when {@code keyStr} is not a valid string representation of a {@link ResourceKey
-     *                                  resource key}.
+     * @throws ResourceRuntimeException when {@code keyOrIdStr} is not a valid string representation of a {@link
+     *                                  ResourceKey resource key}, nor a valid string representation of the {@link
+     *                                  ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     *                                  resource registry}.
      * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
      *                                  ResourceKey#getQualifier() qualifier}.
      */
-    ResourceKey getResourceKey(String keyStr);
+    ResourceKey getResourceKey(String keyOrIdStr);
 
     /**
-     * Gets {@link ResourcePath resource path} for given string representation of the resource path.
+     * Gets the {@link ResourcePath resource path} for given string representation of a resource path, or string
+     * representation of the {@link ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     * resource registry}.
      *
-     * @param pathStr String representation of the resource path.
+     * @param pathOrIdStr String representation of the resource path.
      * @return Resource path.
-     * @throws ResourceRuntimeException when {@code pathStr} is not a valid string representation of a {@link
-     *                                  ResourcePath resource path}.
+     * @throws ResourceRuntimeException when {@code pathOrIdStr} is not a valid string representation of a {@link
+     *                                  ResourcePath resource path}, nor a valid string representation of the {@link
+     *                                  ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     *                                  resource registry}.
      * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
      *                                  ResourcePath#getQualifier() qualifier}.
      * @throws ResourceRuntimeException when a resource key could be created, but it is not a {@link ResourcePath
      *                                  resource path}.
      */
-    ResourcePath getResourcePath(String pathStr);
+    ResourcePath getResourcePath(String pathOrIdStr);
 
 
     /**
-     * Gets {@link Resource resource} for given string representation of a {@link ResourceKey resource key}.
+     * Gets the {@link Resource resource} for given string representation of a {@link ResourceKey resource key}, or
+     * string representation of the {@link ResourceKey#getId() resource identifier} of the default {@link
+     * ResourceRegistry resource registry}.
      *
-     * @param keyStr String representation of a {@link ResourceKey resource key}.
+     * @param keyOrIdStr String representation of a resource key or identifier.
      * @return Resource.
-     * @throws ResourceRuntimeException when {@code keyStr} is not a valid string representation of a {@link ResourceKey
-     *                                  resource key}.
+     * @throws ResourceRuntimeException when {@code keyOrIdStr} is not a valid string representation of a {@link
+     *                                  ResourceKey resource key}, nor a valid string representation of the {@link
+     *                                  ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     *                                  resource registry}.
      * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
      *                                  ResourceKey#getQualifier() qualifier}.
      * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to get
      *                                  the resource.
      */
-    Resource getResource(String keyStr);
+    Resource getResource(String keyOrIdStr);
 
     /**
-     * Gets a {@link ReadableResource readable resource} for given string representation of a {@link ResourceKey
-     * resource key}.
+     * Gets the {@link ReadableResource readable resource} for given string representation of a {@link ResourceKey
+     * resource key}, or string representation of the {@link ResourceKey#getId() resource identifier} of the default
+     * {@link ResourceRegistry resource registry}.
      *
-     * @param keyStr String representation of a resource key.
+     * @param keyOrIdStr String representation of a resource key or identifier.
      * @return Readable resource.
-     * @throws ResourceRuntimeException when {@code keyStr} is not a valid string representation of a {@link ResourceKey
-     *                                  resource key}.
+     * @throws ResourceRuntimeException when {@code keyOrIdStr} is not a valid string representation of a {@link
+     *                                  ResourceKey resource key}, nor a valid string representation of the {@link
+     *                                  ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     *                                  resource registry}.
      * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
      *                                  ResourceKey#getQualifier() qualifier}.
      * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to get
@@ -115,16 +130,19 @@ public interface ResourceService {
      * @throws ResourceRuntimeException when a resource is found, but it is not a {@link ReadableResource readable
      *                                  resource}.
      */
-    ReadableResource getReadableResource(String keyStr);
+    ReadableResource getReadableResource(String keyOrIdStr);
 
     /**
      * Gets a {@link WritableResource writable resource} for given string representation of a {@link ResourceKey
-     * resource key}.
+     * resource key}, or string representation of the {@link ResourceKey#getId() resource identifier} of the default
+     * {@link ResourceRegistry resource registry}.
      *
-     * @param keyStr String representation of a resource key.
+     * @param keyOrIdStr String representation of a resource key or identifier.
      * @return Writable resource.
-     * @throws ResourceRuntimeException when {@code keyStr} is not a valid string representation of a {@link ResourceKey
-     *                                  resource key}.
+     * @throws ResourceRuntimeException when {@code keyOrIdStr} is not a valid string representation of a {@link
+     *                                  ResourceKey resource key}, nor a valid string representation of the {@link
+     *                                  ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     *                                  resource registry}.
      * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
      *                                  ResourceKey#getQualifier() qualifier}.
      * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to get
@@ -132,16 +150,19 @@ public interface ResourceService {
      * @throws ResourceRuntimeException when a resource is found, but it is not a {@link WritableResource writable
      *                                  resource}.
      */
-    WritableResource getWritableResource(String keyStr);
+    WritableResource getWritableResource(String keyOrIdStr);
 
     /**
      * Gets a {@link HierarchicalResource hierarchical resource} for given string representation of a {@link
-     * ResourcePath resource path}.
+     * ResourcePath resource path}, or string representation of the {@link ResourceKey#getId() resource identifier} of
+     * the default {@link ResourceRegistry resource registry}.
      *
-     * @param pathStr String representation of a resource path
+     * @param pathOrIdStr String representation of a resource path or identifier.
      * @return Hierarchical resource.
-     * @throws ResourceRuntimeException when {@code pathStr} is not a valid string representation of a {@link
-     *                                  ResourcePath resource path}.
+     * @throws ResourceRuntimeException when {@code pathOrIdStr} is not a valid string representation of a {@link
+     *                                  ResourcePath resource path}, nor a valid string representation of the {@link
+     *                                  ResourceKey#getId() resource identifier} of the default {@link ResourceRegistry
+     *                                  resource registry}.
      * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
      *                                  ResourcePath#getQualifier() qualifier}.
      * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to get
@@ -149,7 +170,7 @@ public interface ResourceService {
      * @throws ResourceRuntimeException when a resource is found, but it is not a {@link HierarchicalResource
      *                                  hierarchical resource}.
      */
-    HierarchicalResource getHierarchicalResource(String pathStr);
+    HierarchicalResource getHierarchicalResource(String pathOrIdStr);
 
 
     /**
@@ -203,4 +224,13 @@ public interface ResourceService {
      *                                  convert the identifier of the key into its string representation.
      */
     String toStringRepresentation(ResourceKey key);
+
+
+    /**
+     * Gets the default {@link ResourceRegistry resource registry}, which is used to get resources for string
+     * representations of {@link ResourceKey#getId() resource identifier}s.
+     *
+     * @return Default resource registry.
+     */
+    ResourceRegistry getDefaultResourceRegistry();
 }

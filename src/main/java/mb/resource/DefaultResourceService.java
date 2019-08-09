@@ -7,29 +7,32 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.HashMap;
 
 public class DefaultResourceService implements ResourceService {
+    private final ResourceRegistry defaultRegistry;
     private final HashMap<String, ResourceRegistry> registries;
 
 
-    public DefaultResourceService() {
+    public DefaultResourceService(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        this.defaultRegistry = defaultRegistry;
         this.registries = new HashMap<>();
-    }
-
-    public DefaultResourceService(Iterable<ResourceRegistry> registries) {
-        this.registries = new HashMap<>();
+        this.registries.put(defaultRegistry.qualifier(), defaultRegistry);
         for(ResourceRegistry registry : registries) {
             this.registries.put(registry.qualifier(), registry);
         }
     }
 
-    public DefaultResourceService(ResourceRegistry... registries) {
+    public DefaultResourceService(ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
+        this.defaultRegistry = defaultRegistry;
         this.registries = new HashMap<>();
+        this.registries.put(defaultRegistry.qualifier(), defaultRegistry);
         for(ResourceRegistry registry : registries) {
             this.registries.put(registry.qualifier(), registry);
         }
     }
 
-    public DefaultResourceService(HashMap<String, ResourceRegistry> registries) {
-        this.registries = registries;
+    public DefaultResourceService(ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
+        this.defaultRegistry = defaultRegistry;
+        this.registries = new HashMap<>(registries);
+        this.registries.put(defaultRegistry.qualifier(), defaultRegistry);
     }
 
 
@@ -67,11 +70,15 @@ public class DefaultResourceService implements ResourceService {
     }
 
 
-    @Override public ResourceKey getResourceKey(String keyStr) {
-        final ResourceKeyConverter.@Nullable Parsed parsedResourceKey = ResourceKeyConverter.parse(keyStr);
+    @Override public ResourceKey getResourceKey(String keyOrIdStr) {
+        final ResourceKeyConverter.@Nullable Parsed parsedResourceKey = ResourceKeyConverter.parse(keyOrIdStr);
         if(parsedResourceKey == null) {
-            throw new ResourceRuntimeException(
-                "No qualifier was found in string representation of resource key '" + keyStr + "'");
+            try {
+                return defaultRegistry.getResourceKey(keyOrIdStr);
+            } catch(ResourceRuntimeException e) {
+                throw new ResourceRuntimeException(
+                    "No qualifier was found in string representation of resource key '" + keyOrIdStr + "', nor could a resource key be created by the default resource registry '" + defaultRegistry + "'", e);
+            }
         }
         final String qualifier = parsedResourceKey.qualifier;
         final @Nullable ResourceRegistry registry = registries.get(qualifier);
@@ -82,8 +89,8 @@ public class DefaultResourceService implements ResourceService {
         return registry.getResourceKey(parsedResourceKey.idStr);
     }
 
-    @Override public ResourcePath getResourcePath(String pathStr) {
-        final ResourceKey key = getResourceKey(pathStr);
+    @Override public ResourcePath getResourcePath(String pathOrIdStr) {
+        final ResourceKey key = getResourceKey(pathOrIdStr);
         if(!(key instanceof ResourcePath)) {
             throw new ResourceRuntimeException("Resource key '" + key + "' is not a path");
         }
@@ -91,11 +98,15 @@ public class DefaultResourceService implements ResourceService {
     }
 
 
-    @Override public Resource getResource(String keyStr) {
-        final ResourceKeyConverter.@Nullable Parsed parsedResourceKey = ResourceKeyConverter.parse(keyStr);
+    @Override public Resource getResource(String keyOrIdStr) {
+        final ResourceKeyConverter.@Nullable Parsed parsedResourceKey = ResourceKeyConverter.parse(keyOrIdStr);
         if(parsedResourceKey == null) {
-            throw new ResourceRuntimeException(
-                "No qualifier was found in string representation of resource key '" + keyStr + "'");
+            try {
+                return defaultRegistry.getResource(keyOrIdStr);
+            } catch(ResourceRuntimeException e) {
+                throw new ResourceRuntimeException(
+                    "No qualifier was found in string representation of resource key '" + keyOrIdStr + "', nor could a resource be created by the default resource registry '" + defaultRegistry + "'", e);
+            }
         }
         final String qualifier = parsedResourceKey.qualifier;
         final @Nullable ResourceRegistry registry = registries.get(qualifier);
@@ -106,24 +117,24 @@ public class DefaultResourceService implements ResourceService {
         return registry.getResource(parsedResourceKey.idStr);
     }
 
-    @Override public ReadableResource getReadableResource(String keyStr) {
-        final Resource resource = getResource(keyStr);
+    @Override public ReadableResource getReadableResource(String keyOrIdStr) {
+        final Resource resource = getResource(keyOrIdStr);
         if(!(resource instanceof ReadableResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a readable resource");
         }
         return (ReadableResource) resource;
     }
 
-    @Override public WritableResource getWritableResource(String keyStr) {
-        final Resource resource = getResource(keyStr);
+    @Override public WritableResource getWritableResource(String keyOrIdStr) {
+        final Resource resource = getResource(keyOrIdStr);
         if(!(resource instanceof WritableResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a writable resource");
         }
         return (WritableResource) resource;
     }
 
-    @Override public HierarchicalResource getHierarchicalResource(String pathStr) {
-        final Resource resource = getResource(pathStr);
+    @Override public HierarchicalResource getHierarchicalResource(String pathOrIdStr) {
+        final Resource resource = getResource(pathOrIdStr);
         if(!(resource instanceof HierarchicalResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a hierarchical resource");
         }
@@ -165,15 +176,7 @@ public class DefaultResourceService implements ResourceService {
     }
 
 
-    public void addRegistry(ResourceRegistry registry) {
-        registries.put(registry.qualifier(), registry);
-    }
-
-    public void removeRegistry(ResourceRegistry registry) {
-        registries.remove(registry.qualifier());
-    }
-
-    public void removeRegistry(String qualifier) {
-        registries.remove(qualifier);
+    @Override public ResourceRegistry getDefaultResourceRegistry() {
+        return defaultRegistry;
     }
 }
