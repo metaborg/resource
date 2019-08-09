@@ -6,7 +6,7 @@ import mb.resource.ResourceRuntimeException;
 
 import java.io.Serializable;
 
-public class FSRegistry implements ResourceRegistry {
+public class FSResourceRegistry implements ResourceRegistry {
     @Override public String qualifier() {
         return FSPath.qualifier;
     }

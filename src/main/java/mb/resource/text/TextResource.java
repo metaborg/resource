@@ -1,8 +1,7 @@
-package mb.resource.string;
+package mb.resource.text;
 
 import mb.resource.DefaultResourceKey;
 import mb.resource.ReadableResource;
-import mb.resource.ResourceKey;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -11,14 +10,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
-public class StringResource implements ReadableResource, Serializable {
-    public final String str;
+public class TextResource implements ReadableResource, Serializable {
+    public final String text;
     public final DefaultResourceKey key;
 
 
-    public StringResource(String str, String id) {
-        this.str = str;
-        this.key = new DefaultResourceKey(StringResourceRegistry.qualifier, id);
+    public TextResource(String text, String id) {
+        this.text = text;
+        this.key = new DefaultResourceKey(TextResourceRegistry.qualifier, id);
     }
 
     @Override public void close() {
@@ -43,26 +42,26 @@ public class StringResource implements ReadableResource, Serializable {
     }
 
     @Override public long getSize() {
-        return str.length() * 2; // UTF-16 is 2 bytes per character.
+        return text.length() * 2; // UTF-16 is 2 bytes per character.
     }
 
     @Override public InputStream newInputStream() {
-        return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)); // Encode as UTF-8 bytes.
+        return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)); // Encode as UTF-8 bytes.
     }
 
     @Override public byte[] readBytes() {
-        return str.getBytes(StandardCharsets.UTF_8); // Encode as UTF-8 bytes.
+        return text.getBytes(StandardCharsets.UTF_8); // Encode as UTF-8 bytes.
     }
 
     @Override public String readString(Charset fromBytesCharset) {
-        return str; // Ignore fromBytesCharset, we do not need to decode from bytes.
+        return text; // Ignore fromBytesCharset, we do not need to decode from bytes.
     }
 
 
     @Override public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final StringResource that = (StringResource) o;
+        final TextResource that = (TextResource) o;
         return key.equals(that.key);
     }
 
