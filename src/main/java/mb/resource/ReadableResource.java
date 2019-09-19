@@ -4,9 +4,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 public interface ReadableResource extends Resource, AutoCloseable {
+
     boolean exists() throws IOException;
 
     boolean isReadable() throws IOException;
@@ -15,6 +17,9 @@ public interface ReadableResource extends Resource, AutoCloseable {
 
     long getSize() throws IOException;
 
+    default Charset getCharset() {
+        return StandardCharsets.UTF_8;
+    }
 
     InputStream newInputStream() throws IOException;
 
@@ -33,6 +38,9 @@ public interface ReadableResource extends Resource, AutoCloseable {
         return new String(readBytes(), fromBytesCharset);
     }
 
+    default String readString() throws IOException {
+        return readString(getCharset());
+    }
 
     @Override void close() throws IOException;
 }
