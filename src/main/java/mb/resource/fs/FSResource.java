@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -299,14 +300,13 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return Files.readAllBytes(path.javaPath);
     }
 
-    public List<String> readLines(Charset charset) throws IOException {
-        return Files.readAllLines(path.javaPath, charset);
+    public List<String> readLines() throws IOException {
+        return readLines(StandardCharsets.UTF_8);
     }
 
-    @Override public String readString(Charset charset) throws IOException {
-        return new String(readBytes(), charset);
+    public List<String> readLines(Charset fromCharset) throws IOException {
+        return Files.readAllLines(path.javaPath, fromCharset);
     }
-
 
     @Override public OutputStream newOutputStream() throws IOException {
         return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE,
@@ -317,12 +317,16 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         Files.write(path.javaPath, bytes);
     }
 
-    public void writeLines(Iterable<String> lines, Charset charset) throws IOException {
-        Files.write(path.javaPath, lines, charset);
+    public void writeLines(Iterable<String> lines) throws IOException {
+        writeLines(lines, StandardCharsets.UTF_8);
     }
 
-    @Override public void writeString(String string, Charset charset) throws IOException {
-        Files.write(path.javaPath, string.getBytes(charset));
+    public void writeLines(Iterable<String> lines, Charset fromCharset) throws IOException {
+        Files.write(path.javaPath, lines, fromCharset);
+    }
+
+    @Override public void writeString(String string, Charset fromCharset) throws IOException {
+        Files.write(path.javaPath, string.getBytes(fromCharset));
     }
 
 

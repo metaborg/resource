@@ -17,10 +17,6 @@ public interface ReadableResource extends Resource, AutoCloseable {
 
     long getSize() throws IOException;
 
-    default Charset getCharset() {
-        return StandardCharsets.UTF_8;
-    }
-
     InputStream newInputStream() throws IOException;
 
     default byte[] readBytes() throws IOException {
@@ -34,12 +30,12 @@ public interface ReadableResource extends Resource, AutoCloseable {
         return outputStream.toByteArray();
     }
 
-    default String readString(Charset fromBytesCharset) throws IOException {
-        return new String(readBytes(), fromBytesCharset);
+    default String readString(Charset fromCharset) throws IOException {
+        return new String(readBytes(), fromCharset);
     }
 
     default String readString() throws IOException {
-        return readString(getCharset());
+        return readString(StandardCharsets.UTF_8);
     }
 
     @Override void close() throws IOException;

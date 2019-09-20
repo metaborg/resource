@@ -53,8 +53,8 @@ public class TextResource implements ReadableResource, Serializable {
         return text.getBytes(StandardCharsets.UTF_8); // Encode as UTF-8 bytes.
     }
 
-    @Override public String readString(Charset fromBytesCharset) {
-        return text; // Ignore fromBytesCharset, we do not need to decode from bytes.
+    @Override public String readString(Charset fromCharset) {
+        return text; // Ignore the character set, we do not need to decode from bytes.
     }
 
 
