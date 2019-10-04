@@ -10,22 +10,20 @@ public interface ResourceRegistry {
      */
     String qualifier();
 
-
     /**
      * Gets resource for given identifier.
      *
      * @param id Identifier to get resource for.
-     * @return Resource for {@code id}.
+     * @return The resource.
      * @throws ResourceRuntimeException when retrieving resource failed unexpectedly.
      */
     Resource getResource(Serializable id);
 
-
     /**
      * Gets resource key for given string representation of identifier.
      *
-     * @param idStr String representation of identifier to get resource for.
-     * @return Resource key for {@code id}.
+     * @param idStr String representation of the resource identifier.
+     * @return The resource key.
      * @throws ResourceRuntimeException when building the resource key failed unexpectedly.
      */
     ResourceKey getResourceKey(String idStr);
@@ -33,8 +31,8 @@ public interface ResourceRegistry {
     /**
      * Gets resource for given string representation of identifier.
      *
-     * @param idStr String representation of identifier to get resource for.
-     * @return Resource for {@code id}.
+     * @param idStr String representation of the resource identifier.
+     * @return The resource.
      * @throws ResourceRuntimeException when retrieving resource failed unexpectedly.
      */
     Resource getResource(String idStr);
@@ -46,4 +44,5 @@ public interface ResourceRegistry {
      * @return String representation for given identifier.
      */
     String toStringRepresentation(Serializable id);
+
 }

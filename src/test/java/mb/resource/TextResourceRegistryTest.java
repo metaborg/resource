@@ -71,7 +71,7 @@ class TextResourceRegistryTest {
         final String id = resource.key.getId();
         registry.addResource(resource);
         assertNotNull(registry.getResource(id));
-        registry.removeResource(id);
+        registry.deleteResource(id);
         assertThrows(ResourceRuntimeException.class, () -> registry.getResource(id));
     }
 }

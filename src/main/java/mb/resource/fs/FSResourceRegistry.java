@@ -30,6 +30,11 @@ public class FSResourceRegistry implements ResourceRegistry {
         return new FSResource(idStr);
     }
 
+//    @Override
+//    public Resource createResource(String idStr) {
+//        return null;
+//    }
+
     @Override public String toStringRepresentation(Serializable id) {
         if(!(id instanceof FSPath)) {
             throw new ResourceRuntimeException(

@@ -3,7 +3,12 @@ package mb.resource;
 import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.ResourcePath;
 
+
+/**
+ * The resource service, used to get a resource corresponding to a resource key.
+ */
 public interface ResourceService {
+
     /**
      * Gets {@link Resource resource} for given {@link ResourceKey resource key}.
      *
@@ -233,4 +238,5 @@ public interface ResourceService {
      * @return Default resource registry.
      */
     ResourceRegistry getDefaultResourceRegistry();
+
 }
