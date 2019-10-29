@@ -7,6 +7,9 @@ import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public interface HierarchicalResource extends WritableResource {
+
     /**
      * Gets the path of this resource.
      *
@@ -28,7 +32,8 @@ public interface HierarchicalResource extends WritableResource {
      *
      * @return Key of this resource.
      */
-    @Override ResourcePath getKey();
+    @Override
+    ResourcePath getKey();
 
 
     /**
@@ -175,7 +180,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource appendToLeaf(String segment) {
         final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
+        if (leaf == null) {
             return this;
         }
         return replaceLeaf(leaf + segment);
@@ -190,7 +195,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource applyToLeaf(Function<String, String> func) {
         final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
+        if (leaf == null) {
             return this;
         }
         return replaceLeaf(func.apply(leaf));
@@ -206,7 +211,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource replaceLeafExtension(String extension) {
         final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
+        if (leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
@@ -223,7 +228,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource ensureLeafExtension(String extension) {
         final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
+        if (leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
@@ -238,7 +243,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource appendExtensionToLeaf(String extension) {
         final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
+        if (leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
@@ -253,65 +258,178 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource applyToLeafExtension(Function<String, String> func) {
         final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
+        if (leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
     }
 
-
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     HierarchicalResourceType getType() throws IOException;
 
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     default boolean isFile() throws IOException {
         return getType() == HierarchicalResourceType.File;
     }
 
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     default boolean isDirectory() throws IOException {
         return getType() == HierarchicalResourceType.Directory;
     }
 
-
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> list() throws IOException;
 
+    /**
+     * @param matcher
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> list(ResourceMatcher matcher) throws IOException;
 
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> walk() throws IOException;
 
+    /**
+     * @param walker
+     * @param matcher
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     default Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         return walk(walker, matcher, null);
     }
 
+    /**
+     * @param walker
+     * @param matcher
+     * @param access
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
 
 
     /**
-     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws ResourceRuntimeException      when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws UnsupportedOperationException The operation is not supported.
      */
     void copyTo(HierarchicalResource other) throws IOException;
 
     /**
-     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws ResourceRuntimeException      when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws UnsupportedOperationException The operation is not supported.
      */
     void moveTo(HierarchicalResource other) throws IOException;
 
 
+    /**
+     * Creates this file resource.
+     *
+     * @param createParents Whether to create the parent directories.
+     * @throws FileAlreadyExistsException    The file already exists.
+     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     void createFile(boolean createParents) throws IOException;
 
+    /**
+     * Creates this file resource.
+     * <p>
+     * This method does not create the parent directories of they do not exist.
+     *
+     * @throws FileAlreadyExistsException    The file already exists.
+     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     default void createFile() throws IOException {
         createFile(false);
     }
 
+    /**
+     * Creates this directory resource.
+     *
+     * @param createParents Whether to create the parent directories.
+     * @throws FileAlreadyExistsException    The directory already exists.
+     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     void createDirectory(boolean createParents) throws IOException;
 
+    /**
+     * Creates this directory resource.
+     * <p>
+     * This method does not create the parent directories of they do not exist.
+     *
+     * @throws FileAlreadyExistsException    The directory already exists.
+     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     default void createDirectory() throws IOException {
         createDirectory(false);
     }
 
+    /**
+     * Creates this resource if it does not already exist.
+     * <p>
+     * This method creates parent directories if necessary.
+     * <p>
+     * It is possible for the resource to be deleted between a call to this
+     * method and a following call to a method such as {@link #openWrite()}.
+     *
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    void ensureExists() throws IOException;
+
+    /**
+     * Creates the parent directories of this resource.
+     *
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     void createParents() throws IOException;
 
-    void delete(boolean deleteContents) throws IOException;
+    /**
+     * Deletes the resource.
+     *
+     * @param deleteRecursively Whether to delete the children of the resource recursively.
+     * @throws DirectoryNotEmptyException    The directory resource is not empty.
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    void delete(boolean deleteRecursively) throws IOException;
 
+    /**
+     * Deletes the resource.
+     * <p>
+     * This method does not recursively delete the children of the resource, if any.
+     *
+     * @throws DirectoryNotEmptyException    The directory resource is not empty.
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     default void delete() throws IOException {
         delete(false);
     }
+
+    @Override
+    default OutputStream openWriteOrCreate() throws IOException {
+        ensureExists();
+        return openWrite();
+    }
+
+    @Override
+    default OutputStream createNew() throws IOException {
+        createFile();
+        return openWrite();
+    }
+
 }

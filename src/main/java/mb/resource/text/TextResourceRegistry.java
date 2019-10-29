@@ -1,12 +1,16 @@
 package mb.resource.text;
 
-import mb.resource.DefaultResourceKey;
+import mb.resource.SimpleResourceKey;
 import mb.resource.HashMapResourceRegistry;
 import mb.resource.ResourceRuntimeException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * An in-memory read-only text resource registry.
+ */
 public class TextResourceRegistry extends HashMapResourceRegistry {
     public static final String qualifier = "text";
 
@@ -15,8 +19,8 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
     }
 
 
-    @Override public DefaultResourceKey getResourceKey(String idStr) {
-        return new DefaultResourceKey(TextResourceRegistry.qualifier, idStr);
+    @Override public SimpleResourceKey getResourceKey(String idStr) {
+        return new SimpleResourceKey(TextResourceRegistry.qualifier, idStr);
     }
 
     @Override public String toStringRepresentation(Serializable id) {
@@ -32,18 +36,27 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
         return idStr;
     }
 
-
-    public TextResource createResource(String text, String id) {
+    /**
+     * Creates a new read-only in-memory text resource.
+     *
+     * @param text The content of the resource.
+     * @param id The unique identifier of the resource; or {@code null} to generate one.
+     * @return The created resource.
+     */
+    public TextResource createResource(String text, @Nullable String id) {
+        id = id != null ? id : UUID.randomUUID().toString();
         final TextResource resource = new TextResource(text, id);
         addResource(resource);
         return resource;
     }
 
-    public TextResource createResourceWithRandomUUID(String text) {
-        return createResource(text, UUID.randomUUID().toString());
+    /**
+     * Creates a new read-only in-memory text resource with a generated unique identifier.
+     * @param text The content of the resource.
+     * @return The created resource.
+     */
+    public TextResource createResource(String text) {
+        return createResource(text, null);
     }
 
-    public void removeResource(String id) {
-        super.removeResource(id);
-    }
 }

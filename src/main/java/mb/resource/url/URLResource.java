@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
@@ -41,6 +42,19 @@ public class URLResource implements HierarchicalResource {
         return path;
     }
 
+    /**
+     * Gets the URI of the resource.
+     *
+     * @return The URI.
+     */
+    public URI getURI() { return this.path.getURI();}
+
+    /**
+     * Gets the URL of the resource.
+     *
+     * @return The URL.
+     */
+    public URL getURL() throws MalformedURLException { return this.path.getURL();}
 
     @Override public boolean exists() {
         return true; // Don't know if it exists; return true although opening a stream may fail.
@@ -60,7 +74,7 @@ public class URLResource implements HierarchicalResource {
         return openConnection().getContentLengthLong();
     }
 
-    @Override public InputStream newInputStream() throws IOException {
+    @Override public InputStream openRead() throws IOException {
         return openConnection().getInputStream();
     }
 
@@ -69,11 +83,11 @@ public class URLResource implements HierarchicalResource {
         return true; // Don't know if it is writable; return true although opening an output stream may fail.
     }
 
-    @Override public void setLastModifiedTime(Instant time) throws IOException {
+    @Override public void setLastModifiedTime(Instant moment) throws IOException {
         // Not supported.
     }
 
-    @Override public OutputStream newOutputStream() throws IOException {
+    @Override public OutputStream openWrite() throws IOException {
         final URLConnection connection = openConnection();
         connection.setDoOutput(true);
         return connection.getOutputStream();
@@ -226,18 +240,18 @@ public class URLResource implements HierarchicalResource {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public void ensureExists() throws IOException {
+        // Don't know if it exists, just pretend it does; although opening a stream may fail.
+    }
+
     @Override public void createParents() throws IOException {
         throw new UnsupportedOperationException();
     }
 
 
-    @Override public void delete(boolean deleteContents) throws IOException {
+    @Override public void delete(boolean deleteRecursively) throws IOException {
         throw new UnsupportedOperationException();
-    }
-
-
-    private URL getURL() throws MalformedURLException {
-        return path.getURL();
     }
 
     private URLConnection openConnection() throws IOException {

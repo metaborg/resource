@@ -3,7 +3,11 @@ package mb.resource;
 import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.ResourcePath;
 
+/**
+ * The resource service, used to get a resource corresponding to a resource key.
+ */
 public interface ResourceService {
+
     /**
      * Gets {@link Resource resource} for given {@link ResourceKey resource key}.
      *
@@ -176,7 +180,8 @@ public interface ResourceService {
     /**
      * If {@code pathOrKey} is a string representation of a {@link ResourceKey resource key}, returns a (replaced)
      * {@link Resource resource} for that key. Otherwise, returns a resource where given {@code pathOrKey} is appended
-     * (or replaced with) as a path to given {@code resource} using {@link HierarchicalResource#appendOrReplaceWithPath(String)}.
+     * (or replaced with) as a path to given {@code resource} using
+     * {@link HierarchicalResource#appendOrReplaceWithPath(String)}.
      *
      * @param resource     Resource to attempt to append {@code pathOrKey} to.
      * @param keyStrOrPath String representation of a {@link ResourceKey key}, or path which should be appended to
@@ -233,4 +238,5 @@ public interface ResourceService {
      * @return Default resource registry.
      */
     ResourceRegistry getDefaultResourceRegistry();
+
 }
