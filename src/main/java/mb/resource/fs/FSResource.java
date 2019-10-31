@@ -12,16 +12,10 @@ import mb.resource.hierarchical.match.ResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -308,9 +302,24 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return Files.readAllLines(path.javaPath, fromCharset);
     }
 
+
     @Override public OutputStream openWrite() throws IOException {
         return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE,
-                StandardOpenOption.TRUNCATE_EXISTING);
+            StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+    }
+
+    @Override public OutputStream openWriteAppend() throws IOException {
+        return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE,
+            StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+    }
+
+    @Override public OutputStream openWriteExisting() throws IOException {
+        return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE,
+            StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    @Override public OutputStream openWriteNew() throws IOException {
+        return Files.newOutputStream(path.javaPath, StandardOpenOption.CREATE_NEW);
     }
 
     @Override public void writeBytes(byte[] bytes) throws IOException {
@@ -329,15 +338,6 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         Files.write(path.javaPath, string.getBytes(fromCharset));
     }
 
-    @Override
-    public OutputStream createNew() throws IOException {
-        return Files.newOutputStream(path.javaPath, StandardOpenOption.CREATE_NEW);
-    }
-
-    @Override public OutputStream openWriteOrCreate() throws IOException {
-        return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE,
-                StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-    }
 
     @Override public void copyTo(HierarchicalResource other) throws IOException {
         if(!(other instanceof FSResource)) {
@@ -376,18 +376,9 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         Files.createDirectory(path.javaPath);
     }
 
-    @Override
-    public void ensureExists() throws IOException {
-        try {
-            createFile(true);
-        } catch (FileAlreadyExistsException ex) {
-            // Ignored
-        }
-    }
-
     @Override public void createParents() throws IOException {
         final @Nullable FSResource parent = getParent();
-        if (parent == null) return;
+        if(parent == null) return;
         Files.createDirectories(parent.path.javaPath);
     }
 

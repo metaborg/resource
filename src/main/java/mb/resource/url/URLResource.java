@@ -87,10 +87,14 @@ public class URLResource implements HierarchicalResource {
         // Not supported.
     }
 
-    @Override public OutputStream openWrite() throws IOException {
+    @Override public OutputStream openWriteExisting() throws IOException {
         final URLConnection connection = openConnection();
         connection.setDoOutput(true);
         return connection.getOutputStream();
+    }
+
+    @Override public OutputStream openWriteAppend() throws IOException {
+        throw new UnsupportedOperationException("Opening an appending output stream is not supported");
     }
 
 
@@ -238,11 +242,6 @@ public class URLResource implements HierarchicalResource {
 
     @Override public void createDirectory(boolean createParents) throws IOException {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void ensureExists() throws IOException {
-        // Don't know if it exists, just pretend it does; although opening a stream may fail.
     }
 
     @Override public void createParents() throws IOException {

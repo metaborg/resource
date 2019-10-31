@@ -8,7 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
-
 /**
  * A readable resource.
  */
@@ -17,8 +16,7 @@ public interface ReadableResource extends Resource, AutoCloseable {
     /**
      * Gets whether the resource exists.
      *
-     * @return {@code true} when the resource exists;
-     * otherwise, {@code false}.
+     * @return {@code true} when the resource exists; otherwise, {@code false}.
      * @throws IOException An I/O exception occurred.
      */
     boolean exists() throws IOException;
@@ -26,8 +24,7 @@ public interface ReadableResource extends Resource, AutoCloseable {
     /**
      * Gets whether the resource is accessible and readable.
      *
-     * @return {@code true} when the resource is accessible and readable;
-     * otherwise, {@code false}.
+     * @return {@code true} when the resource is accessible and readable; otherwise, {@code false}.
      * @throws IOException An I/O exception occurred.
      */
     boolean isReadable() throws IOException;
@@ -55,7 +52,7 @@ public interface ReadableResource extends Resource, AutoCloseable {
      *
      * @return The input stream to read from.
      * @throws FileNotFoundException The resource does not exist.
-     * @throws IOException An I/O exception occurred.
+     * @throws IOException           An I/O exception occurred.
      */
     InputStream openRead() throws IOException;
 
@@ -70,7 +67,7 @@ public interface ReadableResource extends Resource, AutoCloseable {
         final byte[] buffer = new byte[4096];
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(buffer.length);
         int bytesRead;
-        while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
+        while((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
             outputStream.write(buffer, 0, bytesRead);
         }
         return outputStream.toByteArray();
@@ -88,8 +85,7 @@ public interface ReadableResource extends Resource, AutoCloseable {
     }
 
     /**
-     * Reads the content of the resource as a string
-     * using the default character set.
+     * Reads the content of the resource as a string using the default character set.
      *
      * @return A string with the read data.
      * @throws IOException An I/O exception occurred.
@@ -103,7 +99,6 @@ public interface ReadableResource extends Resource, AutoCloseable {
      *
      * @throws IOException An I/O exception occurred.
      */
-    @Override
-    void close() throws IOException;
+    @Override void close() throws IOException;
 
 }

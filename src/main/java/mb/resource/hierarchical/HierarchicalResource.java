@@ -180,7 +180,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource appendToLeaf(String segment) {
         final @Nullable String leaf = getLeaf();
-        if (leaf == null) {
+        if(leaf == null) {
             return this;
         }
         return replaceLeaf(leaf + segment);
@@ -195,7 +195,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource applyToLeaf(Function<String, String> func) {
         final @Nullable String leaf = getLeaf();
-        if (leaf == null) {
+        if(leaf == null) {
             return this;
         }
         return replaceLeaf(func.apply(leaf));
@@ -211,7 +211,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource replaceLeafExtension(String extension) {
         final @Nullable String leaf = getLeaf();
-        if (leaf == null) {
+        if(leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
@@ -228,7 +228,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource ensureLeafExtension(String extension) {
         final @Nullable String leaf = getLeaf();
-        if (leaf == null) {
+        if(leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
@@ -243,7 +243,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource appendExtensionToLeaf(String extension) {
         final @Nullable String leaf = getLeaf();
-        if (leaf == null) {
+        if(leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
@@ -258,7 +258,7 @@ public interface HierarchicalResource extends WritableResource {
      */
     default HierarchicalResource applyToLeafExtension(Function<String, String> func) {
         final @Nullable String leaf = getLeaf();
-        if (leaf == null) {
+        if(leaf == null) {
             return this;
         }
         return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
@@ -330,13 +330,25 @@ public interface HierarchicalResource extends WritableResource {
     void moveTo(HierarchicalResource other) throws IOException;
 
 
+    @Override default OutputStream openWrite() throws IOException {
+        ensureFileExists();
+        return openWriteExisting();
+    }
+
+    @Override default OutputStream openWriteNew() throws IOException {
+        createFile();
+        return openWriteExisting();
+    }
+
+
     /**
      * Creates this file resource.
      *
      * @param createParents Whether to create the parent directories.
-     * @throws FileAlreadyExistsException    The file already exists.
-     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
-     * @throws UnsupportedOperationException The operation is not supported.
+     * @throws FileAlreadyExistsException      The file already exists.
+     * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
      */
     void createFile(boolean createParents) throws IOException;
 
@@ -345,21 +357,43 @@ public interface HierarchicalResource extends WritableResource {
      * <p>
      * This method does not create the parent directories of they do not exist.
      *
-     * @throws FileAlreadyExistsException    The file already exists.
-     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
-     * @throws UnsupportedOperationException The operation is not supported.
+     * @throws FileAlreadyExistsException      The file already exists.
+     * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
      */
     default void createFile() throws IOException {
         createFile(false);
     }
 
     /**
+     * Creates this file resource if it does not already exist.
+     * <p>
+     * This method creates parent directories if necessary.
+     * <p>
+     * It is possible for the resource to be deleted between a call to this method and a following call to a method such
+     * as {@link #openWriteExisting()}.
+     *
+     * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
+     * @throws IOException                     An I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
+     */
+    default void ensureFileExists() throws IOException {
+        try {
+            createFile(true);
+        } catch(FileAlreadyExistsException ex) {
+            // Ignored
+        }
+    }
+
+    /**
      * Creates this directory resource.
      *
      * @param createParents Whether to create the parent directories.
-     * @throws FileAlreadyExistsException    The directory already exists.
-     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
-     * @throws UnsupportedOperationException The operation is not supported.
+     * @throws DirectoryAlreadyExistsException The directory already exists.
+     * @throws FileAlreadyExistsException      A file with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
      */
     void createDirectory(boolean createParents) throws IOException;
 
@@ -368,9 +402,10 @@ public interface HierarchicalResource extends WritableResource {
      * <p>
      * This method does not create the parent directories of they do not exist.
      *
-     * @throws FileAlreadyExistsException    The directory already exists.
-     * @throws IOException                   The parent directory does not exist, or an I/O exception occurred.
-     * @throws UnsupportedOperationException The operation is not supported.
+     * @throws DirectoryAlreadyExistsException The directory already exists.
+     * @throws FileAlreadyExistsException      A file with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
      */
     default void createDirectory() throws IOException {
         createDirectory(false);
@@ -381,13 +416,19 @@ public interface HierarchicalResource extends WritableResource {
      * <p>
      * This method creates parent directories if necessary.
      * <p>
-     * It is possible for the resource to be deleted between a call to this
-     * method and a following call to a method such as {@link #openWrite()}.
+     * It is possible for the resource to be deleted between a call to this method and a following call to a method.
      *
+     * @throws FileAlreadyExistsException    A file with the same name already exists.
      * @throws IOException                   An I/O exception occurred.
      * @throws UnsupportedOperationException The operation is not supported.
      */
-    void ensureExists() throws IOException;
+    default void ensureDirectoryExists() throws IOException {
+        try {
+            createDirectory(true);
+        } catch(DirectoryAlreadyExistsException ex) {
+            // Ignored
+        }
+    }
 
     /**
      * Creates the parent directories of this resource.
@@ -418,18 +459,6 @@ public interface HierarchicalResource extends WritableResource {
      */
     default void delete() throws IOException {
         delete(false);
-    }
-
-    @Override
-    default OutputStream openWriteOrCreate() throws IOException {
-        ensureExists();
-        return openWrite();
-    }
-
-    @Override
-    default OutputStream createNew() throws IOException {
-        createFile();
-        return openWrite();
     }
 
 }
