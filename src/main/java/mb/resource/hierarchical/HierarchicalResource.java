@@ -355,7 +355,7 @@ public interface HierarchicalResource extends WritableResource {
     /**
      * Creates this file resource.
      * <p>
-     * This method does not create the parent directories of they do not exist.
+     * This method does not create the parent directories if they do not exist.
      *
      * @throws FileAlreadyExistsException      The file already exists.
      * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
@@ -400,7 +400,7 @@ public interface HierarchicalResource extends WritableResource {
     /**
      * Creates this directory resource.
      * <p>
-     * This method does not create the parent directories of they do not exist.
+     * This method does not create the parent directories if they do not exist.
      *
      * @throws DirectoryAlreadyExistsException The directory already exists.
      * @throws FileAlreadyExistsException      A file with the same name already exists.
