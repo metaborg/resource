@@ -231,6 +231,10 @@ public class URLResource implements HierarchicalResource {
         throw new UnsupportedOperationException();
     }
 
+    @Override public void copyRecursivelyTo(HierarchicalResource other) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public void moveTo(HierarchicalResource other) throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -261,7 +265,7 @@ public class URLResource implements HierarchicalResource {
     @Override public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final URLResource that = (URLResource) o;
+        final URLResource that = (URLResource)o;
         return path.equals(that.path);
     }
 

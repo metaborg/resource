@@ -318,13 +318,19 @@ public interface HierarchicalResource extends WritableResource {
 
 
     /**
-     * @throws ResourceRuntimeException      when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
      * @throws UnsupportedOperationException The operation is not supported.
      */
     void copyTo(HierarchicalResource other) throws IOException;
 
     /**
-     * @throws ResourceRuntimeException      when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    void copyRecursivelyTo(HierarchicalResource other) throws IOException;
+
+    /**
+     * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
      * @throws UnsupportedOperationException The operation is not supported.
      */
     void moveTo(HierarchicalResource other) throws IOException;

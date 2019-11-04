@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -343,18 +344,41 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         if(!(other instanceof FSResource)) {
             throw new ResourceRuntimeException("Cannot copy to '" + other + "', it is not an FSResource");
         }
-        copyTo((FSResource) other);
+        copyTo((FSResource)other);
     }
 
     public void copyTo(FSResource other) throws IOException {
         Files.copy(path.javaPath, other.path.javaPath);
     }
 
+    @Override public void copyRecursivelyTo(HierarchicalResource other) throws IOException {
+        if(!(other instanceof FSResource)) {
+            throw new ResourceRuntimeException("Cannot copy recursively to '" + other + "', it is not an FSResource");
+        }
+        copyRecursivelyTo((FSResource)other);
+    }
+
+    public void copyRecursivelyTo(FSResource other) throws IOException {
+        try {
+            try(Stream<Path> stream = Files.walk(this.path.javaPath)) {
+                stream.forEachOrdered(sourcePath -> {
+                    try {
+                        Files.copy(sourcePath, this.path.javaPath.resolve(other.path.javaPath.relativize(sourcePath)));
+                    } catch(IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+            }
+        } catch(UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
+
     @Override public void moveTo(HierarchicalResource other) throws IOException {
         if(!(other instanceof FSResource)) {
             throw new ResourceRuntimeException("Cannot move to '" + other + "', it is not an FSResource");
         }
-        moveTo((FSResource) other);
+        moveTo((FSResource)other);
     }
 
     public void moveTo(FSResource other) throws IOException {
@@ -409,7 +433,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     @Override public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final FSResource that = (FSResource) o;
+        final FSResource that = (FSResource)o;
         return path.equals(that.path);
     }
 
