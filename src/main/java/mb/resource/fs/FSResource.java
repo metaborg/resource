@@ -400,6 +400,10 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         Files.createDirectory(path.javaPath);
     }
 
+    @Override public void ensureDirectoryExists() throws IOException {
+        Files.createDirectories(path.javaPath);
+    }
+
     @Override public void createParents() throws IOException {
         final @Nullable FSResource parent = getParent();
         if(parent == null) return;
