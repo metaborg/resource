@@ -204,6 +204,55 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return new FSResource(newPath);
     }
 
+    @Override public FSResource appendToLeaf(String segment) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(leaf + segment);
+    }
+
+    @Override public FSResource applyToLeaf(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(func.apply(leaf));
+    }
+
+    @Override public FSResource replaceLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
+    }
+
+    @Override public FSResource ensureLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
+    }
+
+    @Override public FSResource appendExtensionToLeaf(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
+    }
+
+    @Override public FSResource applyToLeafExtension(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
+    }
+
+
     @Override public HierarchicalResourceType getType() throws IOException {
         final BasicFileAttributes attributes = Files.readAttributes(getJavaPath(), BasicFileAttributes.class);
         if(attributes.isRegularFile()) {

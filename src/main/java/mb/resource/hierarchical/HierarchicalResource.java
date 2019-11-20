@@ -264,6 +264,7 @@ public interface HierarchicalResource extends WritableResource {
         return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
     }
 
+
     /**
      * @throws UnsupportedOperationException The operation is not supported.
      */
@@ -282,6 +283,7 @@ public interface HierarchicalResource extends WritableResource {
     default boolean isDirectory() throws IOException {
         return getType() == HierarchicalResourceType.Directory;
     }
+
 
     /**
      * @throws UnsupportedOperationException The operation is not supported.
