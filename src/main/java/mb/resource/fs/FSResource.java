@@ -397,7 +397,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
     public void copyTo(FSResource other) throws IOException {
-        Files.copy(path.javaPath, other.path.javaPath);
+        Files.copy(path.javaPath, other.path.javaPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override public void copyRecursivelyTo(HierarchicalResource other) throws IOException {
@@ -431,7 +431,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
     public void moveTo(FSResource other) throws IOException {
-        Files.move(path.javaPath, other.path.javaPath);
+        Files.move(path.javaPath, other.path.javaPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
 
