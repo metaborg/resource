@@ -5,15 +5,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class ExtensionsPathMatcher implements PathMatcher {
     private final List<String> extensions;
     private transient HashSet<String> extensionsHashSet;
+
+    public ExtensionsPathMatcher(HashSet<String> extensions) {
+        this.extensions = new ArrayList<>(extensions);
+        this.extensionsHashSet = extensions;
+    }
+
+    public ExtensionsPathMatcher(ArrayList<String> extensions) {
+        this.extensions = extensions;
+        this.extensionsHashSet = new HashSet<>(extensions);
+    }
 
     public ExtensionsPathMatcher(Collection<String> extensions) {
         this.extensions = new ArrayList<>(extensions);

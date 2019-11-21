@@ -6,10 +6,11 @@ import mb.resource.ResourceRuntimeException;
 
 import java.io.Serializable;
 
-public class FSRegistry implements ResourceRegistry {
+public class FSResourceRegistry implements ResourceRegistry {
     @Override public String qualifier() {
         return FSPath.qualifier;
     }
+
 
     @Override public FSResource getResource(Serializable id) {
         if(!(id instanceof FSPath)) {
@@ -18,6 +19,11 @@ public class FSRegistry implements ResourceRegistry {
         }
         final FSPath path = (FSPath) id;
         return new FSResource(path);
+    }
+
+
+    @Override public FSPath getResourceKey(String idStr) {
+        return new FSPath(idStr);
     }
 
     @Override public Resource getResource(String idStr) {

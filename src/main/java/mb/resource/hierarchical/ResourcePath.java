@@ -4,6 +4,7 @@ import mb.resource.ResourceKey;
 import mb.resource.ResourceRuntimeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -112,7 +113,9 @@ public interface ResourcePath extends ResourceKey {
      * @param segments Segments to append.
      * @return Appended path.
      */
-    ResourcePath appendSegments(List<String> segments);
+    default ResourcePath appendSegments(List<String> segments) {
+        return appendSegments((Collection<String>)segments);
+    }
 
     /**
      * Returns a path where {@code segments} are appended to the current path in order. A segment should be a single
@@ -121,7 +124,9 @@ public interface ResourcePath extends ResourceKey {
      * @param segments Segments to append.
      * @return Appended path.
      */
-    ResourcePath appendSegments(String... segments);
+    default ResourcePath appendSegments(String... segments) {
+        return appendSegments(Arrays.asList(segments));
+    }
 
 
     /**
@@ -181,7 +186,13 @@ public interface ResourcePath extends ResourceKey {
      * @param segment Segment to append.
      * @return Path with leaf segment appended.
      */
-    ResourcePath appendToLeaf(String segment);
+    default ResourcePath appendToLeaf(String segment) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(leaf + segment);
+    }
 
     /**
      * Returns a path where the leaf segment of the current path is replaced by applying {@code func} to it. If the
@@ -190,7 +201,13 @@ public interface ResourcePath extends ResourceKey {
      * @param func Function to apply to the leaf segment.
      * @return Path with leaf segment replaced.
      */
-    ResourcePath applyToLeaf(Function<String, String> func);
+    default ResourcePath applyToLeaf(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(func.apply(leaf));
+    }
 
 
     /**
@@ -200,7 +217,13 @@ public interface ResourcePath extends ResourceKey {
      * @param extension File extension to replace.
      * @return Path with file extension replaced.
      */
-    ResourcePath replaceLeafExtension(String extension);
+    default ResourcePath replaceLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
+    }
 
     /**
      * Returns a path where the file extension of the current path is ensured to be {@code extension}. That is, it
@@ -211,7 +234,13 @@ public interface ResourcePath extends ResourceKey {
      * @param extension File extension to ensure.
      * @return Path with file extension ensured.
      */
-    ResourcePath ensureLeafExtension(String extension);
+    default ResourcePath ensureLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
+    }
 
     /**
      * Returns a path where the leaf segment of the current path is appended with a '.' and {@code extension}. If the
@@ -220,7 +249,13 @@ public interface ResourcePath extends ResourceKey {
      * @param extension File extension to append.
      * @return Path with file extension appended.
      */
-    ResourcePath appendExtensionToLeaf(String extension);
+    default ResourcePath appendExtensionToLeaf(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
+    }
 
     /**
      * Returns a path where the file extension of the leaf segment of the current path is replaced by applying {@code
@@ -229,5 +264,11 @@ public interface ResourcePath extends ResourceKey {
      * @param func Function to apply to the file extension.
      * @return Path with file extension replaced.
      */
-    ResourcePath applyToLeafExtension(Function<String, String> func);
+    default ResourcePath applyToLeafExtension(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
+    }
 }

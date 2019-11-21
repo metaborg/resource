@@ -4,7 +4,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
 
+/**
+ * A resource key, which uniquely identifies a resource.
+ */
 public interface ResourceKey extends Serializable {
+
     /**
      * Gets the qualifier of the key.
      *
@@ -20,9 +24,13 @@ public interface ResourceKey extends Serializable {
     Serializable getId();
 
 
-    @Override boolean equals(@Nullable Object other);
+    @Override
+    boolean equals(@Nullable Object other);
 
-    @Override int hashCode();
+    @Override
+    int hashCode();
 
-    @Override String toString();
+    @Override
+    String toString();
+
 }

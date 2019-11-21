@@ -1,10 +1,10 @@
-package mb.resource.fs;
+package mb.resource.hierarchical;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Function;
 
-class FilenameExtensionUtil {
+public class FilenameExtensionUtil {
     public static @Nullable String getExtension(String filename) {
         final int i = filename.lastIndexOf('.');
         if(i > 0) {

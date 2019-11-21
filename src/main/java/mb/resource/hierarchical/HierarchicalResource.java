@@ -7,12 +7,17 @@ import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 public interface HierarchicalResource extends WritableResource {
+
     /**
      * Gets the path of this resource.
      *
@@ -27,7 +32,8 @@ public interface HierarchicalResource extends WritableResource {
      *
      * @return Key of this resource.
      */
-    @Override ResourcePath getKey();
+    @Override
+    ResourcePath getKey();
 
 
     /**
@@ -49,7 +55,9 @@ public interface HierarchicalResource extends WritableResource {
      *
      * @return Leaf segment of this resource, or {@code null} it it has none.
      */
-    @Nullable String getLeaf();
+    default @Nullable String getLeaf() {
+        return getPath().getLeaf();
+    }
 
     /**
      * Gets the file extension of the leaf segment of this resource, or {@code null} if it has no leaf segment (e.g., it
@@ -57,7 +65,9 @@ public interface HierarchicalResource extends WritableResource {
      *
      * @return File extension of the leaf segment of this resource, or {@code null} it it has none.
      */
-    @Nullable String getLeafExtension();
+    default @Nullable String getLeafExtension() {
+        return getPath().getLeafExtension();
+    }
 
 
     /**
@@ -94,7 +104,9 @@ public interface HierarchicalResource extends WritableResource {
      * @param segments Segments to append.
      * @return Appended resource.
      */
-    HierarchicalResource appendSegments(List<String> segments);
+    default HierarchicalResource appendSegments(List<String> segments) {
+        return appendSegments((Collection<String>)segments);
+    }
 
     /**
      * Returns a resource where {@code segments} are appended to the current resource in order. A segment should be a
@@ -103,7 +115,9 @@ public interface HierarchicalResource extends WritableResource {
      * @param segments Segments to append.
      * @return Appended resource.
      */
-    HierarchicalResource appendSegments(String... segments);
+    default HierarchicalResource appendSegments(String... segments) {
+        return appendSegments(Arrays.asList(segments));
+    }
 
 
     /**
@@ -164,7 +178,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param segment Segment to append.
      * @return Resource with leaf segment appended.
      */
-    HierarchicalResource appendToLeaf(String segment);
+    default HierarchicalResource appendToLeaf(String segment) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(leaf + segment);
+    }
 
     /**
      * Returns a resource where the leaf segment of the current resource is replaced by applying {@code func} to it. If
@@ -173,7 +193,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param func Function to apply to the leaf segment.
      * @return Resource with leaf segment replaced.
      */
-    HierarchicalResource applyToLeaf(Function<String, String> func);
+    default HierarchicalResource applyToLeaf(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(func.apply(leaf));
+    }
 
 
     /**
@@ -183,7 +209,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to replace.
      * @return Resource with file extension replaced.
      */
-    HierarchicalResource replaceLeafExtension(String extension);
+    default HierarchicalResource replaceLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
+    }
 
     /**
      * Returns a resource where the file extension of the current resource is ensured to be {@code extension}. That is,
@@ -194,7 +226,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to ensure.
      * @return Resource with file extension ensured.
      */
-    HierarchicalResource ensureLeafExtension(String extension);
+    default HierarchicalResource ensureLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
+    }
 
     /**
      * Returns a resource where the leaf segment of the current resource is appended with a '.' and {@code extension}.
@@ -203,7 +241,13 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to append.
      * @return Resource with file extension appended.
      */
-    HierarchicalResource appendExtensionToLeaf(String extension);
+    default HierarchicalResource appendExtensionToLeaf(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
+    }
 
     /**
      * Returns a resource where the file extension of the leaf segment of the current resource is replaced by applying
@@ -212,55 +256,217 @@ public interface HierarchicalResource extends WritableResource {
      * @param func Function to apply to the file extension.
      * @return Resource with file extension replaced.
      */
-    HierarchicalResource applyToLeafExtension(Function<String, String> func);
+    default HierarchicalResource applyToLeafExtension(Function<String, String> func) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
+    }
 
 
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     HierarchicalResourceType getType() throws IOException;
 
-    boolean isFile() throws IOException;
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    default boolean isFile() throws IOException {
+        return getType() == HierarchicalResourceType.File;
+    }
 
-    boolean isDirectory() throws IOException;
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    default boolean isDirectory() throws IOException {
+        return getType() == HierarchicalResourceType.Directory;
+    }
 
 
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> list() throws IOException;
 
+    /**
+     * @param matcher
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> list(ResourceMatcher matcher) throws IOException;
 
+    /**
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> walk() throws IOException;
 
-    Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException;
+    /**
+     * @param walker
+     * @param matcher
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    default Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+        return walk(walker, matcher, null);
+    }
 
+    /**
+     * @param walker
+     * @param matcher
+     * @param access
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
 
 
     /**
-     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws UnsupportedOperationException The operation is not supported.
      */
     void copyTo(HierarchicalResource other) throws IOException;
 
     /**
-     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    void copyRecursivelyTo(HierarchicalResource other) throws IOException;
+
+    /**
+     * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
+     * @throws UnsupportedOperationException The operation is not supported.
      */
     void moveTo(HierarchicalResource other) throws IOException;
 
 
+    @Override default OutputStream openWrite() throws IOException {
+        ensureFileExists();
+        return openWriteExisting();
+    }
+
+    @Override default OutputStream openWriteNew() throws IOException {
+        createFile();
+        return openWriteExisting();
+    }
+
+
+    /**
+     * Creates this file resource.
+     *
+     * @param createParents Whether to create the parent directories.
+     * @throws FileAlreadyExistsException      The file already exists.
+     * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
+     */
     void createFile(boolean createParents) throws IOException;
 
+    /**
+     * Creates this file resource.
+     * <p>
+     * This method does not create the parent directories if they do not exist.
+     *
+     * @throws FileAlreadyExistsException      The file already exists.
+     * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
+     */
     default void createFile() throws IOException {
         createFile(false);
     }
 
+    /**
+     * Creates this file resource if it does not already exist.
+     * <p>
+     * This method creates parent directories if necessary.
+     * <p>
+     * It is possible for the resource to be deleted between a call to this method and a following call to a method such
+     * as {@link #openWriteExisting()}.
+     *
+     * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
+     * @throws IOException                     An I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
+     */
+    default void ensureFileExists() throws IOException {
+        try {
+            createFile(true);
+        } catch(FileAlreadyExistsException ex) {
+            // Ignored
+        }
+    }
+
+    /**
+     * Creates this directory resource.
+     *
+     * @param createParents Whether to create the parent directories.
+     * @throws DirectoryAlreadyExistsException The directory already exists.
+     * @throws FileAlreadyExistsException      A file with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
+     */
     void createDirectory(boolean createParents) throws IOException;
 
+    /**
+     * Creates this directory resource.
+     * <p>
+     * This method does not create the parent directories if they do not exist.
+     *
+     * @throws DirectoryAlreadyExistsException The directory already exists.
+     * @throws FileAlreadyExistsException      A file with the same name already exists.
+     * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
+     * @throws UnsupportedOperationException   The operation is not supported.
+     */
     default void createDirectory() throws IOException {
         createDirectory(false);
     }
 
+    /**
+     * Creates this resource if it does not already exist.
+     * <p>
+     * This method creates parent directories if necessary.
+     * <p>
+     * It is possible for the resource to be deleted between a call to this method and a following call to a method.
+     *
+     * @throws FileAlreadyExistsException    A file with the same name already exists.
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    default void ensureDirectoryExists() throws IOException {
+        try {
+            createDirectory(true);
+        } catch(DirectoryAlreadyExistsException ex) {
+            // Ignored
+        }
+    }
+
+    /**
+     * Creates the parent directories of this resource.
+     *
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     void createParents() throws IOException;
 
-    void delete(boolean deleteContents) throws IOException;
+    /**
+     * Deletes the resource.
+     *
+     * @param deleteRecursively Whether to delete the children of the resource recursively.
+     * @throws DirectoryNotEmptyException    The directory resource is not empty.
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    void delete(boolean deleteRecursively) throws IOException;
 
+    /**
+     * Deletes the resource.
+     * <p>
+     * This method does not recursively delete the children of the resource, if any.
+     *
+     * @throws DirectoryNotEmptyException    The directory resource is not empty.
+     * @throws IOException                   An I/O exception occurred.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
     default void delete() throws IOException {
         delete(false);
     }
+
 }

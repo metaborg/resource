@@ -4,6 +4,7 @@ import mb.resource.ReadableResource;
 import mb.resource.Resource;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.WritableResource;
+import mb.resource.hierarchical.FilenameExtensionUtil;
 import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.HierarchicalResourceAccess;
 import mb.resource.hierarchical.HierarchicalResourceType;
@@ -20,8 +21,11 @@ import java.io.Serializable;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -150,18 +154,6 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return new FSResource(newPath);
     }
 
-    @Override public @Nullable String getLeaf() {
-        return path.getLeaf();
-    }
-
-    @Override public @Nullable String getLeafExtension() {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return null;
-        }
-        return FilenameExtensionUtil.getExtension(leaf);
-    }
-
 
     @Override public FSResource appendSegment(String segment) {
         final FSPath newPath = path.appendSegment(segment);
@@ -189,12 +181,12 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
-    @Override public HierarchicalResource appendRelativePath(String relativePath) {
+    @Override public FSResource appendRelativePath(String relativePath) {
         final FSPath newPath = path.appendRelativePath(relativePath);
         return new FSResource(newPath);
     }
 
-    @Override public HierarchicalResource appendOrReplaceWithPath(String other) {
+    @Override public FSResource appendOrReplaceWithPath(String other) {
         final FSPath newPath = path.appendOrReplaceWithPath(other);
         return new FSResource(newPath);
     }
@@ -204,7 +196,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return new FSResource(newPath);
     }
 
-    @Override public HierarchicalResource appendOrReplaceWithPath(ResourcePath other) {
+    @Override public FSResource appendOrReplaceWithPath(ResourcePath other) {
         final FSPath newPath = path.appendOrReplaceWithPath(other);
         return new FSResource(newPath);
     }
@@ -221,34 +213,51 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
     @Override public FSResource appendToLeaf(String segment) {
-        final FSPath newPath = path.appendToLeaf(segment);
-        return new FSResource(newPath);
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(leaf + segment);
     }
 
     @Override public FSResource applyToLeaf(Function<String, String> func) {
-        final FSPath newPath = path.applyToLeaf(func);
-        return new FSResource(newPath);
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(func.apply(leaf));
     }
-
 
     @Override public FSResource replaceLeafExtension(String extension) {
-        final FSPath newPath = path.replaceLeafExtension(extension);
-        return new FSResource(newPath);
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
     }
 
-    @Override public HierarchicalResource ensureLeafExtension(String extension) {
-        final FSPath newPath = path.ensureLeafExtension(extension);
-        return new FSResource(newPath);
+    @Override public FSResource ensureLeafExtension(String extension) {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
     }
 
     @Override public FSResource appendExtensionToLeaf(String extension) {
-        final FSPath newPath = path.appendExtensionToLeaf(extension);
-        return new FSResource(newPath);
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
     }
 
     @Override public FSResource applyToLeafExtension(Function<String, String> func) {
-        final FSPath newPath = path.applyToLeafExtension(func);
-        return new FSResource(newPath);
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return this;
+        }
+        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
     }
 
 
@@ -290,8 +299,8 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return Files.getLastModifiedTime(path.javaPath).toInstant();
     }
 
-    @Override public void setLastModifiedTime(Instant time) throws IOException {
-        Files.setLastModifiedTime(path.javaPath, FileTime.from(time));
+    @Override public void setLastModifiedTime(Instant moment) throws IOException {
+        Files.setLastModifiedTime(path.javaPath, FileTime.from(moment));
     }
 
     @Override public long getSize() throws IOException {
@@ -335,8 +344,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return streamBuilder.build();
     }
 
-
-    @Override public InputStream newInputStream() throws IOException {
+    @Override public InputStream openRead() throws IOException {
         return Files.newInputStream(path.javaPath, StandardOpenOption.READ);
     }
 
@@ -344,30 +352,48 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return Files.readAllBytes(path.javaPath);
     }
 
-    public List<String> readLines(Charset charset) throws IOException {
-        return Files.readAllLines(path.javaPath, charset);
+    public List<String> readLines() throws IOException {
+        return readLines(StandardCharsets.UTF_8);
     }
 
-    @Override public String readString(Charset charset) throws IOException {
-        return new String(readBytes(), charset);
+    public List<String> readLines(Charset fromCharset) throws IOException {
+        return Files.readAllLines(path.javaPath, fromCharset);
     }
 
 
-    @Override public OutputStream newOutputStream() throws IOException {
-        return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE,
+    @Override public OutputStream openWrite() throws IOException {
+        return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE,
+            StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+    }
+
+    @Override public OutputStream openWriteAppend() throws IOException {
+        return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE,
+            StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+    }
+
+    @Override public OutputStream openWriteExisting() throws IOException {
+        return Files.newOutputStream(path.javaPath, StandardOpenOption.WRITE,
             StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    @Override public OutputStream openWriteNew() throws IOException {
+        return Files.newOutputStream(path.javaPath, StandardOpenOption.CREATE_NEW);
     }
 
     @Override public void writeBytes(byte[] bytes) throws IOException {
         Files.write(path.javaPath, bytes);
     }
 
-    public void writeLines(Iterable<String> lines, Charset charset) throws IOException {
-        Files.write(path.javaPath, lines, charset);
+    public void writeLines(Iterable<String> lines) throws IOException {
+        writeLines(lines, StandardCharsets.UTF_8);
     }
 
-    @Override public void writeString(String string, Charset charset) throws IOException {
-        Files.write(path.javaPath, string.getBytes(charset));
+    public void writeLines(Iterable<String> lines, Charset fromCharset) throws IOException {
+        Files.write(path.javaPath, lines, fromCharset);
+    }
+
+    @Override public void writeString(String string, Charset fromCharset) throws IOException {
+        Files.write(path.javaPath, string.getBytes(fromCharset));
     }
 
 
@@ -375,22 +401,45 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         if(!(other instanceof FSResource)) {
             throw new ResourceRuntimeException("Cannot copy to '" + other + "', it is not an FSResource");
         }
-        copyTo((FSResource) other);
+        copyTo((FSResource)other);
     }
 
     public void copyTo(FSResource other) throws IOException {
-        Files.copy(path.javaPath, other.path.javaPath);
+        Files.copy(path.javaPath, other.path.javaPath, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    @Override public void copyRecursivelyTo(HierarchicalResource other) throws IOException {
+        if(!(other instanceof FSResource)) {
+            throw new ResourceRuntimeException("Cannot copy recursively to '" + other + "', it is not an FSResource");
+        }
+        copyRecursivelyTo((FSResource)other);
+    }
+
+    public void copyRecursivelyTo(FSResource other) throws IOException {
+        try {
+            try(Stream<Path> stream = Files.walk(this.path.javaPath)) {
+                stream.forEachOrdered(sourcePath -> {
+                    try {
+                        Files.copy(sourcePath, this.path.javaPath.resolve(other.path.javaPath.relativize(sourcePath)));
+                    } catch(IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+            }
+        } catch(UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     @Override public void moveTo(HierarchicalResource other) throws IOException {
         if(!(other instanceof FSResource)) {
             throw new ResourceRuntimeException("Cannot move to '" + other + "', it is not an FSResource");
         }
-        moveTo((FSResource) other);
+        moveTo((FSResource)other);
     }
 
     public void moveTo(FSResource other) throws IOException {
-        Files.move(path.javaPath, other.path.javaPath);
+        Files.move(path.javaPath, other.path.javaPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
 
@@ -403,23 +452,23 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
 
     @Override public void createDirectory(boolean createParents) throws IOException {
         if(createParents) {
-            Files.createDirectories(path.javaPath);
+            createParents();
         }
-        if(!exists()) {
-            Files.createDirectory(path.javaPath);
-        }
+        Files.createDirectory(path.javaPath);
+    }
+
+    @Override public void ensureDirectoryExists() throws IOException {
+        Files.createDirectories(path.javaPath);
     }
 
     @Override public void createParents() throws IOException {
         final @Nullable FSResource parent = getParent();
-        if(parent != null) {
-            Files.createDirectories(parent.path.javaPath);
-        }
+        if(parent == null) return;
+        Files.createDirectories(parent.path.javaPath);
     }
 
-
-    @Override public void delete(boolean deleteContents) throws IOException {
-        if(deleteContents) {
+    @Override public void delete(boolean deleteRecursively) throws IOException {
+        if(deleteRecursively) {
             try {
                 if(!Files.exists(path.javaPath)) {
                     return;
@@ -445,7 +494,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     @Override public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final FSResource that = (FSResource) o;
+        final FSResource that = (FSResource)o;
         return path.equals(that.path);
     }
 

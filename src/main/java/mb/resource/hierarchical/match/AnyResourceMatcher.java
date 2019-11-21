@@ -9,29 +9,29 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class AllResourceMatcher implements ResourceMatcher {
+public class AnyResourceMatcher implements ResourceMatcher {
     private final List<ResourceMatcher> matchers;
 
-    public AllResourceMatcher(ArrayList<ResourceMatcher> matchers) {
+    public AnyResourceMatcher(ArrayList<ResourceMatcher> matchers) {
         this.matchers = matchers;
     }
 
-    public AllResourceMatcher(ResourceMatcher... matchers) {
+    public AnyResourceMatcher(ResourceMatcher... matchers) {
         this.matchers = Arrays.asList(matchers);
     }
 
     @Override
     public boolean matches(HierarchicalResource resource, HierarchicalResource rootDirectory) throws IOException {
         for(ResourceMatcher matcher : matchers) {
-            if(!matcher.matches(resource, rootDirectory)) return false;
+            if(matcher.matches(resource, rootDirectory)) return true;
         }
-        return true;
+        return false;
     }
 
     @Override public boolean equals(@Nullable Object obj) {
         if(this == obj) return true;
         if(obj == null || getClass() != obj.getClass()) return false;
-        final AllResourceMatcher other = (AllResourceMatcher) obj;
+        final AnyResourceMatcher other = (AnyResourceMatcher) obj;
         return matchers.equals(other.matchers);
     }
 
@@ -40,6 +40,6 @@ public class AllResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "AllResourceMatcher(" + matchers.toString() + ")";
+        return "AnyResourceMatcher(" + matchers.toString() + ")";
     }
 }

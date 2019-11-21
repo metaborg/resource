@@ -3,6 +3,7 @@ package mb.resource.fs;
 import mb.resource.ResourceKey;
 import mb.resource.ResourceKeyConverter;
 import mb.resource.ResourceRuntimeException;
+import mb.resource.hierarchical.FilenameExtensionUtil;
 import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -260,52 +261,6 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     @Override public FSPath replaceLeaf(String segment) {
         final Path javaPath = this.javaPath.resolveSibling(segment);
         return new FSPath(javaPath);
-    }
-
-    @Override public FSPath appendToLeaf(String segment) {
-        final String fileName = this.javaPath.getFileName().toString();
-        final String newFileName = fileName + segment;
-        final Path javaPath = this.javaPath.resolveSibling(newFileName);
-        return new FSPath(javaPath);
-    }
-
-    @Override public FSPath applyToLeaf(Function<String, String> func) {
-        final String fileName = this.javaPath.getFileName().toString();
-        final Path javaPath = this.javaPath.resolveSibling(func.apply(fileName));
-        return new FSPath(javaPath);
-    }
-
-
-    @Override public FSPath replaceLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
-    }
-
-    @Override public FSPath ensureLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
-    }
-
-    @Override public FSPath appendExtensionToLeaf(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
-    }
-
-    @Override public FSPath applyToLeafExtension(Function<String, String> func) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
     }
 
 
