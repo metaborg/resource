@@ -240,15 +240,15 @@ public class URLResource implements HierarchicalResource {
     }
 
 
-    @Override public void createFile(boolean createParents) throws IOException {
+    @Override public URLResource createFile(boolean createParents) throws IOException {
         throw new UnsupportedOperationException();
     }
 
-    @Override public void createDirectory(boolean createParents) throws IOException {
+    @Override public URLResource createDirectory(boolean createParents) throws IOException {
         throw new UnsupportedOperationException();
     }
 
-    @Override public void createParents() throws IOException {
+    @Override public URLResource createParents() throws IOException {
         throw new UnsupportedOperationException();
     }
 

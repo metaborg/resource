@@ -353,25 +353,27 @@ public interface HierarchicalResource extends WritableResource {
      * Creates this file resource.
      *
      * @param createParents Whether to create the parent directories.
+     * @return This object for chaining.
      * @throws FileAlreadyExistsException      The file already exists.
      * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
      * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    void createFile(boolean createParents) throws IOException;
+    HierarchicalResource createFile(boolean createParents) throws IOException;
 
     /**
      * Creates this file resource.
      * <p>
      * This method does not create the parent directories if they do not exist.
      *
+     * @return This object for chaining.
      * @throws FileAlreadyExistsException      The file already exists.
      * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
      * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    default void createFile() throws IOException {
-        createFile(false);
+    default HierarchicalResource createFile() throws IOException {
+        return createFile(false);
     }
 
     /**
@@ -382,41 +384,45 @@ public interface HierarchicalResource extends WritableResource {
      * It is possible for the resource to be deleted between a call to this method and a following call to a method such
      * as {@link #openWriteExisting()}.
      *
+     * @return This object for chaining.
      * @throws DirectoryAlreadyExistsException A directory with the same name already exists.
      * @throws IOException                     An I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    default void ensureFileExists() throws IOException {
+    default HierarchicalResource ensureFileExists() throws IOException {
         try {
-            createFile(true);
+            return createFile(true);
         } catch(FileAlreadyExistsException ex) {
             // Ignored
         }
+        return this;
     }
 
     /**
      * Creates this directory resource.
      *
      * @param createParents Whether to create the parent directories.
+     * @return This object for chaining.
      * @throws DirectoryAlreadyExistsException The directory already exists.
      * @throws FileAlreadyExistsException      A file with the same name already exists.
      * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    void createDirectory(boolean createParents) throws IOException;
+    HierarchicalResource createDirectory(boolean createParents) throws IOException;
 
     /**
      * Creates this directory resource.
      * <p>
      * This method does not create the parent directories if they do not exist.
      *
+     * @return This object for chaining.
      * @throws DirectoryAlreadyExistsException The directory already exists.
      * @throws FileAlreadyExistsException      A file with the same name already exists.
      * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    default void createDirectory() throws IOException {
-        createDirectory(false);
+    default HierarchicalResource createDirectory() throws IOException {
+        return createDirectory(false);
     }
 
     /**
@@ -426,25 +432,28 @@ public interface HierarchicalResource extends WritableResource {
      * <p>
      * It is possible for the resource to be deleted between a call to this method and a following call to a method.
      *
+     * @return This object for chaining.
      * @throws FileAlreadyExistsException    A file with the same name already exists.
      * @throws IOException                   An I/O exception occurred.
      * @throws UnsupportedOperationException The operation is not supported.
      */
-    default void ensureDirectoryExists() throws IOException {
+    default HierarchicalResource ensureDirectoryExists() throws IOException {
         try {
-            createDirectory(true);
+            return createDirectory(true);
         } catch(DirectoryAlreadyExistsException ex) {
             // Ignored
         }
+        return this;
     }
 
     /**
      * Creates the parent directories of this resource.
      *
+     * @return This object for chaining.
      * @throws IOException                   An I/O exception occurred.
      * @throws UnsupportedOperationException The operation is not supported.
      */
-    void createParents() throws IOException;
+    HierarchicalResource createParents() throws IOException;
 
     /**
      * Deletes the resource.
