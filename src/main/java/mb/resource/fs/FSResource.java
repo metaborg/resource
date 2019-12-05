@@ -443,28 +443,32 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
     }
 
 
-    @Override public void createFile(boolean createParents) throws IOException {
+    @Override public FSResource createFile(boolean createParents) throws IOException {
         if(createParents) {
             createParents();
         }
         Files.createFile(path.javaPath);
+        return this;
     }
 
-    @Override public void createDirectory(boolean createParents) throws IOException {
+    @Override public FSResource createDirectory(boolean createParents) throws IOException {
         if(createParents) {
             createParents();
         }
         Files.createDirectory(path.javaPath);
+        return this;
     }
 
-    @Override public void ensureDirectoryExists() throws IOException {
+    @Override public FSResource ensureDirectoryExists() throws IOException {
         Files.createDirectories(path.javaPath);
+        return this;
     }
 
-    @Override public void createParents() throws IOException {
+    @Override public FSResource createParents() throws IOException {
         final @Nullable FSResource parent = getParent();
-        if(parent == null) return;
+        if(parent == null) return this;
         Files.createDirectories(parent.path.javaPath);
+        return this;
     }
 
     @Override public void delete(boolean deleteRecursively) throws IOException {
