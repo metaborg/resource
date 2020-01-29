@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.InvalidPathException;
@@ -20,7 +21,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Serializable {
     static final String qualifier = "java";
@@ -130,6 +130,10 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
         return () -> new PathIterator(javaPath.iterator());
     }
 
+    @Override public String asString() {
+        return javaPath.toString();
+    }
+
 
     @Override public @Nullable FSPath getParent() {
         final @Nullable Path parentJavaPath = this.javaPath.getParent();
@@ -172,12 +176,23 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
         if(!(other instanceof FSPath)) {
             throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an FSPath");
         }
-        return relativize((FSPath) other);
+        return relativize((FSPath)other);
     }
 
     public FSPath relativize(FSPath other) {
         final Path javaRelativePath = javaPath.relativize(other.javaPath);
         return new FSPath(javaRelativePath);
+    }
+
+    @Override public String relativizeToString(ResourcePath other) {
+        if(!(other instanceof FSPath)) {
+            throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an FSPath");
+        }
+        return relativizeToString((FSPath)other);
+    }
+
+    public String relativizeToString(FSPath other) {
+        return javaPath.relativize(other.javaPath).toString();
     }
 
 
@@ -224,11 +239,21 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
         return appendOrReplaceWithPath(javaPath.getFileSystem().getPath(other));
     }
 
+    @Override public FSPath appendString(String other) {
+        final String appended = uri.toString() + other;
+        try {
+            final URI appendedUri = new URI(appended);
+            return new FSPath(appendedUri);
+        } catch(URISyntaxException e) {
+            throw new ResourceRuntimeException("Cannot append string '" + other + "' to '" + uri + "'", e);
+        }
+    }
+
     @Override public FSPath appendRelativePath(ResourcePath relativePath) {
         if(!(relativePath instanceof FSPath)) {
             throw new ResourceRuntimeException("Cannot append '" + relativePath + "', it is not an FSPath");
         }
-        return appendRelativePath((FSPath) relativePath);
+        return appendRelativePath((FSPath)relativePath);
     }
 
     public FSPath appendRelativePath(FSPath relativePath) {
@@ -244,7 +269,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
         if(!(other instanceof FSPath)) {
             throw new ResourceRuntimeException("Cannot append or replace from '" + other + "', it is not an FSPath");
         }
-        return appendOrReplaceWithPath((FSPath) other);
+        return appendOrReplaceWithPath((FSPath)other);
     }
 
     public FSPath appendOrReplaceWithPath(FSPath other) {
@@ -345,7 +370,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final FSPath javaPath = (FSPath) o;
+        final FSPath javaPath = (FSPath)o;
         return uri.equals(javaPath.uri);
     }
 

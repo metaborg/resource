@@ -2,6 +2,7 @@ package mb.resource.url;
 
 import mb.resource.ResourceKeyConverter;
 import mb.resource.ResourceRuntimeException;
+import mb.resource.fs.FSPath;
 import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -78,6 +79,10 @@ public class URLPath implements ResourcePath {
         };
     }
 
+    @Override public String asString() {
+        return uri.toString();
+    }
+
 
     @Override public @Nullable URLPath getParent() {
         return null;
@@ -104,11 +109,22 @@ public class URLPath implements ResourcePath {
         if(!(other instanceof URLPath)) {
             throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an URIPath");
         }
-        return relativize((URLPath) other);
+        return relativize((URLPath)other);
     }
 
     public URLPath relativize(URLPath other) {
         return new URLPath(uri.relativize(other.uri));
+    }
+
+    @Override public String relativizeToString(ResourcePath other) {
+        if(!(other instanceof URLPath)) {
+            throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an URIPath");
+        }
+        return relativizeToString((URLPath)other);
+    }
+
+    public String relativizeToString(URLPath other) {
+        return uri.relativize(other.uri).toString();
     }
 
 
@@ -157,11 +173,21 @@ public class URLPath implements ResourcePath {
         }
     }
 
+    @Override public URLPath appendString(String other) {
+        final String appended = uri.toString() + other;
+        try {
+            final URI appendedUri = new URI(appended);
+            return new URLPath(appendedUri);
+        } catch(URISyntaxException e) {
+            throw new ResourceRuntimeException("Cannot append string '" + other + "' to '" + uri + "'", e);
+        }
+    }
+
     @Override public URLPath appendRelativePath(ResourcePath relativePath) {
         if(!(relativePath instanceof URLPath)) {
             throw new ResourceRuntimeException("Cannot append '" + relativePath + "', it is not an URIPath");
         }
-        return appendRelativePath((URLPath) relativePath);
+        return appendRelativePath((URLPath)relativePath);
     }
 
     public URLPath appendRelativePath(URLPath relativePath) {
@@ -176,7 +202,7 @@ public class URLPath implements ResourcePath {
         if(!(other instanceof URLPath)) {
             throw new ResourceRuntimeException("Cannot append or replace with '" + other + "', it is not an URIPath");
         }
-        return appendOrReplaceWithPath((URLPath) other);
+        return appendOrReplaceWithPath((URLPath)other);
     }
 
     public URLPath appendOrReplaceWithPath(URLPath other) {
@@ -217,7 +243,7 @@ public class URLPath implements ResourcePath {
     @Override public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final URLPath that = (URLPath) o;
+        final URLPath that = (URLPath)o;
         return uri.equals(that.uri);
     }
 
