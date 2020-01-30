@@ -2,6 +2,9 @@ package mb.resource;
 
 import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.ResourcePath;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.io.File;
 
 /**
  * The resource service, used to get a resource corresponding to a resource key.
@@ -180,8 +183,7 @@ public interface ResourceService {
     /**
      * If {@code pathOrKey} is a string representation of a {@link ResourceKey resource key}, returns a (replaced)
      * {@link Resource resource} for that key. Otherwise, returns a resource where given {@code pathOrKey} is appended
-     * (or replaced with) as a path to given {@code resource} using
-     * {@link HierarchicalResource#appendOrReplaceWithPath(String)}.
+     * (or replaced with) as a path to given {@code resource} using {@link HierarchicalResource#appendOrReplaceWithPath(String)}.
      *
      * @param resource     Resource to attempt to append {@code pathOrKey} to.
      * @param keyStrOrPath String representation of a {@link ResourceKey key}, or path which should be appended to
@@ -229,6 +231,27 @@ public interface ResourceService {
      *                                  convert the identifier of the key into its string representation.
      */
     String toStringRepresentation(ResourceKey key);
+
+
+    /**
+     * Attempts to get a local file handle for given resource key.
+     *
+     * @param key Resource key to get a local file handle for.
+     * @return Local file handle, or null if given identifier does not reside on the local file system.
+     * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
+     *                                  ResourceKey#getQualifier() qualifier}.
+     */
+    @Nullable File toLocalFile(ResourceKey key);
+
+    /**
+     * Attempts to get a local file handle for given resource.
+     *
+     * @param resource Resource to get a local file handle for.
+     * @return Local file handle, or null if given resource does not reside on the local file system.
+     * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
+     *                                  Resource#getKey()} key}.
+     */
+    @Nullable File toLocalFile(Resource resource);
 
 
     /**

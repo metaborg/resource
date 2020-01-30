@@ -4,6 +4,7 @@ import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class DefaultResourceService implements ResourceService {
@@ -50,7 +51,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(resource instanceof ReadableResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a readable resource");
         }
-        return (ReadableResource) resource;
+        return (ReadableResource)resource;
     }
 
     @Override public WritableResource getWritableResource(ResourceKey key) {
@@ -58,7 +59,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(resource instanceof WritableResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a writable resource");
         }
-        return (WritableResource) resource;
+        return (WritableResource)resource;
     }
 
     @Override public HierarchicalResource getHierarchicalResource(ResourcePath path) {
@@ -66,7 +67,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(resource instanceof HierarchicalResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a hierarchical resource");
         }
-        return (HierarchicalResource) resource;
+        return (HierarchicalResource)resource;
     }
 
 
@@ -94,7 +95,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(key instanceof ResourcePath)) {
             throw new ResourceRuntimeException("Resource key '" + key + "' is not a path");
         }
-        return (ResourcePath) key;
+        return (ResourcePath)key;
     }
 
 
@@ -122,7 +123,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(resource instanceof ReadableResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a readable resource");
         }
-        return (ReadableResource) resource;
+        return (ReadableResource)resource;
     }
 
     @Override public WritableResource getWritableResource(String keyOrIdStr) {
@@ -130,7 +131,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(resource instanceof WritableResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a writable resource");
         }
-        return (WritableResource) resource;
+        return (WritableResource)resource;
     }
 
     @Override public HierarchicalResource getHierarchicalResource(String pathOrIdStr) {
@@ -138,7 +139,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(resource instanceof HierarchicalResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a hierarchical resource");
         }
-        return (HierarchicalResource) resource;
+        return (HierarchicalResource)resource;
     }
 
 
@@ -161,7 +162,7 @@ public class DefaultResourceService implements ResourceService {
         if(!(newResource instanceof HierarchicalResource)) {
             throw new ResourceRuntimeException("Resource '" + resource + "' is not a hierarchical resource");
         }
-        return (HierarchicalResource) newResource;
+        return (HierarchicalResource)newResource;
     }
 
 
@@ -173,6 +174,25 @@ public class DefaultResourceService implements ResourceService {
         }
         final String idStr = registry.toStringRepresentation(key.getId());
         return ResourceKeyConverter.toString(qualifier, idStr);
+    }
+
+
+    @Override public @Nullable File toLocalFile(ResourceKey key) {
+        final String qualifier = key.getQualifier();
+        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        if(registry == null) {
+            throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
+        }
+        return registry.toLocalFile(key.getId());
+    }
+
+    @Override public @Nullable File toLocalFile(Resource resource) {
+        final String qualifier = resource.getKey().getQualifier();
+        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        if(registry == null) {
+            throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
+        }
+        return registry.toLocalFile(resource);
     }
 
 
