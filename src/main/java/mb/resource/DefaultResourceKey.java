@@ -3,17 +3,17 @@ package mb.resource;
 /**
  * A simple resource key.
  */
-public class SimpleResourceKey implements ResourceKey {
+public class DefaultResourceKey implements ResourceKey {
     private final String qualifier;
     private final String id;
 
     /**
-     * Initializes a new instance of the {@link SimpleResourceKey} class.
+     * Initializes a new instance of the {@link DefaultResourceKey} class.
      *
      * @param qualifier The resource qualifier.
      * @param id        The resource identifier.
      */
-    public SimpleResourceKey(String qualifier, String id) {
+    public DefaultResourceKey(String qualifier, String id) {
         this.qualifier = qualifier;
         this.id = id;
     }
@@ -29,7 +29,7 @@ public class SimpleResourceKey implements ResourceKey {
     @Override public boolean equals(Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final SimpleResourceKey that = (SimpleResourceKey)o;
+        final DefaultResourceKey that = (DefaultResourceKey)o;
         if(!qualifier.equals(that.qualifier)) return false;
         return id.equals(that.id);
     }

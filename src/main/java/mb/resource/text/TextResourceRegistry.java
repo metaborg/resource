@@ -4,7 +4,7 @@ import mb.resource.HashMapResourceRegistry;
 import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRuntimeException;
-import mb.resource.SimpleResourceKey;
+import mb.resource.DefaultResourceKey;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
@@ -21,11 +21,11 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
     }
 
 
-    @Override public SimpleResourceKey getResourceKey(ResourceKeyString keyStr) {
+    @Override public DefaultResourceKey getResourceKey(ResourceKeyString keyStr) {
         if(!keyStr.qualifierMatches(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
-        return new SimpleResourceKey(TextResourceRegistry.qualifier, keyStr.getId());
+        return new DefaultResourceKey(TextResourceRegistry.qualifier, keyStr.getId());
     }
 
     @Override public QualifiedResourceKeyString toStringRepresentation(Serializable id) {

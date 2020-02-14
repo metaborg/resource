@@ -1,6 +1,6 @@
 package mb.resource.text;
 
-import mb.resource.SimpleResourceKey;
+import mb.resource.DefaultResourceKey;
 import mb.resource.ReadableResource;
 
 import java.io.ByteArrayInputStream;
@@ -15,7 +15,7 @@ import java.time.Instant;
  */
 public class TextResource implements ReadableResource, Serializable {
     public final String text;
-    public final SimpleResourceKey key;
+    public final DefaultResourceKey key;
 
     /**
      * Initializes a new instance of the {@link TextResource} class.
@@ -25,7 +25,7 @@ public class TextResource implements ReadableResource, Serializable {
      */
     /* package private */ TextResource(String text, String id) {
         this.text = text;
-        this.key = new SimpleResourceKey(TextResourceRegistry.qualifier, id);
+        this.key = new DefaultResourceKey(TextResourceRegistry.qualifier, id);
     }
 
     @Override public void close() {
@@ -33,7 +33,7 @@ public class TextResource implements ReadableResource, Serializable {
     }
 
 
-    @Override public SimpleResourceKey getKey() {
+    @Override public DefaultResourceKey getKey() {
         return key;
     }
 
