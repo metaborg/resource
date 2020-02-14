@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.Serializable;
 
 public interface ResourceRegistry {
-
     /**
      * Gets the qualifier this resource registry handles.
      *
@@ -26,20 +25,22 @@ public interface ResourceRegistry {
     /**
      * Gets resource key for given string representation of identifier.
      *
-     * @param idStr String representation of the resource identifier.
+     * @param keyStr String representation of the resource identifier.
      * @return The resource key.
-     * @throws ResourceRuntimeException when {@code idStr} cannot be converted into an identifier.
+     * @throws ResourceRuntimeException when {@code keyStr} cannot be converted into an identifier.
+     * @throws ResourceRuntimeException when {@code keyStr} has a qualifier which is not equal to {@link #qualifier()}.
      */
-    ResourceKey getResourceKey(String idStr);
+    ResourceKey getResourceKey(ResourceKeyString keyStr);
 
     /**
      * Gets resource for given string representation of identifier.
      *
-     * @param idStr String representation of the resource identifier.
+     * @param keyStr String representation of the resource identifier.
      * @return The resource.
      * @throws ResourceRuntimeException when {@code idStr} cannot be converted into a resource.
+     * @throws ResourceRuntimeException when {@code keyStr} has a qualifier which is not equal to {@link #qualifier()}.
      */
-    Resource getResource(String idStr);
+    Resource getResource(ResourceKeyString keyStr);
 
     /**
      * Converts given identifier to its string representation.
@@ -49,7 +50,7 @@ public interface ResourceRegistry {
      * @throws ResourceRuntimeException when {@code id} cannot be handled by this resource registry.
      * @throws ResourceRuntimeException when {@code id} cannot be converted into a string representation.
      */
-    String toStringRepresentation(Serializable id);
+    QualifiedResourceKeyString toStringRepresentation(Serializable id);
 
     /**
      * Attempts to get a local file handle for given identifier.
@@ -68,5 +69,4 @@ public interface ResourceRegistry {
      * @throws ResourceRuntimeException when {@code resource} cannot be handled by this resource registry.
      */
     default @Nullable File toLocalFile(Resource resource) { return null; }
-
 }

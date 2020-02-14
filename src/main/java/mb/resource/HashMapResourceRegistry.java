@@ -9,7 +9,6 @@ import java.util.HashMap;
  * Base class for in-memory resource registries.
  */
 abstract public class HashMapResourceRegistry implements ResourceRegistry {
-
     private final String qualifier;
     private final HashMap<Serializable, Resource> resources = new HashMap<>();
 
@@ -23,30 +22,28 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
     }
 
 
-    @Override
-    public String qualifier() {
+    @Override public String qualifier() {
         return qualifier;
     }
 
-
-    @Override
-    public Resource getResource(Serializable id) {
+    @Override public Resource getResource(Serializable id) {
         final @Nullable Resource resource = resources.get(id);
-        if (resource == null) {
+        if(resource == null) {
             throw new ResourceRuntimeException(
-                    "Cannot get resource with identifier '" + id + "'; it was not found in this registry");
+                "Cannot get resource with identifier '" + id + "'; it was not found in this registry");
         }
         return resource;
     }
 
-
-    @Override
-    public Resource getResource(String idStr) {
-        final Serializable id = toId(idStr);
+    @Override public Resource getResource(ResourceKeyString keyStr) {
+        if(!keyStr.qualifierMatches(qualifier)) {
+            throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
+        }
+        final Serializable id = toId(keyStr);
         final @Nullable Resource resource = resources.get(id);
-        if (resource == null) {
+        if(resource == null) {
             throw new ResourceRuntimeException(
-                    "Cannot get resource with identifier '" + id + "'; it was not found in this registry");
+                "Cannot get resource with identifier '" + id + "'; it was not found in this registry");
         }
         return resource;
     }
@@ -58,24 +55,23 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
      * @param idStr String representation of identifier.
      * @return Identifier in its canonical form.
      */
-    protected abstract Serializable toId(String idStr);
+    protected abstract Serializable toId(ResourceKeyString idStr);
 
 
     /**
      * Adds the specified resource to the resources known by this registry.
      *
      * @param resource The resource to add.
-     * @return {@code true} when a resource with the same key was already present and overwritten;
-     * otherwise, {@code false}.
+     * @return {@code true} when a resource with the same key was already present and overwritten; otherwise, {@code
+     * false}.
      */
-    @SuppressWarnings("UnusedReturnValue")
     protected boolean addResource(Resource resource) {
         final ResourceKey key = resource.getKey();
         final Serializable qualifier = key.getQualifier();
-        if (!this.qualifier.equals(qualifier)) {
+        if(!this.qualifier.equals(qualifier)) {
             throw new ResourceRuntimeException(
-                    "Cannot add resource '" + resource + "' to registry; its qualifier '" + qualifier + "' does not " +
-                            "match qualifier '" + this.qualifier + "' of the registry");
+                "Cannot add resource '" + resource + "' to registry; its qualifier '" + qualifier + "' does not " +
+                    "match qualifier '" + this.qualifier + "' of the registry");
         }
         @Nullable Resource oldResource = this.resources.put(key.getId(), resource);
         return oldResource != null;
@@ -85,17 +81,15 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
      * Removes the specified resource from the resources known by this registry.
      *
      * @param resource The resource to remove.
-     * @return {@code true} when the resource was found and removed;
-     * otherwise, {@code false}.
+     * @return {@code true} when the resource was found and removed; otherwise, {@code false}.
      */
-    @SuppressWarnings("UnusedReturnValue")
     protected boolean removeResource(Resource resource) {
         final ResourceKey key = resource.getKey();
         final Serializable qualifier = key.getQualifier();
-        if (!this.qualifier.equals(qualifier)) {
+        if(!this.qualifier.equals(qualifier)) {
             throw new ResourceRuntimeException(
-                    "Cannot remove resource '" + resource + "' from registry; its qualifier '" + qualifier + "' does " +
-                            "not match qualifier '" + this.qualifier + "' of the registry");
+                "Cannot remove resource '" + resource + "' from registry; its qualifier '" + qualifier + "' does " +
+                    "not match qualifier '" + this.qualifier + "' of the registry");
         }
         return removeResource(key.getId());
     }
@@ -104,13 +98,10 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
      * Removes the resource with the specified identifier from the resources known by this registry.
      *
      * @param id The identifier of the resource to remove.
-     * @return {@code true} when the resource was found and removed;
-     * otherwise, {@code false}.
+     * @return {@code true} when the resource was found and removed; otherwise, {@code false}.
      */
-    @SuppressWarnings("UnusedReturnValue")
     protected boolean removeResource(Serializable id) {
         @Nullable Resource oldResource = this.resources.remove(id);
         return oldResource != null;
     }
-
 }

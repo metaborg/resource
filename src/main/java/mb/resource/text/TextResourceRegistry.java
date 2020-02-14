@@ -1,8 +1,10 @@
 package mb.resource.text;
 
-import mb.resource.SimpleResourceKey;
 import mb.resource.HashMapResourceRegistry;
+import mb.resource.QualifiedResourceKeyString;
+import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRuntimeException;
+import mb.resource.SimpleResourceKey;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
@@ -19,28 +21,31 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
     }
 
 
-    @Override public SimpleResourceKey getResourceKey(String idStr) {
-        return new SimpleResourceKey(TextResourceRegistry.qualifier, idStr);
+    @Override public SimpleResourceKey getResourceKey(ResourceKeyString keyStr) {
+        if(!keyStr.qualifierMatches(qualifier)) {
+            throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
+        }
+        return new SimpleResourceKey(TextResourceRegistry.qualifier, keyStr.getId());
     }
 
-    @Override public String toStringRepresentation(Serializable id) {
+    @Override public QualifiedResourceKeyString toStringRepresentation(Serializable id) {
         if(!(id instanceof String)) {
             throw new ResourceRuntimeException(
                 "Cannot get text resource with ID '" + id + "'; the ID is not of type String");
         }
-        return (String) id; // Assuming String id's from DefaultResourceKey
+        return QualifiedResourceKeyString.of(qualifier, (String)id);
     }
 
 
-    @Override protected Serializable toId(String idStr) {
-        return idStr;
+    @Override protected Serializable toId(ResourceKeyString idStr) {
+        return idStr.getId();
     }
 
     /**
      * Creates a new read-only in-memory text resource.
      *
      * @param text The content of the resource.
-     * @param id The unique identifier of the resource; or {@code null} to generate one.
+     * @param id   The unique identifier of the resource; or {@code null} to generate one.
      * @return The created resource.
      */
     public TextResource createResource(String text, @Nullable String id) {
@@ -52,6 +57,7 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
 
     /**
      * Creates a new read-only in-memory text resource with a generated unique identifier.
+     *
      * @param text The content of the resource.
      * @return The created resource.
      */
