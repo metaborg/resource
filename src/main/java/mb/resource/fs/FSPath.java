@@ -1,7 +1,7 @@
 package mb.resource.fs;
 
+import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceKey;
-import mb.resource.ResourceKeyConverter;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.FilenameExtensionUtil;
 import mb.resource.hierarchical.ResourcePath;
@@ -23,8 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Serializable {
-    static final String qualifier = "java";
-
     // URI version of the path which can be serialized and deserialized.
     final URI uri;
     // Transient and non-final for deserialization in readObject. Invariant: always nonnull.
@@ -80,7 +78,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
         return uri;
     }
 
-    public String getStringRepresentation() {
+    public String getIdStringRepresentation() {
         return uri.toString();
     }
 
@@ -351,7 +349,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
      * @return "java" as the {@link ResourceKey} qualifier, indicating it belongs to the java.nio.file filesystem.
      */
     @Override public String getQualifier() {
-        return qualifier;
+        return FSResourceRegistry.qualifier;
     }
 
     /**
@@ -379,7 +377,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     }
 
     @Override public String toString() {
-        return ResourceKeyConverter.toString(qualifier, getStringRepresentation());
+        return QualifiedResourceKeyString.toString(FSResourceRegistry.qualifier, getIdStringRepresentation());
     }
 
 

@@ -1,8 +1,7 @@
 package mb.resource.url;
 
-import mb.resource.ResourceKeyConverter;
+import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceRuntimeException;
-import mb.resource.fs.FSPath;
 import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -252,6 +251,6 @@ public class URLPath implements ResourcePath {
     }
 
     @Override public String toString() {
-        return ResourceKeyConverter.toString(getQualifier(), getIdStringRepresentation());
+        return QualifiedResourceKeyString.toString(URLResourceRegistry.qualifier, getIdStringRepresentation());
     }
 }
