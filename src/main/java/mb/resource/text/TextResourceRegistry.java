@@ -1,10 +1,10 @@
 package mb.resource.text;
 
+import mb.resource.DefaultResourceKey;
 import mb.resource.HashMapResourceRegistry;
 import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRuntimeException;
-import mb.resource.DefaultResourceKey;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
@@ -22,18 +22,26 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
 
 
     @Override public DefaultResourceKey getResourceKey(ResourceKeyString keyStr) {
-        if(!keyStr.qualifierMatches(qualifier)) {
+        if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         return new DefaultResourceKey(TextResourceRegistry.qualifier, keyStr.getId());
     }
 
-    @Override public QualifiedResourceKeyString toStringRepresentation(Serializable id) {
+    @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
         if(!(id instanceof String)) {
             throw new ResourceRuntimeException(
                 "Cannot get text resource with ID '" + id + "'; the ID is not of type String");
         }
         return QualifiedResourceKeyString.of(qualifier, (String)id);
+    }
+
+    @Override public String toString(Serializable id) {
+        if(!(id instanceof String)) {
+            throw new ResourceRuntimeException(
+                "Cannot get text resource with ID '" + id + "'; the ID is not of type String");
+        }
+        return QualifiedResourceKeyString.toString(qualifier, (String)id);
     }
 
 

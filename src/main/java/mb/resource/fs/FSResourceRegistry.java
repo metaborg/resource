@@ -29,26 +29,35 @@ public class FSResourceRegistry implements ResourceRegistry {
 
 
     @Override public FSPath getResourceKey(ResourceKeyString keyStr) {
-        if(!keyStr.qualifierMatches(qualifier)) {
+        if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         return new FSPath(keyStr.getId());
     }
 
     @Override public Resource getResource(ResourceKeyString keyStr) {
-        if(!keyStr.qualifierMatches(qualifier)) {
+        if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         return new FSResource(keyStr.getId());
     }
 
-    @Override public QualifiedResourceKeyString toStringRepresentation(Serializable id) {
+    @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
         if(!(id instanceof FSPath)) {
             throw new ResourceRuntimeException(
                 "Cannot convert identifier '" + id + "' to its string representation; it is not of type FSPath");
         }
         final FSPath path = (FSPath)id;
         return QualifiedResourceKeyString.of(qualifier, path.getIdStringRepresentation());
+    }
+
+    @Override public String toString(Serializable id) {
+        if(!(id instanceof FSPath)) {
+            throw new ResourceRuntimeException(
+                "Cannot convert identifier '" + id + "' to its string representation; it is not of type FSPath");
+        }
+        final FSPath path = (FSPath)id;
+        return QualifiedResourceKeyString.toString(qualifier, path.getIdStringRepresentation());
     }
 
     @Override public @Nullable File toLocalFile(Serializable id) {

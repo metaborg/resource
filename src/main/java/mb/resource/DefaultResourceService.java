@@ -164,13 +164,22 @@ public class DefaultResourceService implements ResourceService {
     }
 
 
-    @Override public QualifiedResourceKeyString toStringRepresentation(ResourceKey key) {
+    @Override public QualifiedResourceKeyString toResourceKeyString(ResourceKey key) {
         final String qualifier = key.getQualifier();
         final @Nullable ResourceRegistry registry = registries.get(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
-        return registry.toStringRepresentation(key.getId());
+        return registry.toResourceKeyString(key.getId());
+    }
+
+    @Override public String toString(ResourceKey key) {
+        final String qualifier = key.getQualifier();
+        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        if(registry == null) {
+            throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
+        }
+        return registry.toString(key.getId());
     }
 
 

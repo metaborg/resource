@@ -28,7 +28,7 @@ public class URLResourceRegistry implements ResourceRegistry {
 
 
     @Override public URLPath getResourceKey(ResourceKeyString keyStr) {
-        if(!keyStr.qualifierMatches(qualifier)) {
+        if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         try {
@@ -41,7 +41,7 @@ public class URLResourceRegistry implements ResourceRegistry {
     }
 
     @Override public URLResource getResource(ResourceKeyString keyStr) {
-        if(!keyStr.qualifierMatches(qualifier)) {
+        if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         try {
@@ -54,12 +54,21 @@ public class URLResourceRegistry implements ResourceRegistry {
         }
     }
 
-    @Override public QualifiedResourceKeyString toStringRepresentation(Serializable id) {
+    @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
         if(!(id instanceof URLPath)) {
             throw new ResourceRuntimeException(
                 "Cannot convert identifier '" + id + "' to its string representation; it is not of type URLPath");
         }
         final URLPath urlPath = (URLPath)id;
         return QualifiedResourceKeyString.of(qualifier(), urlPath.getIdStringRepresentation());
+    }
+
+    @Override public String toString(Serializable id) {
+        if(!(id instanceof URLPath)) {
+            throw new ResourceRuntimeException(
+                "Cannot convert identifier '" + id + "' to its string representation; it is not of type URLPath");
+        }
+        final URLPath urlPath = (URLPath)id;
+        return QualifiedResourceKeyString.toString(qualifier(), urlPath.getIdStringRepresentation());
     }
 }

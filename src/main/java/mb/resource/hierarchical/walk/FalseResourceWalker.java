@@ -3,9 +3,9 @@ package mb.resource.hierarchical.walk;
 import mb.resource.hierarchical.HierarchicalResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class AllResourceWalker implements ResourceWalker {
+public class FalseResourceWalker implements ResourceWalker {
     @Override public boolean traverse(HierarchicalResource directory, HierarchicalResource rootDirectory) {
-        return true;
+        return false;
     }
 
     @Override public boolean equals(@Nullable Object o) {
@@ -17,6 +17,6 @@ public class AllResourceWalker implements ResourceWalker {
     }
 
     @Override public String toString() {
-        return "AllResourceWalker()";
+        return "FalseResourceWalker()";
     }
 }

@@ -43,14 +43,25 @@ public interface ResourceRegistry {
     Resource getResource(ResourceKeyString keyStr);
 
     /**
-     * Converts given identifier to its string representation.
+     * Converts given identifier to a {@link QualifiedResourceKeyString qualified resource key string}.
+     *
+     * @param id Identifier to convert.
+     * @return {@link QualifiedResourceKeyString Qualified resource key string} for given identifier.
+     * @throws ResourceRuntimeException when {@code id} cannot be handled by this resource registry.
+     * @throws ResourceRuntimeException when {@code id} cannot be converted.
+     */
+    QualifiedResourceKeyString toResourceKeyString(Serializable id);
+
+    /**
+     * Converts given identifier to its string representation, which can be parsed back into a resource key with {@code
+     * resourceRegistry.getResourceKey(QualifiedResourceKeyString.parse(str))}.
      *
      * @param id Identifier.
      * @return String representation for given identifier.
      * @throws ResourceRuntimeException when {@code id} cannot be handled by this resource registry.
-     * @throws ResourceRuntimeException when {@code id} cannot be converted into a string representation.
+     * @throws ResourceRuntimeException when {@code id} cannot be converted.
      */
-    QualifiedResourceKeyString toStringRepresentation(Serializable id);
+    String toString(Serializable id);
 
     /**
      * Attempts to get a local file handle for given identifier.
