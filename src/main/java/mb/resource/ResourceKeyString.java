@@ -73,11 +73,18 @@ public interface ResourceKeyString {
 
     /**
      * Checks whether given qualifier matches the qualifier in this resource key string. Always returns false when this
-     * resource key string's qualifier is misisng.
+     * resource key string's qualifier is missing.
      *
      * @return True when qualifier matches, false otherwise.
      */
-    default boolean qualifierMatches(String qualifier) { return getQualifier() != null && getQualifier().equals(qualifier); }
+    default boolean qualifierMatches(String qualifier) { return getQualifier() != null && qualifier.equals(getQualifier()); }
+
+    /**
+     * Checks whether given qualifier matches the qualifier in this resource key string, or whether it is missing.
+     *
+     * @return True when qualifier matches or is missing, false otherwise.
+     */
+    default boolean qualifierMatchesOrMissing(String qualifier) { return getQualifier() == null || qualifier.matches(getQualifier()); }
 
     /**
      * Gets the string representation for the identifier of the key.

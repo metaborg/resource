@@ -36,7 +36,7 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
     }
 
     @Override public Resource getResource(ResourceKeyString keyStr) {
-        if(!keyStr.qualifierMatches(qualifier)) {
+        if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         final Serializable id = toId(keyStr);

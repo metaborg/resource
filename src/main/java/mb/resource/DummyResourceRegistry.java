@@ -28,7 +28,11 @@ public class DummyResourceRegistry implements ResourceRegistry {
         return new DummyResource(new DefaultResourceKey(qualifier, keyStr.getId()));
     }
 
-    @Override public QualifiedResourceKeyString toStringRepresentation(Serializable id) {
+    @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
         return QualifiedResourceKeyString.of(qualifier, (String)id);
+    }
+
+    @Override public String toString(Serializable id) {
+        return QualifiedResourceKeyString.toString(qualifier, (String)id);
     }
 }

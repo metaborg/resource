@@ -12,7 +12,7 @@ public class PathResourceWalker implements ResourceWalker {
     }
 
     @Override public boolean traverse(HierarchicalResource resource, HierarchicalResource rootDirectory) {
-        return pathMatcher.matches(resource.getKey(), rootDirectory.getKey());
+        return pathMatcher.matches(resource.getPath(), rootDirectory.getPath());
     }
 
     @Override public boolean equals(@Nullable Object o) {

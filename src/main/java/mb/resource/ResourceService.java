@@ -205,7 +205,21 @@ public interface ResourceService {
 
 
     /**
-     * Converts given {@link ResourceKey resource key} into its string representation.
+     * Converts given {@link ResourceKey resource key} into a {@link QualifiedResourceKeyString qualified resource key
+     * string}.
+     *
+     * @param key {@link ResourceKey Key} to convert.
+     * @return {@link QualifiedResourceKeyString Qualified resource key string} for given {@link ResourceKey key}.
+     * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
+     *                                  ResourceKey#getQualifier() qualifier}.
+     * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to
+     *                                  convert the identifier of the key.
+     */
+    QualifiedResourceKeyString toResourceKeyString(ResourceKey key);
+
+    /**
+     * Converts given {@link ResourceKey resource key} into its string representation, which can be parsed back into a
+     * resource key with {@code resourceService.getResourceKey(QualifiedResourceKeyString.parse(str))}.
      *
      * @param key {@link ResourceKey Key} to convert to its string representation.
      * @return String representation of given {@link ResourceKey key}.
@@ -214,7 +228,7 @@ public interface ResourceService {
      * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to
      *                                  convert the identifier of the key into its string representation.
      */
-    QualifiedResourceKeyString toStringRepresentation(ResourceKey key);
+    String toString(ResourceKey key);
 
 
     /**
