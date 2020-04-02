@@ -9,6 +9,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class FSResourceRegistry implements ResourceRegistry {
     static final String qualifier = "java";
@@ -32,14 +34,22 @@ public class FSResourceRegistry implements ResourceRegistry {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
-        return new FSPath(keyStr.getId());
+        try {
+            return new FSPath(new URI(keyStr.getId()));
+        } catch(URISyntaxException e) {
+            throw new ResourceRuntimeException("Could not create FSPath from '" + keyStr + "', URI parsing failed", e);
+        }
     }
 
     @Override public Resource getResource(ResourceKeyString keyStr) {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
-        return new FSResource(keyStr.getId());
+        try {
+            return new FSResource(new URI(keyStr.getId()));
+        } catch(URISyntaxException e) {
+            throw new ResourceRuntimeException("Could not create FSPath from '" + keyStr + "', URI parsing failed", e);
+        }
     }
 
     @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {

@@ -148,6 +148,11 @@ public class URLPath implements ResourcePath {
     }
 
 
+    private URI resolve(String other) throws URISyntaxException {
+        // Do string append instead of URI#resolve, as it ignores `other` when `uri` is opaque.
+        return new URI(uri.toString() + other);
+    }
+
     @Override public URLPath appendRelativePath(String relativePath) {
         try {
             final URI relativeURI = new URI(relativePath);
@@ -155,7 +160,7 @@ public class URLPath implements ResourcePath {
                 throw new ResourceRuntimeException(
                     "Cannot append '" + relativePath + "', it is an absolute URI");
             }
-            return new URLPath(uri.resolve(relativeURI));
+            return new URLPath(resolve(relativePath));
         } catch(URISyntaxException e) {
             throw new ResourceRuntimeException(
                 "Cannot append '" + relativePath + "', it cannot be parsed into an URI", e);
@@ -165,7 +170,10 @@ public class URLPath implements ResourcePath {
     @Override public URLPath appendOrReplaceWithPath(String other) {
         try {
             final URI otherUri = new URI(other);
-            return new URLPath(uri.resolve(otherUri));
+            if(otherUri.isAbsolute()) {
+                return new URLPath(otherUri);
+            }
+            return new URLPath(resolve(other));
         } catch(URISyntaxException e) {
             throw new ResourceRuntimeException(
                 "Cannot append or replace with '" + other + "', it cannot be parsed into an URI", e);
@@ -194,6 +202,7 @@ public class URLPath implements ResourcePath {
             throw new ResourceRuntimeException(
                 "Cannot append '" + relativePath + "', it is an absolute URI");
         }
+        // TODO: do string append, as URI#resolve is weird when the URI is opaque?
         return new URLPath(uri.resolve(relativePath.uri));
     }
 
@@ -205,6 +214,7 @@ public class URLPath implements ResourcePath {
     }
 
     public URLPath appendOrReplaceWithPath(URLPath other) {
+        // TODO: do string append, as URI#resolve is weird when the URI is opaque?
         return new URLPath(uri.resolve(other.uri));
     }
 
