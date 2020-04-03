@@ -52,10 +52,6 @@ public class URLPath implements ResourcePath {
         return this; // Return this entire key as the identifier.
     }
 
-    public String getIdStringRepresentation() {
-        return uri.toString();
-    }
-
 
     @Override public boolean isAbsolute() {
         return uri.isAbsolute();
@@ -261,6 +257,6 @@ public class URLPath implements ResourcePath {
     }
 
     @Override public String toString() {
-        return QualifiedResourceKeyString.toString(URLResourceRegistry.qualifier, getIdStringRepresentation());
+        return QualifiedResourceKeyString.toString(URLResourceRegistry.qualifier, asString());
     }
 }

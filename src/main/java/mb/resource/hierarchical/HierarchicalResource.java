@@ -17,7 +17,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public interface HierarchicalResource extends WritableResource {
-
     /**
      * Gets the path of this resource.
      *
@@ -32,8 +31,7 @@ public interface HierarchicalResource extends WritableResource {
      *
      * @return Key of this resource.
      */
-    @Override
-    ResourcePath getKey();
+    @Override ResourcePath getKey();
 
 
     /**
@@ -104,9 +102,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param segments Segments to append.
      * @return Appended resource.
      */
-    default HierarchicalResource appendSegments(List<String> segments) {
-        return appendSegments((Collection<String>)segments);
-    }
+    HierarchicalResource appendSegments(List<String> segments);
 
     /**
      * Returns a resource where {@code segments} are appended to the current resource in order. A segment should be a
@@ -115,9 +111,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param segments Segments to append.
      * @return Appended resource.
      */
-    default HierarchicalResource appendSegments(String... segments) {
-        return appendSegments(Arrays.asList(segments));
-    }
+    HierarchicalResource appendSegments(String... segments);
 
 
     /**
@@ -178,13 +172,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param segment Segment to append.
      * @return Resource with leaf segment appended.
      */
-    default HierarchicalResource appendToLeaf(String segment) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(leaf + segment);
-    }
+    HierarchicalResource appendToLeaf(String segment);
 
     /**
      * Returns a resource where the leaf segment of the current resource is replaced by applying {@code func} to it. If
@@ -193,14 +181,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param func Function to apply to the leaf segment.
      * @return Resource with leaf segment replaced.
      */
-    default HierarchicalResource applyToLeaf(Function<String, String> func) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(func.apply(leaf));
-    }
-
+    HierarchicalResource applyToLeaf(Function<String, String> func);
 
     /**
      * Returns a resource where the file extension of the leaf segment of the current resource is replaced by {@code
@@ -209,13 +190,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to replace.
      * @return Resource with file extension replaced.
      */
-    default HierarchicalResource replaceLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
-    }
+    HierarchicalResource replaceLeafExtension(String extension);
 
     /**
      * Returns a resource where the file extension of the current resource is ensured to be {@code extension}. That is,
@@ -226,13 +201,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to ensure.
      * @return Resource with file extension ensured.
      */
-    default HierarchicalResource ensureLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
-    }
+    HierarchicalResource ensureLeafExtension(String extension);
 
     /**
      * Returns a resource where the leaf segment of the current resource is appended with a '.' and {@code extension}.
@@ -241,13 +210,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param extension File extension to append.
      * @return Resource with file extension appended.
      */
-    default HierarchicalResource appendExtensionToLeaf(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
-    }
+    HierarchicalResource appendExtensionToLeaf(String extension);
 
     /**
      * Returns a resource where the file extension of the leaf segment of the current resource is replaced by applying
@@ -256,13 +219,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param func Function to apply to the file extension.
      * @return Resource with file extension replaced.
      */
-    default HierarchicalResource applyToLeafExtension(Function<String, String> func) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
-    }
+    HierarchicalResource applyToLeafExtension(Function<String, String> func);
 
 
     /**
@@ -306,9 +263,7 @@ public interface HierarchicalResource extends WritableResource {
      * @param matcher
      * @throws UnsupportedOperationException The operation is not supported.
      */
-    default Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
-        return walk(walker, matcher, null);
-    }
+    Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException;
 
     /**
      * @param walker
@@ -372,9 +327,7 @@ public interface HierarchicalResource extends WritableResource {
      * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    default HierarchicalResource createFile() throws IOException {
-        return createFile(false);
-    }
+    HierarchicalResource createFile() throws IOException;
 
     /**
      * Creates this file resource if it does not already exist.
@@ -389,14 +342,8 @@ public interface HierarchicalResource extends WritableResource {
      * @throws IOException                     An I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    default HierarchicalResource ensureFileExists() throws IOException {
-        try {
-            return createFile(true);
-        } catch(FileAlreadyExistsException ex) {
-            // Ignored
-        }
-        return this;
-    }
+    HierarchicalResource ensureFileExists() throws IOException;
+
 
     /**
      * Creates this directory resource.
@@ -421,9 +368,7 @@ public interface HierarchicalResource extends WritableResource {
      * @throws IOException                     The parent directory does not exist, or an I/O exception occurred.
      * @throws UnsupportedOperationException   The operation is not supported.
      */
-    default HierarchicalResource createDirectory() throws IOException {
-        return createDirectory(false);
-    }
+    HierarchicalResource createDirectory() throws IOException;
 
     /**
      * Creates this resource if it does not already exist.
@@ -437,14 +382,7 @@ public interface HierarchicalResource extends WritableResource {
      * @throws IOException                   An I/O exception occurred.
      * @throws UnsupportedOperationException The operation is not supported.
      */
-    default HierarchicalResource ensureDirectoryExists() throws IOException {
-        try {
-            return createDirectory(true);
-        } catch(DirectoryAlreadyExistsException ex) {
-            // Ignored
-        }
-        return this;
-    }
+    HierarchicalResource ensureDirectoryExists() throws IOException;
 
     /**
      * Creates the parent directories of this resource.
@@ -454,6 +392,7 @@ public interface HierarchicalResource extends WritableResource {
      * @throws UnsupportedOperationException The operation is not supported.
      */
     HierarchicalResource createParents() throws IOException;
+
 
     /**
      * Deletes the resource.
@@ -477,5 +416,4 @@ public interface HierarchicalResource extends WritableResource {
     default void delete() throws IOException {
         delete(false);
     }
-
 }
