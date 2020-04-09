@@ -3,8 +3,8 @@ package mb.resource.fs;
 import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceKey;
 import mb.resource.ResourceRuntimeException;
-import mb.resource.hierarchical.FilenameExtensionUtil;
 import mb.resource.hierarchical.ResourcePath;
+import mb.resource.hierarchical.ResourcePathDefaults;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -20,9 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Serializable {
+public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath, Comparable<FSPath>, Serializable {
     // URI version of the path which can be serialized and deserialized.
     final URI uri;
     // Transient and non-final for deserialization in readObject. Invariant: always nonnull.
@@ -79,6 +78,7 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     }
 
     public String getIdStringRepresentation() {
+        // TODO: can we not just use asString(), which uses javaPath.toString()? If so, can use default toString() implementation.
         return uri.toString();
     }
 
@@ -157,18 +157,12 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
         return fileName.toString();
     }
 
-    @Override public @Nullable String getLeafExtension() {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return null;
-        }
-        return FilenameExtensionUtil.getExtension(leaf);
-    }
 
     @Override public FSPath getNormalized() {
         final Path normalizedJavaPath = this.javaPath.normalize();
         return new FSPath(normalizedJavaPath);
     }
+
 
     @Override public FSPath relativize(ResourcePath other) {
         if(!(other instanceof FSPath)) {
@@ -206,18 +200,6 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
     }
 
     @Override public FSPath appendSegments(Collection<String> segments) {
-        final Path relJavaPath = createLocalPath(segments);
-        final Path javaPath = this.javaPath.resolve(relJavaPath);
-        return new FSPath(javaPath);
-    }
-
-    @Override public FSPath appendSegments(List<String> segments) {
-        final Path relJavaPath = createLocalPath(segments);
-        final Path javaPath = this.javaPath.resolve(relJavaPath);
-        return new FSPath(javaPath);
-    }
-
-    @Override public FSPath appendSegments(String... segments) {
         final Path relJavaPath = createLocalPath(segments);
         final Path javaPath = this.javaPath.resolve(relJavaPath);
         return new FSPath(javaPath);
@@ -362,6 +344,11 @@ public class FSPath implements ResourceKey, ResourcePath, Comparable<FSPath>, Se
 
     @Override public int compareTo(FSPath other) {
         return this.javaPath.compareTo(other.javaPath);
+    }
+
+
+    @Override protected FSPath self() {
+        return this;
     }
 
 

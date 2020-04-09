@@ -4,7 +4,6 @@ import mb.resource.ResourceKey;
 import mb.resource.ResourceRuntimeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -69,8 +68,13 @@ public interface ResourcePath extends ResourceKey {
      *
      * @return File extension of the leaf segment of this path, or {@code null} it it has none.
      */
-    @Nullable String getLeafExtension();
-
+    default @Nullable String getLeafExtension() {
+        final @Nullable String leaf = getLeaf();
+        if(leaf != null) {
+            return FilenameExtensionUtil.getExtension(leaf);
+        }
+        return null;
+    }
 
     /**
      * Returns a normalized path. Path normalization is implementation-defined.
@@ -83,7 +87,9 @@ public interface ResourcePath extends ResourceKey {
      * Returns a path that relativizes {@code other} to this path. This is the inverse of {@link
      * #appendRelativePath(ResourcePath)}.
      *
-     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this key's type.
+     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this path's type.
+     * @throws ResourceRuntimeException when {@code other}'s qualifier is not the same as this path's qualifier.
+     * @throws ResourceRuntimeException when {@code other} does not have a common root to this path.
      */
     ResourcePath relativize(ResourcePath other);
 
@@ -91,14 +97,14 @@ public interface ResourcePath extends ResourceKey {
      * Returns a string that relativizes {@code other} to this path. This is the inverse of {@link
      * #appendRelativePath(String)}.
      *
-     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this key's type.
+     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this path's type.
      */
     String relativizeToString(ResourcePath other);
 
 
     /**
      * Returns a path where {@code segment} is appended to the current path. A segment should be a single segment and
-     * should not contain path characters.
+     * should not contain path separator characters.
      *
      * @param segment Segment to append.
      * @return Appended path.
@@ -107,7 +113,7 @@ public interface ResourcePath extends ResourceKey {
 
     /**
      * Returns a path where {@code segments} are appended to the current path in order. A segment should be a single
-     * segment and should not contain path characters.
+     * segment and should not contain path separator characters.
      *
      * @param segments Segments to append.
      * @return Appended path.
@@ -116,7 +122,7 @@ public interface ResourcePath extends ResourceKey {
 
     /**
      * Returns a path where {@code segments} are appended to the current path in order. A segment should be a single
-     * segment and should not contain path characters.
+     * segment and should not contain path separator characters.
      *
      * @param segments Segments to append.
      * @return Appended path.
@@ -125,25 +131,21 @@ public interface ResourcePath extends ResourceKey {
 
     /**
      * Returns a path where {@code segments} are appended to the current path in order. A segment should be a single
-     * segment and should not contain path characters.
+     * segment and should not contain path separator characters.
      *
      * @param segments Segments to append.
      * @return Appended path.
      */
-    default ResourcePath appendSegments(List<String> segments) {
-        return appendSegments((Collection<String>)segments);
-    }
+    ResourcePath appendSegments(List<String> segments);
 
     /**
      * Returns a path where {@code segments} are appended to the current path in order. A segment should be a single
-     * segment and should not contain path characters.
+     * segment and should not contain path separator characters.
      *
      * @param segments Segments to append.
      * @return Appended path.
      */
-    default ResourcePath appendSegments(String... segments) {
-        return appendSegments(Arrays.asList(segments));
-    }
+    ResourcePath appendSegments(String... segments);
 
 
     /**
@@ -212,13 +214,7 @@ public interface ResourcePath extends ResourceKey {
      * @param segment Segment to append.
      * @return Path with leaf segment appended.
      */
-    default ResourcePath appendToLeaf(String segment) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(leaf + segment);
-    }
+    ResourcePath appendToLeaf(String segment);
 
     /**
      * Returns a path where the leaf segment of the current path is replaced by applying {@code func} to it. If the
@@ -227,14 +223,7 @@ public interface ResourcePath extends ResourceKey {
      * @param func Function to apply to the leaf segment.
      * @return Path with leaf segment replaced.
      */
-    default ResourcePath applyToLeaf(Function<String, String> func) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(func.apply(leaf));
-    }
-
+    ResourcePath applyToLeaf(Function<String, String> func);
 
     /**
      * Returns a path where the file extension of the leaf segment of the current path is replaced by {@code extension}.
@@ -243,13 +232,7 @@ public interface ResourcePath extends ResourceKey {
      * @param extension File extension to replace.
      * @return Path with file extension replaced.
      */
-    default ResourcePath replaceLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
-    }
+    ResourcePath replaceLeafExtension(String extension);
 
     /**
      * Returns a path where the file extension of the current path is ensured to be {@code extension}. That is, it
@@ -260,13 +243,7 @@ public interface ResourcePath extends ResourceKey {
      * @param extension File extension to ensure.
      * @return Path with file extension ensured.
      */
-    default ResourcePath ensureLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
-    }
+    ResourcePath ensureLeafExtension(String extension);
 
     /**
      * Returns a path where the leaf segment of the current path is appended with a '.' and {@code extension}. If the
@@ -275,13 +252,7 @@ public interface ResourcePath extends ResourceKey {
      * @param extension File extension to append.
      * @return Path with file extension appended.
      */
-    default ResourcePath appendExtensionToLeaf(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
-    }
+    ResourcePath appendExtensionToLeaf(String extension);
 
     /**
      * Returns a path where the file extension of the leaf segment of the current path is replaced by applying {@code
@@ -290,11 +261,5 @@ public interface ResourcePath extends ResourceKey {
      * @param func Function to apply to the file extension.
      * @return Path with file extension replaced.
      */
-    default ResourcePath applyToLeafExtension(Function<String, String> func) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
-    }
+    ResourcePath applyToLeafExtension(Function<String, String> func);
 }

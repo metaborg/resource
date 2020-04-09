@@ -1,12 +1,9 @@
 package mb.resource.fs;
 
-import mb.resource.ReadableResource;
-import mb.resource.Resource;
 import mb.resource.ResourceRuntimeException;
-import mb.resource.WritableResource;
-import mb.resource.hierarchical.FilenameExtensionUtil;
 import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.HierarchicalResourceAccess;
+import mb.resource.hierarchical.HierarchicalResourceDefaults;
 import mb.resource.hierarchical.HierarchicalResourceType;
 import mb.resource.hierarchical.ResourcePath;
 import mb.resource.hierarchical.match.ResourceMatcher;
@@ -33,10 +30,9 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class FSResource implements Resource, ReadableResource, WritableResource, HierarchicalResource, Serializable {
+public class FSResource extends HierarchicalResourceDefaults<FSResource> implements HierarchicalResource, Serializable {
     final FSPath path;
 
 
@@ -170,16 +166,6 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return new FSResource(newPath);
     }
 
-    @Override public FSResource appendSegments(List<String> segments) {
-        final FSPath newPath = path.appendSegments(segments);
-        return new FSResource(newPath);
-    }
-
-    @Override public FSResource appendSegments(String... segments) {
-        final FSPath newPath = path.appendSegments(segments);
-        return new FSResource(newPath);
-    }
-
 
     @Override public FSResource appendRelativePath(String relativePath) {
         final FSPath newPath = path.appendRelativePath(relativePath);
@@ -196,68 +182,10 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return new FSResource(newPath);
     }
 
-    @Override public FSResource appendOrReplaceWithPath(ResourcePath other) {
-        final FSPath newPath = path.appendOrReplaceWithPath(other);
-        return new FSResource(newPath);
-    }
-
-    public FSResource appendRelativePath(FSPath relativePath) {
-        final FSPath newPath = path.appendRelativePath(relativePath);
-        return new FSResource(newPath);
-    }
-
 
     @Override public FSResource replaceLeaf(String segment) {
         final FSPath newPath = path.replaceLeaf(segment);
         return new FSResource(newPath);
-    }
-
-    @Override public FSResource appendToLeaf(String segment) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(leaf + segment);
-    }
-
-    @Override public FSResource applyToLeaf(Function<String, String> func) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(func.apply(leaf));
-    }
-
-    @Override public FSResource replaceLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.replaceExtension(leaf, extension));
-    }
-
-    @Override public FSResource ensureLeafExtension(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
-    }
-
-    @Override public FSResource appendExtensionToLeaf(String extension) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.appendExtension(leaf, extension));
-    }
-
-    @Override public FSResource applyToLeafExtension(Function<String, String> func) {
-        final @Nullable String leaf = getLeaf();
-        if(leaf == null) {
-            return this;
-        }
-        return replaceLeaf(FilenameExtensionUtil.applyToExtension(leaf, func));
     }
 
 
@@ -331,10 +259,6 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         return Files.walk(path.javaPath).map(FSResource::new);
     }
 
-    @Override public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
-        return walk(walker, matcher, null);
-    }
-
     @Override
     public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
         final Stream.Builder<FSResource> streamBuilder = Stream.builder();
@@ -343,6 +267,7 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         Files.walkFileTree(path.javaPath, visitor);
         return streamBuilder.build();
     }
+
 
     @Override public InputStream openRead() throws IOException {
         return Files.newInputStream(path.javaPath, StandardOpenOption.READ);
@@ -492,6 +417,11 @@ public class FSResource implements Resource, ReadableResource, WritableResource,
         } else {
             Files.deleteIfExists(path.javaPath);
         }
+    }
+
+
+    @Override protected FSResource self() {
+        return this;
     }
 
 

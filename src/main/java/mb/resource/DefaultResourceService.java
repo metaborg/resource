@@ -5,41 +5,54 @@ import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class DefaultResourceService implements ResourceService {
+    private final @Nullable ResourceService parent;
     private final ResourceRegistry defaultRegistry;
     private final HashMap<String, ResourceRegistry> registries;
 
 
-    public DefaultResourceService(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+    private DefaultResourceService(@Nullable ResourceService parent, ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
+        this.parent = parent;
         this.defaultRegistry = defaultRegistry;
-        this.registries = new HashMap<>();
-        this.registries.put(defaultRegistry.qualifier(), defaultRegistry);
-        for(ResourceRegistry registry : registries) {
-            this.registries.put(registry.qualifier(), registry);
-        }
+        this.registries = registries;
     }
 
-    public DefaultResourceService(ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
-        this.defaultRegistry = defaultRegistry;
-        this.registries = new HashMap<>();
-        this.registries.put(defaultRegistry.qualifier(), defaultRegistry);
-        for(ResourceRegistry registry : registries) {
-            this.registries.put(registry.qualifier(), registry);
-        }
+    public DefaultResourceService(ResourceService parent, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        this(parent, defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
+    }
+
+    public DefaultResourceService(ResourceService parent, ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
+        this(parent, defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
     }
 
     public DefaultResourceService(ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
-        this.defaultRegistry = defaultRegistry;
-        this.registries = new HashMap<>(registries);
-        this.registries.put(defaultRegistry.qualifier(), defaultRegistry);
+        this(null, defaultRegistry, registries);
+    }
+
+    public DefaultResourceService(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        this(null, defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
+    }
+
+    public DefaultResourceService(ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
+        this(null, defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
+    }
+
+    private static HashMap<String, ResourceRegistry> toRegistriesHashMap(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        final HashMap<String, ResourceRegistry> registriesMap = new HashMap<>();
+        registriesMap.put(defaultRegistry.qualifier(), defaultRegistry);
+        for(ResourceRegistry registry : registries) {
+            registriesMap.put(registry.qualifier(), registry);
+        }
+        return registriesMap;
     }
 
 
     @Override public Resource getResource(ResourceKey key) {
         final String qualifier = key.getQualifier();
-        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
@@ -81,7 +94,7 @@ public class DefaultResourceService implements ResourceService {
                     "No qualifier was found in string representation of resource key '" + keyStr + "', nor could a resource key be created by the default resource registry '" + defaultRegistry + "'", e);
             }
         }
-        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException(
                 "No resource registry was found for qualifier '" + qualifier + "'");
@@ -108,7 +121,7 @@ public class DefaultResourceService implements ResourceService {
                     "No qualifier was found in string representation of resource key '" + keyStr + "', nor could a resource be created by the default resource registry '" + defaultRegistry + "'", e);
             }
         }
-        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException(
                 "No resource registry was found for qualifier '" + qualifier + "'");
@@ -145,7 +158,7 @@ public class DefaultResourceService implements ResourceService {
         final ResourceKeyString parsedResourceKey = ResourceKeyString.parse(keyStrOrPath);
         final @Nullable String qualifier = parsedResourceKey.getQualifier();
         if(qualifier != null) {
-            final @Nullable ResourceRegistry registry = registries.get(qualifier);
+            final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
             if(registry == null) {
                 throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
             }
@@ -166,7 +179,7 @@ public class DefaultResourceService implements ResourceService {
 
     @Override public QualifiedResourceKeyString toResourceKeyString(ResourceKey key) {
         final String qualifier = key.getQualifier();
-        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
@@ -175,7 +188,7 @@ public class DefaultResourceService implements ResourceService {
 
     @Override public String toString(ResourceKey key) {
         final String qualifier = key.getQualifier();
-        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
@@ -185,7 +198,7 @@ public class DefaultResourceService implements ResourceService {
 
     @Override public @Nullable File toLocalFile(ResourceKey key) {
         final String qualifier = key.getQualifier();
-        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
@@ -194,7 +207,7 @@ public class DefaultResourceService implements ResourceService {
 
     @Override public @Nullable File toLocalFile(Resource resource) {
         final String qualifier = resource.getKey().getQualifier();
-        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
@@ -204,5 +217,22 @@ public class DefaultResourceService implements ResourceService {
 
     @Override public ResourceRegistry getDefaultResourceRegistry() {
         return defaultRegistry;
+    }
+
+    @Override public @Nullable ResourceRegistry getResourceRegistry(String qualifier) {
+        final @Nullable ResourceRegistry registry = registries.get(qualifier);
+        if(registry != null) {
+            return registry;
+        }
+        if(parent != null) {
+            return parent.getResourceRegistry(qualifier);
+        }
+        return null;
+    }
+
+
+    @Override
+    public DefaultResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        return new DefaultResourceService(this, defaultRegistry, registries);
     }
 }
