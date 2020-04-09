@@ -5,6 +5,7 @@ import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * The resource service, used to get a resource corresponding to a resource key.
@@ -259,4 +260,49 @@ public interface ResourceService {
      * @return Default resource registry.
      */
     ResourceRegistry getDefaultResourceRegistry();
+
+    /**
+     * Gets the {@link ResourceRegistry resource registry} which is used to get resources for given {@link
+     * ResourceKey#getQualifier() qualifier}.
+     *
+     * @param qualifier Qualifier to get {@link ResourceRegistry resource registry} for.
+     * @return {@link ResourceRegistry Resource registry} for {@code qualifier}, or null if there is none.
+     */
+    @Nullable ResourceRegistry getResourceRegistry(String qualifier);
+
+
+    /**
+     * Creates a child resource service, with a new default resource registry and additional resource registries. The
+     * child resource service will first attempt to get resources from its own registries, but defer to the registries
+     * of this parent if no registry is found.
+     *
+     * @param defaultRegistry Default resource registry for the child.
+     * @param registries      Resource registries for the child.
+     * @return Child resource service.
+     */
+    ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries);
+
+    /**
+     * Creates a child resource service with additional resource registries. The child resource service will first
+     * attempt to get resources from its own registries, but defer to the registries of this parent if no registry is
+     * found.
+     *
+     * @param registries Resource registries for the child.
+     * @return Child resource service.
+     */
+    default ResourceService createChild(Iterable<ResourceRegistry> registries) {
+        return createChild(getDefaultResourceRegistry(), registries);
+    }
+
+    /**
+     * Creates a child resource service with additional resource registries. The child resource service will first
+     * attempt to get resources from its own registries, but defer to the registries of this parent if no registry is
+     * found.
+     *
+     * @param registries Resource registries for the child.
+     * @return Child resource service.
+     */
+    default ResourceService createChild(ResourceRegistry... registries) {
+        return createChild(getDefaultResourceRegistry(), Arrays.asList(registries));
+    }
 }

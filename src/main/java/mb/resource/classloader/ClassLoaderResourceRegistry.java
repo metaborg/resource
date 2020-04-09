@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class ClassLoaderResourceRegistry implements ResourceRegistry {
+    private static final String defaultQualifier = "classloader-resource";
+
     private final String qualifier;
     private final ClassLoader classLoader;
 
@@ -16,6 +18,14 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
     public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader) {
         this.qualifier = qualifier;
         this.classLoader = classLoader;
+    }
+
+    public ClassLoaderResourceRegistry(ClassLoader classLoader) {
+        this(defaultQualifier, classLoader);
+    }
+
+    public ClassLoaderResourceRegistry() {
+        this(defaultQualifier, ClassLoaderResourceRegistry.class.getClassLoader());
     }
 
 
