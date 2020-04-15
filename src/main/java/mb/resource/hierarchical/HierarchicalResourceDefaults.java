@@ -138,7 +138,7 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
 
     @Override public abstract boolean equals(@Nullable Object other);
 
-    @Override public abstract int hashCode();
+    @Override public int hashCode() { return getPath().hashCode(); }
 
     @Override public String toString() {
         return getPath().toString();

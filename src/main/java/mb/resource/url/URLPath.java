@@ -1,6 +1,5 @@
 package mb.resource.url;
 
-import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -12,6 +11,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public class URLPath implements ResourcePath {
@@ -69,13 +69,9 @@ public class URLPath implements ResourcePath {
             }
 
             @Override public String next() {
-                return null;
+                throw new NoSuchElementException();
             }
         };
-    }
-
-    @Override public String asString() {
-        return uri.toString();
     }
 
 
@@ -257,6 +253,6 @@ public class URLPath implements ResourcePath {
     }
 
     @Override public String toString() {
-        return QualifiedResourceKeyString.toString(URLResourceRegistry.qualifier, asString());
+        return uri.toString();
     }
 }

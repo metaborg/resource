@@ -225,10 +225,6 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
         return id.segments;
     }
 
-    @Override public String asString() {
-        return id.toString();
-    }
-
 
     @Override public @Nullable ClassLoaderResourcePath getParent() {
         final @Nullable Identifier parent = id.getParent();
@@ -332,5 +328,9 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
 
     @Override public int hashCode() {
         return Objects.hash(qualifier, id);
+    }
+
+    @Override public String toString() {
+        return id.toString();
     }
 }

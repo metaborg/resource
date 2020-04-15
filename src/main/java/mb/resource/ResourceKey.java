@@ -27,5 +27,10 @@ public interface ResourceKey extends Serializable {
 
     @Override int hashCode();
 
+    /**
+     * Gets this key as a string for display/debugging purposes only.
+     *
+     * @return String representation of this key.
+     */
     @Override String toString();
 }

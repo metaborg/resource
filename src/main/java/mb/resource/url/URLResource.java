@@ -233,8 +233,4 @@ public class URLResource extends HierarchicalResourceDefaults<URLResource> imple
         final URLResource that = (URLResource)o;
         return path.equals(that.path);
     }
-
-    @Override public int hashCode() {
-        return path.hashCode();
-    }
 }
