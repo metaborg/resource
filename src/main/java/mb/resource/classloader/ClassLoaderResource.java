@@ -16,7 +16,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 public class ClassLoaderResource extends HierarchicalResourceDefaults<ClassLoaderResource> implements HierarchicalResource {
@@ -210,9 +209,5 @@ public class ClassLoaderResource extends HierarchicalResourceDefaults<ClassLoade
         if(o == null || getClass() != o.getClass()) return false;
         final ClassLoaderResource that = (ClassLoaderResource)o;
         return path.equals(that.path);
-    }
-
-    @Override public int hashCode() {
-        return Objects.hash(path);
     }
 }

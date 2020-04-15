@@ -1,6 +1,7 @@
 package mb.resource.hierarchical;
 
 import mb.resource.ResourceKey;
+import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRuntimeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -31,14 +32,6 @@ public interface ResourcePath extends ResourceKey {
      * @return Segments of this path.
      */
     Iterable<String> getSegments();
-
-    /**
-     * Gets this path as a string, that can be used for appending with {@link #appendOrReplaceWithPath(String)}, {@link
-     * #appendRelativePath(String)}, and {@link #appendString(String)}.
-     *
-     * @return This path as a string.
-     */
-    String asString();
 
 
     /**
@@ -262,4 +255,13 @@ public interface ResourcePath extends ResourceKey {
      * @return Path with file extension replaced.
      */
     ResourcePath applyToLeafExtension(Function<String, String> func);
+
+
+    /**
+     * Gets this path as a string, that can be used for appending with {@link #appendOrReplaceWithPath(String)}, {@link
+     * #appendRelativePath(String)} (if this path is relative), and {@link #appendString(String)}.
+     *
+     * @return This path as a string.
+     */
+    @Override String toString();
 }

@@ -1,6 +1,5 @@
 package mb.resource.hierarchical;
 
-import mb.resource.QualifiedResourceKeyString;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
@@ -96,7 +95,5 @@ public abstract class ResourcePathDefaults<SELF extends ResourcePathDefaults<SEL
 
     @Override public abstract int hashCode();
 
-    @Override public String toString() {
-        return QualifiedResourceKeyString.toString(getQualifier(), asString());
-    }
+    @Override public abstract String toString();
 }

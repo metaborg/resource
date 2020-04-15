@@ -1,6 +1,5 @@
 package mb.resource.fs;
 
-import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceKey;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
@@ -126,10 +125,6 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
 
     @Override public Iterable<String> getSegments() {
         return () -> new PathIterator(javaPath.iterator());
-    }
-
-    @Override public String asString() {
-        return javaPath.toString();
     }
 
 
@@ -364,7 +359,7 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     }
 
     @Override public String toString() {
-        return QualifiedResourceKeyString.toString(FSResourceRegistry.qualifier, getIdStringRepresentation());
+        return javaPath.toString();
     }
 
 

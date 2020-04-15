@@ -60,7 +60,7 @@ public class URLResourceRegistry implements ResourceRegistry {
                 "Cannot convert identifier '" + id + "' to its string representation; it is not of type URLPath");
         }
         final URLPath urlPath = (URLPath)id;
-        return QualifiedResourceKeyString.of(qualifier(), urlPath.asString());
+        return QualifiedResourceKeyString.of(qualifier(), urlPath.toString());
     }
 
     @Override public String toString(Serializable id) {
@@ -69,6 +69,6 @@ public class URLResourceRegistry implements ResourceRegistry {
                 "Cannot convert identifier '" + id + "' to its string representation; it is not of type URLPath");
         }
         final URLPath urlPath = (URLPath)id;
-        return QualifiedResourceKeyString.toString(qualifier(), urlPath.asString());
+        return QualifiedResourceKeyString.toString(qualifier(), urlPath.toString());
     }
 }

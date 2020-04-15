@@ -35,11 +35,12 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
 
 
     @Override public ClassLoaderResource getResource(Serializable id) {
-        if(!(id instanceof ClassLoaderResourcePath)) {
+        if(!(id instanceof ClassLoaderResourcePath.Identifier)) {
             throw new ResourceRuntimeException(
-                "Cannot get class loader resource with ID '" + id + "'; the ID is not of type ClassLoaderResourcePath");
+                "Cannot get class loader resource with ID '" + id + "'; the ID is not of type ClassLoaderResourcePath.Identifier");
         }
-        final ClassLoaderResourcePath path = (ClassLoaderResourcePath)id;
+        final ClassLoaderResourcePath.Identifier identifier = (ClassLoaderResourcePath.Identifier)id;
+        final ClassLoaderResourcePath path = new ClassLoaderResourcePath(qualifier, identifier);
         return new ClassLoaderResource(classLoader, path);
     }
 
@@ -61,21 +62,21 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
 
 
     @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
-        if(!(id instanceof ClassLoaderResourcePath)) {
+        if(!(id instanceof ClassLoaderResourcePath.Identifier)) {
             throw new ResourceRuntimeException(
-                "Cannot convert identifier '" + id + "' to its string representation; it is not of type ClassLoaderResourcePath");
+                "Cannot convert identifier '" + id + "' to its string representation; it is not of type ClassLoaderResourcePath.Identifier");
         }
-        final ClassLoaderResourcePath path = (ClassLoaderResourcePath)id;
-        return QualifiedResourceKeyString.of(path.getQualifier(), path.asString());
+        final ClassLoaderResourcePath.Identifier identifier = (ClassLoaderResourcePath.Identifier)id;
+        return QualifiedResourceKeyString.of(qualifier, identifier.toString());
     }
 
     @Override public String toString(Serializable id) {
-        if(!(id instanceof ClassLoaderResourcePath)) {
+        if(!(id instanceof ClassLoaderResourcePath.Identifier)) {
             throw new ResourceRuntimeException(
-                "Cannot convert identifier '" + id + "' to its string representation; it is not of type ClassLoaderResourcePath");
+                "Cannot convert identifier '" + id + "' to its string representation; it is not of type ClassLoaderResourcePath.Identifier");
         }
-        final ClassLoaderResourcePath path = (ClassLoaderResourcePath)id;
-        return QualifiedResourceKeyString.toString(path.getQualifier(), path.asString());
+        final ClassLoaderResourcePath.Identifier identifier = (ClassLoaderResourcePath.Identifier)id;
+        return QualifiedResourceKeyString.toString(qualifier, identifier.toString());
     }
 
 

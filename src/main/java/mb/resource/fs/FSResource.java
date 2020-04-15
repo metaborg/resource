@@ -431,12 +431,4 @@ public class FSResource extends HierarchicalResourceDefaults<FSResource> impleme
         final FSResource that = (FSResource)o;
         return path.equals(that.path);
     }
-
-    @Override public int hashCode() {
-        return path.hashCode();
-    }
-
-    @Override public String toString() {
-        return path.toString();
-    }
 }
