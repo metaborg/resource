@@ -265,6 +265,10 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
 
 
     private static Path createJavaPath(URI uri) {
+        if(uri.getScheme() == null) {
+            // If the URI schema is null, Paths.get(uri) won't work. Just create a local path from the string of the URI instead.
+            return createLocalPath(uri.toString());
+        }
         try {
             return Paths.get(uri);
         } catch(IllegalArgumentException | FileSystemNotFoundException e) {
