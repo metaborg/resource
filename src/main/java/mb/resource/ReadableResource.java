@@ -63,14 +63,17 @@ public interface ReadableResource extends Resource, AutoCloseable {
      * @throws IOException An I/O exception occurred.
      */
     default byte[] readBytes() throws IOException {
-        final InputStream inputStream = openRead();
-        final byte[] buffer = new byte[4096];
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(buffer.length);
-        int bytesRead;
-        while((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
+        try(final InputStream inputStream = openRead()) {
+            final byte[] buffer = new byte[4096];
+            try(final ByteArrayOutputStream outputStream = new ByteArrayOutputStream(buffer.length)) {
+                int bytesRead;
+                while((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                outputStream.flush();
+                return outputStream.toByteArray();
+            }
         }
-        return outputStream.toByteArray();
     }
 
     /**
