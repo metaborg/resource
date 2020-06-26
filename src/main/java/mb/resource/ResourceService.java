@@ -331,7 +331,7 @@ public interface ResourceService {
      * @return Child resource service.
      */
     default ResourceService createChild(Iterable<ResourceRegistry> registries, Iterable<ResourceService> otherParents) {
-        return createChild(getDefaultResourceRegistry(), registries);
+        return createChild(getDefaultResourceRegistry(), registries, otherParents);
     }
 
     /**
