@@ -320,4 +320,28 @@ public interface ResourceService {
     default ResourceService createChild(ResourceRegistry... registries) {
         return createChild(getDefaultResourceRegistry(), Arrays.asList(registries));
     }
+
+    /**
+     * Creates a child resource service with additional resource registries and parents. The child resource service will
+     * first attempt to get resources from its own registries, but defer to the registries of this parent if no registry
+     * is found.
+     *
+     * @param registries    Resource registries for the child.
+     * @param otherParents  Other resource services that serve as parent for the child.
+     * @return Child resource service.
+     */
+    default ResourceService createChild(Iterable<ResourceRegistry> registries, Iterable<ResourceService> otherParents) {
+        return createChild(getDefaultResourceRegistry(), registries);
+    }
+
+    /**
+     * Creates a child resource service with additional parents. The child resource service will first attempt to get
+     * resources from its own registries, but defer to the registries of this parent if no registry is found.
+     *
+     * @param otherParents Other resource services that serve as parent for the child.
+     * @return Child resource service.
+     */
+    default ResourceService createChild(ResourceService... otherParents) {
+        return createChild(getDefaultResourceRegistry(), Collections.emptyList(), Arrays.asList(otherParents));
+    }
 }
