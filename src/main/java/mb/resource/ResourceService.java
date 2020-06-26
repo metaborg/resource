@@ -342,6 +342,6 @@ public interface ResourceService {
      * @return Child resource service.
      */
     default ResourceService createChild(ResourceService... otherParents) {
-        return createChild(getDefaultResourceRegistry(), Collections.emptyList(), Arrays.asList(otherParents));
+        return createChild(Collections.emptyList(), Arrays.asList(otherParents));
     }
 }
