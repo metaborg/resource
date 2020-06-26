@@ -6,6 +6,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * The resource service, used to get a resource corresponding to a resource key.
@@ -270,6 +271,18 @@ public interface ResourceService {
      */
     @Nullable ResourceRegistry getResourceRegistry(String qualifier);
 
+    /**
+     * Creates a child resource service, with a new default resource registry, additional resource registries, and
+     * additional parents. The child resource service will first attempt to get resources from its own registries, but
+     * defer to the registries of its parents if no registry is found.
+     *
+     * @param defaultRegistry Default resource registry for the child.
+     * @param registries      Resource registries for the child.
+     * @param otherParents    Other resource services that serve as parent for the child.
+     * @return Child resource service.
+     */
+    ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries,
+                                Iterable<ResourceService> otherParents);
 
     /**
      * Creates a child resource service, with a new default resource registry and additional resource registries. The
@@ -280,7 +293,9 @@ public interface ResourceService {
      * @param registries      Resource registries for the child.
      * @return Child resource service.
      */
-    ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries);
+    default ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        return createChild(defaultRegistry, registries, Collections.emptyList());
+    }
 
     /**
      * Creates a child resource service with additional resource registries. The child resource service will first
