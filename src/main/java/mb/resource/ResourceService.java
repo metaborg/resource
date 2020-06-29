@@ -273,16 +273,16 @@ public interface ResourceService {
 
     /**
      * Creates a child resource service, with a new default resource registry, additional resource registries, and
-     * additional parents. The child resource service will first attempt to get resources from its own registries, but
-     * defer to the registries of its parents if no registry is found.
+     * additional ancestors. The child resource service will first attempt to get resources from its own registries, but
+     * defer to the registries of its ancestors if no registry is found.
      *
-     * @param defaultRegistry Default resource registry for the child.
-     * @param registries      Resource registries for the child.
-     * @param otherParents    Other resource services that serve as parent for the child.
+     * @param defaultRegistry       Default resource registry for the child.
+     * @param registries            Resource registries for the child.
+     * @param additionalAncestors   Other resource services that serve as parent for the child.
      * @return Child resource service.
      */
     ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries,
-                                Iterable<ResourceService> otherParents);
+                                Iterable<ResourceService> additionalAncestors);
 
     /**
      * Creates a child resource service, with a new default resource registry and additional resource registries. The
@@ -326,22 +326,22 @@ public interface ResourceService {
      * first attempt to get resources from its own registries, but defer to the registries of this parent if no registry
      * is found.
      *
-     * @param registries    Resource registries for the child.
-     * @param otherParents  Other resource services that serve as parent for the child.
+     * @param registries            Resource registries for the child.
+     * @param additionalAncestors   Other resource services that serve as ancestors for the child.
      * @return Child resource service.
      */
-    default ResourceService createChild(Iterable<ResourceRegistry> registries, Iterable<ResourceService> otherParents) {
-        return createChild(getDefaultResourceRegistry(), registries, otherParents);
+    default ResourceService createChild(Iterable<ResourceRegistry> registries, Iterable<ResourceService> additionalAncestors) {
+        return createChild(getDefaultResourceRegistry(), registries, additionalAncestors);
     }
 
     /**
-     * Creates a child resource service with additional parents. The child resource service will first attempt to get
-     * resources from its own registries, but defer to the registries of this parent if no registry is found.
+     * Creates a child resource service with additional ancestors. The child resource service will first attempt to get
+     * resources from its own registries, but defer to the registries of this ancestors if no registry is found.
      *
-     * @param otherParents Other resource services that serve as parent for the child.
+     * @param additionalAncestors Other resource services that serve as ancestors for the child.
      * @return Child resource service.
      */
-    default ResourceService createChild(ResourceService... otherParents) {
-        return createChild(Collections.emptyList(), Arrays.asList(otherParents));
+    default ResourceService createChild(ResourceService... additionalAncestors) {
+        return createChild(Collections.emptyList(), Arrays.asList(additionalAncestors));
     }
 }

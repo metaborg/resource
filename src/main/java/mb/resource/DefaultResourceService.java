@@ -13,19 +13,19 @@ import java.util.List;
 import java.util.Objects;
 
 public class DefaultResourceService implements ResourceService {
-    private final List<ResourceService> parents;
+    private final List<ResourceService> ancestors;
     private final ResourceRegistry defaultRegistry;
     private final HashMap<String, ResourceRegistry> registries;
 
 
-    private DefaultResourceService(List<ResourceService> parents, ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
-        this.parents = parents;
+    private DefaultResourceService(List<ResourceService> ancestors, ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
+        this.ancestors = ancestors;
         this.defaultRegistry = defaultRegistry;
         this.registries = registries;
     }
 
-    public DefaultResourceService(List<ResourceService> parents, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
-        this(new ArrayList<>(parents), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
+    public DefaultResourceService(List<ResourceService> ancestors, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        this(new ArrayList<>(ancestors), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
     }
 
     public DefaultResourceService(ResourceService parent, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
@@ -232,8 +232,8 @@ public class DefaultResourceService implements ResourceService {
         if(registry != null) {
             return registry;
         }
-        return parents.stream()
-            .map(parent -> parent.getResourceRegistry(qualifier))
+        return ancestors.stream()
+            .map(ancestor -> ancestor.getResourceRegistry(qualifier))
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(null);
@@ -241,10 +241,10 @@ public class DefaultResourceService implements ResourceService {
 
 
     @Override
-    public DefaultResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries, Iterable<ResourceService> otherParents) {
-        ArrayList<ResourceService> parents = new ArrayList<>();
-        parents.add(this);
-        otherParents.forEach(parents::add);
-        return new DefaultResourceService(parents, defaultRegistry, registries);
+    public DefaultResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries, Iterable<ResourceService> additionalAncestors) {
+        ArrayList<ResourceService> ancestors = new ArrayList<>();
+        ancestors.add(this);
+        additionalAncestors.forEach(ancestors::add);
+        return new DefaultResourceService(ancestors, defaultRegistry, registries);
     }
 }
