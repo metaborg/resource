@@ -5,39 +5,47 @@ import mb.resource.hierarchical.ResourcePath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 public class DefaultResourceService implements ResourceService {
-    private final @Nullable ResourceService parent;
+    private final List<ResourceService> ancestors;
     private final ResourceRegistry defaultRegistry;
     private final HashMap<String, ResourceRegistry> registries;
 
 
-    private DefaultResourceService(@Nullable ResourceService parent, ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
-        this.parent = parent;
+    private DefaultResourceService(List<ResourceService> ancestors, ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
+        this.ancestors = ancestors;
         this.defaultRegistry = defaultRegistry;
         this.registries = registries;
     }
 
+    public DefaultResourceService(List<ResourceService> ancestors, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
+        this(new ArrayList<>(ancestors), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
+    }
+
     public DefaultResourceService(ResourceService parent, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
-        this(parent, defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
+        this(Collections.singletonList(parent), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
     }
 
     public DefaultResourceService(ResourceService parent, ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
-        this(parent, defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
+        this(Collections.singletonList(parent), defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
     }
 
     public DefaultResourceService(ResourceRegistry defaultRegistry, HashMap<String, ResourceRegistry> registries) {
-        this(null, defaultRegistry, registries);
+        this(Collections.emptyList(), defaultRegistry, registries);
     }
 
     public DefaultResourceService(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
-        this(null, defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
+        this(Collections.emptyList(), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
     }
 
     public DefaultResourceService(ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
-        this(null, defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
+        this(Collections.emptyList(), defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
     }
 
     private static HashMap<String, ResourceRegistry> toRegistriesHashMap(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
@@ -224,15 +232,19 @@ public class DefaultResourceService implements ResourceService {
         if(registry != null) {
             return registry;
         }
-        if(parent != null) {
-            return parent.getResourceRegistry(qualifier);
-        }
-        return null;
+        return ancestors.stream()
+            .map(ancestor -> ancestor.getResourceRegistry(qualifier))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
     }
 
 
     @Override
-    public DefaultResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
-        return new DefaultResourceService(this, defaultRegistry, registries);
+    public DefaultResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries, Iterable<ResourceService> additionalAncestors) {
+        ArrayList<ResourceService> ancestors = new ArrayList<>();
+        ancestors.add(this);
+        additionalAncestors.forEach(ancestors::add);
+        return new DefaultResourceService(ancestors, defaultRegistry, registries);
     }
 }
