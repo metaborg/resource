@@ -74,7 +74,15 @@ public abstract class ResourcePathDefaults<SELF extends ResourcePathDefaults<SEL
         return replaceLeaf(FilenameExtensionUtil.ensureExtension(leaf, extension));
     }
 
-    @Override public SELF appendExtensionToLeaf(String extension) {
+    @Override public SELF removeLeafExtension() {
+        final @Nullable String leaf = getLeaf();
+        if(leaf == null) {
+            return self();
+        }
+        return replaceLeaf(FilenameExtensionUtil.removeExtension(leaf));
+    }
+
+    @Override public SELF appendToLeafExtension(String extension) {
         final @Nullable String leaf = getLeaf();
         if(leaf == null) {
             return self();

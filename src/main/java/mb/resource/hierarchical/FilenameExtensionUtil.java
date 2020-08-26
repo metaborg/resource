@@ -35,6 +35,14 @@ public class FilenameExtensionUtil {
         return filename + "." + extension;
     }
 
+    public static String removeExtension(String filename) {
+        final int i = filename.lastIndexOf('.');
+        if(i < 0) {
+            return filename;
+        }
+        return filename.substring(0, i);
+    }
+
     public static String applyToExtension(String filename, Function<String, String> func) {
         final int i = filename.lastIndexOf('.');
         if(i < 0) {

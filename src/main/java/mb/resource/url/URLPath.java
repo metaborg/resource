@@ -236,7 +236,11 @@ public class URLPath implements ResourcePath {
         throw new UnsupportedOperationException();
     }
 
-    @Override public URLPath appendExtensionToLeaf(String extension) {
+    @Override public ResourcePath removeLeafExtension() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public URLPath appendToLeafExtension(String extension) {
         throw new UnsupportedOperationException();
     }
 

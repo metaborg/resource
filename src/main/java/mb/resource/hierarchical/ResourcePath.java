@@ -1,7 +1,6 @@
 package mb.resource.hierarchical;
 
 import mb.resource.ResourceKey;
-import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRuntimeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -239,13 +238,21 @@ public interface ResourcePath extends ResourceKey {
     ResourcePath ensureLeafExtension(String extension);
 
     /**
+     * Returns a path where the file extension of the leaf segment of the current path is removed. If the current path
+     * has no leaf or file extension, it is returned unchanged.
+     *
+     * @return Path with file extension removed.
+     */
+    ResourcePath removeLeafExtension();
+
+    /**
      * Returns a path where the leaf segment of the current path is appended with a '.' and {@code extension}. If the
      * current path has no leaf, it is returned unchanged.
      *
      * @param extension File extension to append.
      * @return Path with file extension appended.
      */
-    ResourcePath appendExtensionToLeaf(String extension);
+    ResourcePath appendToLeafExtension(String extension);
 
     /**
      * Returns a path where the file extension of the leaf segment of the current path is replaced by applying {@code
