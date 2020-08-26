@@ -25,7 +25,7 @@ public class DefaultResourceKeyString implements ResourceKeyString {
         return id;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
         final DefaultResourceKeyString that = (DefaultResourceKeyString)o;

@@ -173,7 +173,7 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
         }
 
 
-        @Override public boolean equals(Object o) {
+        @Override public boolean equals(@Nullable Object o) {
             if(this == o) return true;
             if(o == null || getClass() != o.getClass()) return false;
             final Identifier that = (Identifier)o;
@@ -209,6 +209,10 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
 
     @Override public Identifier getId() {
         return id;
+    }
+
+    @Override public String getIdAsString() {
+        return getId().toString();
     }
 
 
@@ -319,7 +323,7 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
     }
 
 
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
         final ClassLoaderResourcePath that = (ClassLoaderResourcePath)o;
@@ -331,6 +335,6 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
     }
 
     @Override public String toString() {
-        return id.toString();
+        return asString();
     }
 }

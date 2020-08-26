@@ -41,6 +41,10 @@ public class URLResource extends HierarchicalResourceDefaults<URLResource> imple
         return path;
     }
 
+    @Override public URLPath getPath() {
+        return path;
+    }
+
     /**
      * Gets the URI of the resource.
      *

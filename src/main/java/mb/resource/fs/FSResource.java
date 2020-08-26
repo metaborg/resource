@@ -425,7 +425,7 @@ public class FSResource extends HierarchicalResourceDefaults<FSResource> impleme
     }
 
 
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
         final FSResource that = (FSResource)o;

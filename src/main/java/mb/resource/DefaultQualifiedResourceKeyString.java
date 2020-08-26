@@ -1,5 +1,7 @@
 package mb.resource;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Objects;
 
 public class DefaultQualifiedResourceKeyString implements QualifiedResourceKeyString, ResourceKeyString {
@@ -19,7 +21,7 @@ public class DefaultQualifiedResourceKeyString implements QualifiedResourceKeySt
         return id;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
         final DefaultQualifiedResourceKeyString that = (DefaultQualifiedResourceKeyString)o;

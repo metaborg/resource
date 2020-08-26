@@ -1,5 +1,7 @@
 package mb.resource;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A simple resource key.
  */
@@ -18,6 +20,7 @@ public class DefaultResourceKey implements ResourceKey {
         this.id = id;
     }
 
+
     @Override public String getQualifier() {
         return qualifier;
     }
@@ -26,7 +29,12 @@ public class DefaultResourceKey implements ResourceKey {
         return id;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override public String getIdAsString() {
+        return id;
+    }
+
+
+    @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
         final DefaultResourceKey that = (DefaultResourceKey)o;
@@ -41,6 +49,6 @@ public class DefaultResourceKey implements ResourceKey {
     }
 
     @Override public String toString() {
-        return QualifiedResourceKeyString.toString(getQualifier(), getId());
+        return asString();
     }
 }

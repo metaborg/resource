@@ -1,11 +1,13 @@
 package mb.resource.url;
 
-import mb.resource.QualifiedResourceKeyString;
+import mb.resource.Resource;
+import mb.resource.ResourceKey;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRegistry;
 import mb.resource.ResourceRuntimeException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.Serializable;
+import java.io.File;
 import java.net.URISyntaxException;
 
 public class URLResourceRegistry implements ResourceRegistry {
@@ -17,16 +19,6 @@ public class URLResourceRegistry implements ResourceRegistry {
     }
 
 
-    @Override public URLResource getResource(Serializable id) {
-        if(!(id instanceof URLPath)) {
-            throw new ResourceRuntimeException(
-                "Cannot get URL resource with ID '" + id + "'; the ID is not of type URLPath");
-        }
-        final URLPath urlPath = (URLPath)id;
-        return new URLResource(urlPath);
-    }
-
-
     @Override public URLPath getResourceKey(ResourceKeyString keyStr) {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
@@ -34,10 +26,16 @@ public class URLResourceRegistry implements ResourceRegistry {
         try {
             return new URLPath(keyStr.getId());
         } catch(URISyntaxException e) {
-            throw new ResourceRuntimeException(
-                "Cannot get URL path with identifier string representation '" + keyStr + "'; the string representation cannot be parsed into an URI",
-                e);
+            throw new ResourceRuntimeException("Cannot get URL path with key string representation '" + keyStr + "'; it cannot be parsed into an URI", e);
         }
+    }
+
+    @Override public URLResource getResource(ResourceKey key) {
+        if(!(key instanceof URLPath)) {
+            throw new ResourceRuntimeException("Cannot get URL resource with key '" + key + "'; it is not of type URLPath");
+        }
+        final URLPath urlPath = (URLPath)key;
+        return new URLResource(urlPath);
     }
 
     @Override public URLResource getResource(ResourceKeyString keyStr) {
@@ -48,27 +46,32 @@ public class URLResourceRegistry implements ResourceRegistry {
             final URLPath urlPath = new URLPath(keyStr.getId());
             return new URLResource(urlPath);
         } catch(URISyntaxException e) {
-            throw new ResourceRuntimeException(
-                "Cannot get URL resource with identifier string representation '" + keyStr + "'; the string representation cannot be parsed into an URI",
-                e);
+            throw new ResourceRuntimeException("Cannot get URL resource with key string representation '" + keyStr + "'; it cannot be parsed into an URI", e);
         }
     }
 
-    @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
-        if(!(id instanceof URLPath)) {
-            throw new ResourceRuntimeException(
-                "Cannot convert identifier '" + id + "' to its string representation; it is not of type URLPath");
+
+    @Override public @Nullable File toLocalFile(ResourceKey key) {
+        if(!(key instanceof URLPath)) {
+            throw new ResourceRuntimeException("Cannot attempt to convert key '" + key + "' to a local file; the key is not of type URLPath");
         }
-        final URLPath urlPath = (URLPath)id;
-        return QualifiedResourceKeyString.of(qualifier(), urlPath.toString());
+        final URLPath path = (URLPath)key;
+        try {
+            return new File(path.getURI());
+        } catch(IllegalArgumentException e) {
+            return null;
+        }
     }
 
-    @Override public String toString(Serializable id) {
-        if(!(id instanceof URLPath)) {
-            throw new ResourceRuntimeException(
-                "Cannot convert identifier '" + id + "' to its string representation; it is not of type URLPath");
+    @Override public @Nullable File toLocalFile(Resource resource) {
+        if(!(resource instanceof URLResource)) {
+            throw new ResourceRuntimeException("Cannot attempt to convert resource '" + resource + "' to a local file; the resource is not of type URLResource");
         }
-        final URLPath urlPath = (URLPath)id;
-        return QualifiedResourceKeyString.toString(qualifier(), urlPath.toString());
+        final URLResource urlResource = (URLResource)resource;
+        try {
+            return new File(urlResource.getPath().getURI());
+        } catch(IllegalArgumentException e) {
+            return null;
+        }
     }
 }

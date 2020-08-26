@@ -12,7 +12,7 @@ class TextResourceRegistryTest {
         final TextResourceRegistry registry = new TextResourceRegistry();
         final TextResource resource = registry.createResource("Hello world!", "1");
         registry.addResource(resource);
-        final TextResource getResource = (TextResource) registry.getResource("1");
+        final TextResource getResource = (TextResource) registry.getResource(resource.key);
         assertNotNull(getResource);
         assertEquals(resource, getResource);
         assertEquals(resource.getKey().getQualifier(), getResource.getKey().getQualifier());
@@ -25,10 +25,10 @@ class TextResourceRegistryTest {
         final TextResourceRegistry registry = new TextResourceRegistry();
         final TextResource resource1 = registry.createResource("Hello world!", "1");
         registry.addResource(resource1);
-        final Resource getResource1 = registry.getResource("1");
+        final Resource getResource1 = registry.getResource(resource1.key);
         final TextResource resource2 = registry.createResource("World hello!", "2");
         registry.addResource(resource2);
-        final Resource getResource2 = registry.getResource("2");
+        final Resource getResource2 = registry.getResource(resource2.key);
         assertEquals(resource1, getResource1);
         assertEquals(resource2, getResource2);
         assertNotEquals(resource1, getResource2);
@@ -41,11 +41,11 @@ class TextResourceRegistryTest {
         final String id = "1";
         final TextResource resource1 = registry.createResource("Hello world!", id);
         registry.addResource(resource1);
-        final TextResource getResource1 = (TextResource) registry.getResource(id);
+        final TextResource getResource1 = (TextResource) registry.getResource(resource1.key);
         assertEquals(resource1, getResource1);
         final TextResource resource2 = registry.createResource("World hello!", id);
         registry.addResource(resource2);
-        final TextResource getResource2 = (TextResource) registry.getResource(id);
+        final TextResource getResource2 = (TextResource) registry.getResource(resource2.key);
         assertNotNull(getResource2);
         assertEquals(resource2, getResource2);
         assertNotEquals(resource1.text, getResource2.text);
@@ -57,10 +57,10 @@ class TextResourceRegistryTest {
         final String id = "1";
         final TextResource resource = registry.createResource("Hello world!", id);
         registry.addResource(resource);
-        assertNotNull(registry.getResource(id));
+        assertNotNull(registry.getResource(resource.key));
         registry.removeResource((Resource) resource);
         assertThrows(ResourceRuntimeException.class, () -> {
-            registry.getResource(id);
+            registry.getResource(resource.key);
         });
     }
 
@@ -70,8 +70,8 @@ class TextResourceRegistryTest {
         final TextResource resource = registry.createResource("Hello world!", "1");
         final String id = resource.key.getId();
         registry.addResource(resource);
-        assertNotNull(registry.getResource(id));
+        assertNotNull(registry.getResource(resource.key));
         registry.removeResource(id);
-        assertThrows(ResourceRuntimeException.class, () -> registry.getResource(id));
+        assertThrows(ResourceRuntimeException.class, () -> registry.getResource(resource.key));
     }
 }

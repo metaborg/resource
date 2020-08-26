@@ -1,6 +1,9 @@
 package mb.resource;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.net.URI;
 
 /**
  * String representation of a {@link ResourceKey resource key}.
@@ -45,7 +48,29 @@ public interface QualifiedResourceKeyString extends ResourceKeyString {
     }
 
     /**
-     * Creates a qualified resource key string, as a {@link String}, from given string representations of a qualifier and identifier.
+     * Creates a qualified resource key string from given {@link URI} that was created with {@link #toUri()}.
+     *
+     * @param uri {@link URI} representation of a (partial) resource key string.
+     * @return Qualified resource key string.
+     * @throws ResourceRuntimeException when given {@link URI} has no {@link URI#getScheme() scheme}.
+     * @throws ResourceRuntimeException when given {@link URI} has no {@link URI#getSchemeSpecificPart() scheme-specific part}.
+     */
+    static QualifiedResourceKeyString of(URI uri) {
+        final @Nullable String scheme = uri.getScheme();
+        if(scheme == null) {
+            throw new ResourceRuntimeException("Cannot convert '" + uri + "' to a qualified resource key string, it has no scheme");
+        }
+        final @Nullable String ssp = uri.getSchemeSpecificPart(); // TODO: should the SSP be URI-decoded?
+        if(ssp == null) {
+            throw new ResourceRuntimeException("Cannot convert '" + uri + "' to a resource key string, it has no scheme-specific part");
+        }
+        return new DefaultQualifiedResourceKeyString(uri.getScheme(), ssp);
+    }
+
+
+    /**
+     * Creates a qualified resource key string, as a {@link String}, from given string representations of a qualifier
+     * and identifier.
      *
      * @param qualifier String representation for the qualifier of the key.
      * @param id        String representation for the identifier of the key.

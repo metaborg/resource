@@ -1,6 +1,5 @@
 package mb.resource.fs;
 
-import mb.resource.ResourceKey;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
 import mb.resource.hierarchical.ResourcePathDefaults;
@@ -74,11 +73,6 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
 
     public URI getURI() {
         return uri;
-    }
-
-    public String getIdStringRepresentation() {
-        // TODO: can we not just use asString(), which uses javaPath.toString()? If so, can use default toString() implementation.
-        return uri.toString();
     }
 
 
@@ -326,18 +320,16 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     }
 
 
-    /**
-     * @return "java" as the {@link ResourceKey} qualifier, indicating it belongs to the java.nio.file filesystem.
-     */
     @Override public String getQualifier() {
         return FSResourceRegistry.qualifier;
     }
 
-    /**
-     * @return this path as the {@link ResourceKey} identifier.
-     */
-    @Override public FSPath getId() {
-        return this;
+    @Override public URI getId() {
+        return uri;
+    }
+
+    @Override public String getIdAsString() {
+        return uri.toString();
     }
 
 
@@ -363,7 +355,7 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     }
 
     @Override public String toString() {
-        return javaPath.toString();
+        return asString();
     }
 
 

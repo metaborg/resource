@@ -207,33 +207,6 @@ public interface ResourceService {
 
 
     /**
-     * Converts given {@link ResourceKey resource key} into a {@link QualifiedResourceKeyString qualified resource key
-     * string}.
-     *
-     * @param key {@link ResourceKey Key} to convert.
-     * @return {@link QualifiedResourceKeyString Qualified resource key string} for given {@link ResourceKey key}.
-     * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
-     *                                  ResourceKey#getQualifier() qualifier}.
-     * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to
-     *                                  convert the identifier of the key.
-     */
-    QualifiedResourceKeyString toResourceKeyString(ResourceKey key);
-
-    /**
-     * Converts given {@link ResourceKey resource key} into its string representation, which can be parsed back into a
-     * resource key with {@code resourceService.getResourceKey(QualifiedResourceKeyString.parse(str))}.
-     *
-     * @param key {@link ResourceKey Key} to convert to its string representation.
-     * @return String representation of given {@link ResourceKey key}.
-     * @throws ResourceRuntimeException when no {@link ResourceRegistry resource registry} is found for {@link
-     *                                  ResourceKey#getQualifier() qualifier}.
-     * @throws ResourceRuntimeException when the {@link ResourceRegistry resource registry} unexpectedly fails to
-     *                                  convert the identifier of the key into its string representation.
-     */
-    String toString(ResourceKey key);
-
-
-    /**
      * Attempts to get a local file handle for given resource key.
      *
      * @param key Resource key to get a local file handle for.
@@ -276,13 +249,13 @@ public interface ResourceService {
      * additional ancestors. The child resource service will first attempt to get resources from its own registries, but
      * defer to the registries of its ancestors if no registry is found.
      *
-     * @param defaultRegistry       Default resource registry for the child.
-     * @param registries            Resource registries for the child.
-     * @param additionalAncestors   Other resource services that serve as parent for the child.
+     * @param defaultRegistry     Default resource registry for the child.
+     * @param registries          Resource registries for the child.
+     * @param additionalAncestors Other resource services that serve as parent for the child.
      * @return Child resource service.
      */
     ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries,
-                                Iterable<ResourceService> additionalAncestors);
+        Iterable<ResourceService> additionalAncestors);
 
     /**
      * Creates a child resource service, with a new default resource registry and additional resource registries. The
@@ -326,8 +299,8 @@ public interface ResourceService {
      * first attempt to get resources from its own registries, but defer to the registries of this parent if no registry
      * is found.
      *
-     * @param registries            Resource registries for the child.
-     * @param additionalAncestors   Other resource services that serve as ancestors for the child.
+     * @param registries          Resource registries for the child.
+     * @param additionalAncestors Other resource services that serve as ancestors for the child.
      * @return Child resource service.
      */
     default ResourceService createChild(Iterable<ResourceRegistry> registries, Iterable<ResourceService> additionalAncestors) {

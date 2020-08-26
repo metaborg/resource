@@ -1,11 +1,11 @@
 package mb.resource.classloader;
 
-import mb.resource.QualifiedResourceKeyString;
+import mb.resource.ResourceKey;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRegistry;
 import mb.resource.ResourceRuntimeException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 public class ClassLoaderResourceRegistry implements ResourceRegistry {
@@ -34,22 +34,19 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
     }
 
 
-    @Override public ClassLoaderResource getResource(Serializable id) {
-        if(!(id instanceof ClassLoaderResourcePath.Identifier)) {
-            throw new ResourceRuntimeException(
-                "Cannot get class loader resource with ID '" + id + "'; the ID is not of type ClassLoaderResourcePath.Identifier");
-        }
-        final ClassLoaderResourcePath.Identifier identifier = (ClassLoaderResourcePath.Identifier)id;
-        final ClassLoaderResourcePath path = new ClassLoaderResourcePath(qualifier, identifier);
-        return new ClassLoaderResource(classLoader, path);
-    }
-
-
     @Override public ClassLoaderResourcePath getResourceKey(ResourceKeyString keyStr) {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         return new ClassLoaderResourcePath(qualifier, keyStr.getId());
+    }
+
+    @Override public ClassLoaderResource getResource(ResourceKey key) {
+        if(!(key instanceof ClassLoaderResourcePath)) {
+            throw new ResourceRuntimeException(
+                "Cannot get class loader resource for key '" + key + "'; it is not of type ClassLoaderResourcePath");
+        }
+        return new ClassLoaderResource(classLoader, (ClassLoaderResourcePath)key);
     }
 
     @Override public ClassLoaderResource getResource(ResourceKeyString keyStr) {
@@ -61,26 +58,7 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
     }
 
 
-    @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
-        if(!(id instanceof ClassLoaderResourcePath.Identifier)) {
-            throw new ResourceRuntimeException(
-                "Cannot convert identifier '" + id + "' to its string representation; it is not of type ClassLoaderResourcePath.Identifier");
-        }
-        final ClassLoaderResourcePath.Identifier identifier = (ClassLoaderResourcePath.Identifier)id;
-        return QualifiedResourceKeyString.of(qualifier, identifier.toString());
-    }
-
-    @Override public String toString(Serializable id) {
-        if(!(id instanceof ClassLoaderResourcePath.Identifier)) {
-            throw new ResourceRuntimeException(
-                "Cannot convert identifier '" + id + "' to its string representation; it is not of type ClassLoaderResourcePath.Identifier");
-        }
-        final ClassLoaderResourcePath.Identifier identifier = (ClassLoaderResourcePath.Identifier)id;
-        return QualifiedResourceKeyString.toString(qualifier, identifier.toString());
-    }
-
-
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
         final ClassLoaderResourceRegistry that = (ClassLoaderResourceRegistry)o;

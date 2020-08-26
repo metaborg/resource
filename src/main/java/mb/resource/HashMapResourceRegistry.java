@@ -26,11 +26,11 @@ abstract public class HashMapResourceRegistry implements ResourceRegistry {
         return qualifier;
     }
 
-    @Override public Resource getResource(Serializable id) {
-        final @Nullable Resource resource = resources.get(id);
+    @Override public Resource getResource(ResourceKey key) {
+        final @Nullable Resource resource = resources.get(key.getId());
         if(resource == null) {
             throw new ResourceRuntimeException(
-                "Cannot get resource with identifier '" + id + "'; it was not found in this registry");
+                "Cannot get resource with key '" + key + "'; it was not found in this registry");
         }
         return resource;
     }

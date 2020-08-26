@@ -64,7 +64,7 @@ public class DefaultResourceService implements ResourceService {
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
-        return registry.getResource(key.getId());
+        return registry.getResource(key);
     }
 
     @Override public ReadableResource getReadableResource(ResourceKey key) {
@@ -185,32 +185,13 @@ public class DefaultResourceService implements ResourceService {
     }
 
 
-    @Override public QualifiedResourceKeyString toResourceKeyString(ResourceKey key) {
-        final String qualifier = key.getQualifier();
-        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
-        if(registry == null) {
-            throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
-        }
-        return registry.toResourceKeyString(key.getId());
-    }
-
-    @Override public String toString(ResourceKey key) {
-        final String qualifier = key.getQualifier();
-        final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
-        if(registry == null) {
-            throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
-        }
-        return registry.toString(key.getId());
-    }
-
-
     @Override public @Nullable File toLocalFile(ResourceKey key) {
         final String qualifier = key.getQualifier();
         final @Nullable ResourceRegistry registry = getResourceRegistry(qualifier);
         if(registry == null) {
             throw new ResourceRuntimeException("No resource registry was found for qualifier '" + qualifier + "'");
         }
-        return registry.toLocalFile(key.getId());
+        return registry.toLocalFile(key);
     }
 
     @Override public @Nullable File toLocalFile(Resource resource) {

@@ -186,11 +186,11 @@ public class ClassLoaderResource extends HierarchicalResourceDefaults<ClassLoade
 
 
     private @Nullable URL getResource() {
-        return classLoader.getResource(path.toString());
+        return classLoader.getResource(path.getId().toString());
     }
 
     private URLConnection openConnection() throws IOException {
-        final String resourcePath = path.toString();
+        final String resourcePath = path.getId().toString();
         final @Nullable URL url = getResource();
         if(url == null) {
             throw new IOException("Resource '" + resourcePath + "' could not be found in class loader '" + classLoader + "'");
@@ -204,7 +204,7 @@ public class ClassLoaderResource extends HierarchicalResourceDefaults<ClassLoade
     }
 
 
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
         final ClassLoaderResource that = (ClassLoaderResource)o;

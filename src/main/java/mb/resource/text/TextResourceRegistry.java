@@ -2,7 +2,6 @@ package mb.resource.text;
 
 import mb.resource.DefaultResourceKey;
 import mb.resource.HashMapResourceRegistry;
-import mb.resource.QualifiedResourceKeyString;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRuntimeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -28,26 +27,10 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
         return new DefaultResourceKey(TextResourceRegistry.qualifier, keyStr.getId());
     }
 
-    @Override public QualifiedResourceKeyString toResourceKeyString(Serializable id) {
-        if(!(id instanceof String)) {
-            throw new ResourceRuntimeException(
-                "Cannot get text resource with ID '" + id + "'; the ID is not of type String");
-        }
-        return QualifiedResourceKeyString.of(qualifier, (String)id);
-    }
-
-    @Override public String toString(Serializable id) {
-        if(!(id instanceof String)) {
-            throw new ResourceRuntimeException(
-                "Cannot get text resource with ID '" + id + "'; the ID is not of type String");
-        }
-        return QualifiedResourceKeyString.toString(qualifier, (String)id);
-    }
-
-
     @Override protected Serializable toId(ResourceKeyString idStr) {
         return idStr.getId();
     }
+
 
     /**
      * Creates a new read-only in-memory text resource.
@@ -72,5 +55,4 @@ public class TextResourceRegistry extends HashMapResourceRegistry {
     public TextResource createResource(String text) {
         return createResource(text, null);
     }
-
 }

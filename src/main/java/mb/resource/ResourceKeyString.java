@@ -2,6 +2,9 @@ package mb.resource;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * String representation of a {@link ResourceKey resource key}, where the qualifier may be missing, indicating that the
  * qualifier is irrelevant, can be derived from the context, or that a default should be used.
@@ -35,7 +38,7 @@ public interface ResourceKeyString {
      * @param keyStr {@link String} representation of a (partial) resource key string.
      * @return Resource key string parsed from given string.
      */
-    public static ResourceKeyString parse(String keyStr) {
+    static ResourceKeyString parse(String keyStr) {
         final String[] split = keyStr.split(DefaultQualifiedResourceKeyString.separator, 2);
         if(split.length < 2) {
             return new DefaultResourceKeyString(keyStr);
@@ -43,6 +46,23 @@ public interface ResourceKeyString {
         final String qualifier = split[0];
         return new DefaultResourceKeyString(qualifier.isEmpty() ? null : qualifier, split[1]);
     }
+
+    /**
+     * Creates a resource key string from given {@link URI} that was created with {@link #toUri()}.
+     *
+     * @param uri {@link URI} representation of a (partial) resource key string.
+     * @return Resource key string.
+     * @throws ResourceRuntimeException when given {@link URI} has no {@link URI#getSchemeSpecificPart() scheme-specific part}.
+     */
+    static ResourceKeyString of(URI uri) {
+        final @Nullable String scheme = uri.getScheme();
+        final @Nullable String ssp = uri.getSchemeSpecificPart(); // TODO: should the SSP be URI-decoded?
+        if(ssp == null) {
+            throw new ResourceRuntimeException("Cannot convert '" + uri + "' to a resource key string, it has no scheme-specific part");
+        }
+        return new DefaultResourceKeyString(uri.getScheme(), ssp);
+    }
+
 
     /**
      * Creates a resource key string, as a {@link String}, from given string representations of a qualifier and
@@ -105,6 +125,21 @@ public interface ResourceKeyString {
         return QualifiedResourceKeyString.of(qualifier, getId());
     }
 
+
+    /**
+     * Creates an {@link URI} representation of this resource key string. This string representation can be converted
+     * back into this object using {@link #parse(String)}.
+     *
+     * @return {@link URI} representation of this resource key string.
+     */
+    default URI toUri() {
+        try {
+            return new URI(getQualifier(), UriEncode.encodePath(getId()), null);
+        } catch(URISyntaxException e) {
+            // TODO: should ensure that URISyntaxException can never be thrown. To ensure this, qualifiers may only contain alphanumeric and +.-.
+            throw new ResourceRuntimeException("Converting '" + this + "' to an URI failed unexpectedly", e);
+        }
+    }
 
     /**
      * Creates a {@link String} representation of this resource key string. This string representation can be converted
