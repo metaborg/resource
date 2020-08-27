@@ -48,6 +48,15 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
         }
 
 
+        private boolean startsWith(Identifier prefix) {
+            if(segments.size() < prefix.segments.size()) return false;
+            for(int i = 0; i < prefix.segments.size(); i++) {
+                if(!prefix.segments.get(i).equals(segments.get(i))) return false;
+            }
+            return true;
+        }
+
+
         private @Nullable Identifier getParent() {
             final int size = segments.size();
             if(size > 1) {
@@ -227,6 +236,18 @@ public class ClassLoaderResourcePath extends ResourcePathDefaults<ClassLoaderRes
 
     @Override public Iterable<String> getSegments() {
         return id.segments;
+    }
+
+
+    @Override public boolean startsWith(ResourcePath prefix) {
+        if(!(prefix instanceof ClassLoaderResourcePath)) {
+            throw new ResourceRuntimeException("Cannot check if this path starts with '" + prefix + "', it is not an ClassLoaderResourcePath");
+        }
+        return startsWith((ClassLoaderResourcePath)prefix);
+    }
+
+    public boolean startsWith(ClassLoaderResourcePath prefix) {
+        return id.startsWith(prefix.id);
     }
 
 

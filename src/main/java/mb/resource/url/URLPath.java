@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class URLPath implements ResourcePath {
@@ -76,6 +77,26 @@ public class URLPath implements ResourcePath {
                 throw new NoSuchElementException();
             }
         };
+    }
+
+
+    @Override public boolean startsWith(ResourcePath prefix) {
+        if(!(prefix instanceof URLPath)) {
+            throw new ResourceRuntimeException("Cannot check if this path starts with '" + prefix + "', it is not an URLPath");
+        }
+        return startsWith((URLPath)prefix);
+    }
+
+    public boolean startsWith(URLPath prefix) {
+        if(!Objects.equals(uri.getScheme(), prefix.uri.getScheme())) return false;
+        final @Nullable String path = uri.getPath();
+        final @Nullable String prefixPath = prefix.uri.getPath();
+        if(path != null && prefixPath != null) {
+            return path.startsWith(prefixPath);
+        } else if(path == null && prefixPath == null) {
+            return true;
+        }
+        return false;
     }
 
 

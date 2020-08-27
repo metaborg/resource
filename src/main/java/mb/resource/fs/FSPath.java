@@ -122,6 +122,18 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     }
 
 
+    @Override public boolean startsWith(ResourcePath prefix) {
+        if(!(prefix instanceof FSPath)) {
+            throw new ResourceRuntimeException("Cannot check if this path starts with '" + prefix + "', it is not an FSPath");
+        }
+        return startsWith((FSPath)prefix);
+    }
+
+    public boolean startsWith(FSPath prefix) {
+        return javaPath.startsWith(prefix.javaPath);
+    }
+
+
     @Override public @Nullable FSPath getParent() {
         final @Nullable Path parentJavaPath = this.javaPath.getParent();
         if(parentJavaPath == null) {

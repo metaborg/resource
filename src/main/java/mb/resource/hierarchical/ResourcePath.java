@@ -34,6 +34,17 @@ public interface ResourcePath extends ResourceKey {
 
 
     /**
+     * Tests if this path starts with the specified prefix.
+     *
+     * @param prefix Path prefix to look for
+     * @return {@code true} if this path starts with {@code prefix}, {@code false} otherwise.
+     * @throws ResourceRuntimeException when {@code prefix}'s (sub)type is not the same as this path's type.
+     * @throws ResourceRuntimeException when {@code prefix}'s qualifier is not the same as this path's qualifier.
+     */
+    boolean startsWith(ResourcePath prefix);
+
+
+    /**
      * Gets the parent of this path, or {@code null} if it has no parent (e.g., it is a root or empty).
      *
      * @return Parent of this path, or {@code null} if it has none.
@@ -89,6 +100,8 @@ public interface ResourcePath extends ResourceKey {
      * Returns a string that relativizes {@code other} to this path. This is the inverse of {@link
      * #appendRelativePath(String)}.
      *
+     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this path's type.
+     * @throws ResourceRuntimeException when {@code other}'s qualifier is not the same as this path's qualifier.
      * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this path's type.
      */
     String relativizeToString(ResourcePath other);
