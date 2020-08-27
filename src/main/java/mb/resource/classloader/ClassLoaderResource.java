@@ -2,9 +2,9 @@ package mb.resource.classloader;
 
 import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.HierarchicalResourceAccess;
-import mb.resource.hierarchical.HierarchicalResourceDefaults;
 import mb.resource.hierarchical.HierarchicalResourceType;
-import mb.resource.hierarchical.ResourcePath;
+import mb.resource.hierarchical.SegmentsPath;
+import mb.resource.hierarchical.SegmentsResource;
 import mb.resource.hierarchical.match.ResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -15,77 +15,24 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.stream.Stream;
 
-public class ClassLoaderResource extends HierarchicalResourceDefaults<ClassLoaderResource> implements HierarchicalResource {
+public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> implements HierarchicalResource {
     private final ClassLoader classLoader;
-    private final ClassLoaderResourcePath path;
 
 
-    ClassLoaderResource(ClassLoader classLoader, ClassLoaderResourcePath path) {
+    ClassLoaderResource(ClassLoader classLoader, SegmentsPath path) {
+        super(path);
         this.classLoader = classLoader;
-        this.path = path;
     }
 
     ClassLoaderResource(ClassLoader classLoader, String qualifier, String path) {
+        super(new SegmentsPath(qualifier, path));
         this.classLoader = classLoader;
-        this.path = new ClassLoaderResourcePath(qualifier, path);
     }
-
 
     @Override public void close() throws IOException {
         // Nothing to close.
-    }
-
-
-    @Override public ResourcePath getKey() {
-        return path;
-    }
-
-
-    @Override public @Nullable ClassLoaderResource getParent() {
-        final @Nullable ClassLoaderResourcePath parent = path.getParent();
-        if(parent == null) return null;
-        return new ClassLoaderResource(classLoader, parent);
-    }
-
-    @Override public @Nullable ClassLoaderResource getRoot() {
-        final @Nullable ClassLoaderResourcePath root = path.getRoot();
-        if(root == null) return null;
-        return new ClassLoaderResource(classLoader, root);
-    }
-
-
-    @Override public ClassLoaderResource appendSegment(String segment) {
-        return new ClassLoaderResource(classLoader, path.appendSegment(segment));
-    }
-
-    @Override public ClassLoaderResource appendSegments(Iterable<String> segments) {
-        return new ClassLoaderResource(classLoader, path.appendSegments(segments));
-    }
-
-    @Override public ClassLoaderResource appendSegments(Collection<String> segments) {
-        return new ClassLoaderResource(classLoader, path.appendSegments(segments));
-    }
-
-
-    @Override public ClassLoaderResource appendRelativePath(String relativePath) {
-        return new ClassLoaderResource(classLoader, path.appendRelativePath(relativePath));
-    }
-
-    @Override public ClassLoaderResource appendOrReplaceWithPath(String other) {
-        return new ClassLoaderResource(classLoader, path.appendOrReplaceWithPath(other));
-    }
-
-
-    @Override public ClassLoaderResource appendRelativePath(ResourcePath relativePath) {
-        return new ClassLoaderResource(classLoader, path.appendRelativePath(relativePath));
-    }
-
-
-    @Override public ClassLoaderResource replaceLeaf(String segment) {
-        return new ClassLoaderResource(classLoader, path.replaceLeaf(segment));
     }
 
 
@@ -201,6 +148,10 @@ public class ClassLoaderResource extends HierarchicalResourceDefaults<ClassLoade
 
     @Override protected ClassLoaderResource self() {
         return this;
+    }
+
+    @Override protected ClassLoaderResource create(SegmentsPath path) {
+        return new ClassLoaderResource(classLoader, path);
     }
 
 

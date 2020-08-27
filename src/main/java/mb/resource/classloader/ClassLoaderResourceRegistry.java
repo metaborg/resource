@@ -4,6 +4,7 @@ import mb.resource.ResourceKey;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRegistry;
 import mb.resource.ResourceRuntimeException;
+import mb.resource.hierarchical.SegmentsPath;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
@@ -34,26 +35,26 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
     }
 
 
-    @Override public ClassLoaderResourcePath getResourceKey(ResourceKeyString keyStr) {
+    @Override public SegmentsPath getResourceKey(ResourceKeyString keyStr) {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
-        return new ClassLoaderResourcePath(qualifier, keyStr.getId());
+        return new SegmentsPath(qualifier, keyStr.getId());
     }
 
     @Override public ClassLoaderResource getResource(ResourceKey key) {
-        if(!(key instanceof ClassLoaderResourcePath)) {
+        if(!(key instanceof SegmentsPath)) {
             throw new ResourceRuntimeException(
                 "Cannot get class loader resource for key '" + key + "'; it is not of type ClassLoaderResourcePath");
         }
-        return new ClassLoaderResource(classLoader, (ClassLoaderResourcePath)key);
+        return new ClassLoaderResource(classLoader, (SegmentsPath)key);
     }
 
     @Override public ClassLoaderResource getResource(ResourceKeyString keyStr) {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
-        final ClassLoaderResourcePath path = new ClassLoaderResourcePath(qualifier, keyStr.getId());
+        final SegmentsPath path = new SegmentsPath(qualifier, keyStr.getId());
         return new ClassLoaderResource(classLoader, path);
     }
 
