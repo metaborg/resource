@@ -1,5 +1,6 @@
 package mb.resource;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public interface ReadableResource extends Resource, AutoCloseable {
 
     /**
      * Opens the resource for reading.
-     * <p>
+     *
      * Close the input stream when you are done with it.
      *
      * @return The input stream to read from.
@@ -55,6 +56,19 @@ public interface ReadableResource extends Resource, AutoCloseable {
      * @throws IOException           An I/O exception occurred.
      */
     InputStream openRead() throws IOException;
+
+    /**
+     * Opens the resource for reading and wraps it in a {@link BufferedInputStream}.
+     *
+     * Close the buffered input stream when you are done with it.
+     *
+     * @return The buffered input stream to read from.
+     * @throws FileNotFoundException The resource does not exist.
+     * @throws IOException           An I/O exception occurred.
+     */
+    default BufferedInputStream openReadBuffered() throws IOException {
+        return new BufferedInputStream(openRead());
+    }
 
     /**
      * Reads the content of the resource as an array of bytes.

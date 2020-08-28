@@ -1,5 +1,6 @@
 package mb.resource;
 
+import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +31,7 @@ public interface WritableResource extends ReadableResource {
     void setLastModifiedTime(Instant moment) throws IOException;
 
     /**
-     * Opens the resource for writing; or creates the resource if it does not exist.
+     * Opens the resource for writing. Creates the resource if it does not exist.
      * <p>
      * This method overwrites any existing content in the file.
      * <p>
@@ -42,7 +43,22 @@ public interface WritableResource extends ReadableResource {
     OutputStream openWrite() throws IOException;
 
     /**
-     * Opens the resource for writing; or creates the resource if it does not exist.
+     * Opens the resource for writing and wraps it in a {@link BufferedOutputStream}. Creates the resource if it does
+     * not exist.
+     * <p>
+     * This method overwrites any existing content in the file.
+     * <p>
+     * Flush and close the output stream when you are done with it.
+     *
+     * @return The buffered output stream to write to.
+     * @throws IOException An I/O exception occurred.
+     */
+    default BufferedOutputStream openWriteBuffered() throws IOException {
+        return new BufferedOutputStream(openWrite());
+    }
+
+    /**
+     * Opens the resource for writing. Creates the resource if it does not exist.
      * <p>
      * This method appends to the end of the file.
      * <p>
@@ -52,6 +68,21 @@ public interface WritableResource extends ReadableResource {
      * @throws IOException An I/O exception occurred.
      */
     OutputStream openWriteAppend() throws IOException;
+
+    /**
+     * Opens the resource for writing and wraps it in a {@link BufferedOutputStream}. Creates the resource if it does
+     * not exist.
+     * <p>
+     * This method appends to the end of the file.
+     * <p>
+     * Flush and close the output stream when you are done with it.
+     *
+     * @return The buffered output stream to write to.
+     * @throws IOException An I/O exception occurred.
+     */
+    default BufferedOutputStream openWriteAppendBuffered() throws IOException {
+        return new BufferedOutputStream(openWriteAppend());
+    }
 
     /**
      * Opens the resource for writing.
@@ -67,6 +98,21 @@ public interface WritableResource extends ReadableResource {
     OutputStream openWriteExisting() throws IOException;
 
     /**
+     * Opens the resource for writing and wraps it in a {@link BufferedOutputStream}.
+     * <p>
+     * This method throws an error when the files does not exist, and overwrites any existing content in the file.
+     * <p>
+     * Flush and close the output stream when you are done with it.
+     *
+     * @return The buffered output stream to write to.
+     * @throws FileNotFoundException The resource does not exist.
+     * @throws IOException           An I/O exception occurred.
+     */
+    default BufferedOutputStream openWriteExistingBuffered() throws IOException {
+        return new BufferedOutputStream(openWriteExisting());
+    }
+
+    /**
      * Creates a new instance of the resource and opens it for writing.
      * <p>
      * This method throws an error when the file exists.
@@ -78,6 +124,21 @@ public interface WritableResource extends ReadableResource {
      * @throws IOException                An I/O exception occurred.
      */
     OutputStream openWriteNew() throws IOException;
+
+    /**
+     * Creates a new instance of the resource and opens it for writing and wraps it in a {@link BufferedOutputStream}.
+     * <p>
+     * This method throws an error when the file exists.
+     * <p>
+     * Flush and close the output stream when you are done with it.
+     *
+     * @return The buffered output stream to write to.
+     * @throws FileAlreadyExistsException The file already exists.
+     * @throws IOException                An I/O exception occurred.
+     */
+    default BufferedOutputStream openWriteNewBuffered() throws IOException {
+        return new BufferedOutputStream(openWriteNew());
+    }
 
 
     /**
