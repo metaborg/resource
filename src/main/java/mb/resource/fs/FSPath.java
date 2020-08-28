@@ -27,6 +27,12 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
 
 
     public FSPath(Path javaPath) {
+        /* TODO: many Path/Filesystem implementations convert the path to a path that is absolute to some random-ass
+                 directory, before turning it into a URI. Consequently, the URI is out of sync with the actual path when
+                 the path is relative. Therefore, we should probably disallow relative paths for FSPath, or remove all
+                 relative path API from ResourcePath, and instead only use strings for relative paths. Alternatively,
+                 there may be another way to create URIs?
+         */
         this.uri = javaPath.toUri();
         this.javaPath = javaPath;
     }
