@@ -17,7 +17,7 @@ public class RegexPathMatcher implements PathMatcher {
     }
 
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
-        final String relative = rootDir.relativize(path).toString();
+        final String relative = rootDir.relativize(path);
         return compiledPattern.matcher(relative).matches();
     }
 

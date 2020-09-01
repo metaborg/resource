@@ -82,25 +82,14 @@ public class SegmentsPath extends ResourcePathDefaults<SegmentsPath> implements 
     }
 
 
-    @Override public SegmentsPath relativize(ResourcePath other) {
+    @Override public String relativize(ResourcePath other) {
         if(!(other instanceof SegmentsPath)) {
             throw new ResourceRuntimeException("Cannot relativize with path '" + other + "', it is not a SegmentsPath");
         }
         return relativize((SegmentsPath)other);
     }
 
-    public SegmentsPath relativize(SegmentsPath other) {
-        return new SegmentsPath(qualifier, id.relativize(other.id));
-    }
-
-    @Override public String relativizeToString(ResourcePath other) {
-        if(!(other instanceof SegmentsPath)) {
-            throw new ResourceRuntimeException("Cannot relativize with path '" + other + "', it is not a SegmentsPath");
-        }
-        return relativizeToString((SegmentsPath)other);
-    }
-
-    public String relativizeToString(SegmentsPath other) {
+    public String relativize(SegmentsPath other) {
         return id.relativize(other.id).toString();
     }
 

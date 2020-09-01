@@ -171,26 +171,14 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     }
 
 
-    @Override public FSPath relativize(ResourcePath other) {
+    @Override public String relativize(ResourcePath other) {
         if(!(other instanceof FSPath)) {
             throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an FSPath");
         }
         return relativize((FSPath)other);
     }
 
-    public FSPath relativize(FSPath other) {
-        final Path javaRelativePath = javaPath.relativize(other.javaPath);
-        return new FSPath(javaRelativePath);
-    }
-
-    @Override public String relativizeToString(ResourcePath other) {
-        if(!(other instanceof FSPath)) {
-            throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an FSPath");
-        }
-        return relativizeToString((FSPath)other);
-    }
-
-    public String relativizeToString(FSPath other) {
+    public String relativize(FSPath other) {
         return javaPath.relativize(other.javaPath).toString();
     }
 

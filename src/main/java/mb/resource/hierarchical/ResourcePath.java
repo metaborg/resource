@@ -87,16 +87,6 @@ public interface ResourcePath extends ResourceKey {
     ResourcePath getNormalized();
 
     /**
-     * Returns a path that relativizes {@code other} to this path. This is the inverse of {@link
-     * #appendRelativePath(ResourcePath)}.
-     *
-     * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this path's type.
-     * @throws ResourceRuntimeException when {@code other}'s qualifier is not the same as this path's qualifier.
-     * @throws ResourceRuntimeException when {@code other} does not have a common root to this path.
-     */
-    ResourcePath relativize(ResourcePath other);
-
-    /**
      * Returns a string that relativizes {@code other} to this path. This is the inverse of {@link
      * #appendRelativePath(String)}.
      *
@@ -104,7 +94,7 @@ public interface ResourcePath extends ResourceKey {
      * @throws ResourceRuntimeException when {@code other}'s qualifier is not the same as this path's qualifier.
      * @throws ResourceRuntimeException when {@code other}'s (sub)type is not the same as this path's type.
      */
-    String relativizeToString(ResourcePath other);
+    String relativize(ResourcePath other);
 
 
     /**

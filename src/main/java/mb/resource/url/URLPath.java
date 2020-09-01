@@ -121,25 +121,14 @@ public class URLPath implements ResourcePath {
         return new URLPath(uri.normalize());
     }
 
-    @Override public URLPath relativize(ResourcePath other) {
+    @Override public String relativize(ResourcePath other) {
         if(!(other instanceof URLPath)) {
             throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an URIPath");
         }
         return relativize((URLPath)other);
     }
 
-    public URLPath relativize(URLPath other) {
-        return new URLPath(uri.relativize(other.uri));
-    }
-
-    @Override public String relativizeToString(ResourcePath other) {
-        if(!(other instanceof URLPath)) {
-            throw new ResourceRuntimeException("Cannot relativize against '" + other + "', it is not an URIPath");
-        }
-        return relativizeToString((URLPath)other);
-    }
-
-    public String relativizeToString(URLPath other) {
+    public String relativize(URLPath other) {
         return uri.relativize(other.uri).toString();
     }
 
