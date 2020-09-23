@@ -13,7 +13,6 @@ import java.time.Instant;
  * A writable resource.
  */
 public interface WritableResource extends ReadableResource {
-
     /**
      * Gets whether the resource is accessible and writable.
      *
@@ -148,7 +147,7 @@ public interface WritableResource extends ReadableResource {
      * @throws IOException An I/O exception occurred.
      */
     default void writeBytes(byte[] bytes) throws IOException {
-        try(final OutputStream outputStream = openWriteExisting()) {
+        try(final OutputStream outputStream = openWriteBuffered()) {
             outputStream.write(bytes);
             outputStream.flush();
         }
@@ -162,7 +161,7 @@ public interface WritableResource extends ReadableResource {
      * @throws IOException An I/O exception occurred.
      */
     default void writeString(String string, Charset toCharset) throws IOException {
-        try(final OutputStream outputStream = openWriteExisting()) {
+        try(final OutputStream outputStream = openWriteBuffered()) {
             outputStream.write(string.getBytes(toCharset));
             outputStream.flush();
         }
@@ -177,5 +176,4 @@ public interface WritableResource extends ReadableResource {
     default void writeString(String string) throws IOException {
         writeString(string, StandardCharsets.UTF_8);
     }
-
 }
