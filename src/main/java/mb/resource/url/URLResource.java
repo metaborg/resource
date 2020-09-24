@@ -138,12 +138,12 @@ public class URLResource extends HierarchicalResourceDefaults<URLResource> imple
     }
 
     @Override
-    public Stream<? extends URLResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+    public Stream<URLResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         throw new UnsupportedOperationException("URL resources do not support walking");
     }
 
     @Override
-    public Stream<? extends URLResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
+    public Stream<URLResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
         throw new UnsupportedOperationException("URL resources do not support walking");
     }
 

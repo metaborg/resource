@@ -54,7 +54,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
     @Override
-    public Stream<? extends ClassLoaderResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
+    public Stream<ClassLoaderResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
         throw new UnsupportedOperationException("Class loader resources do not support walking");
     }
 

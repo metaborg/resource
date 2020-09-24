@@ -97,9 +97,9 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
 
 
     @Override
-    public abstract Stream<? extends SELF> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
+    public abstract Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
 
-    @Override public Stream<? extends SELF> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+    @Override public Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         return walk(walker, matcher, null);
     }
 
