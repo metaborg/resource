@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -115,6 +114,15 @@ public interface HierarchicalResource extends WritableResource {
 
 
     /**
+     * Returns a resource where {@code path} is appended to the current resource. If {@code path} is an absolute path,
+     * it is appended to the current resource as if it was a relative path.
+     *
+     * @param path Relative path to append from.
+     * @return Appended resource.
+     */
+    HierarchicalResource appendAsRelativePath(String path);
+
+    /**
      * Returns a resource where {@code relativePath} is appended to the current resource. Throws if {@code relativePath}
      * is an absolute path.
      *
@@ -132,6 +140,15 @@ public interface HierarchicalResource extends WritableResource {
      * @return Appended or replaced resource.
      */
     HierarchicalResource appendOrReplaceWithPath(String other);
+
+    /**
+     * Returns a resource where {@code other} is appended to the current resource using string concatenation.
+     *
+     * @param other String to append.
+     * @return Appended resource.
+     * @throws ResourceRuntimeException when {@code other} is not a valid string that can be appended to this resource.
+     */
+    HierarchicalResource appendString(String other);
 
     /**
      * Returns a resource where {@code relativePath} is appended to the current resource. Throws if {@code relativePath}

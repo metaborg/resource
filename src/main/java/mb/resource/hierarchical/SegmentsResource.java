@@ -55,6 +55,9 @@ public abstract class SegmentsResource<SELF extends SegmentsResource<SELF>> exte
         return create(path.appendOrReplaceWithPath(other));
     }
 
+    @Override public SELF appendString(String other) {
+        return create(path.appendString(other));
+    }
 
     @Override public SELF appendRelativePath(ResourcePath relativePath) {
         return create(path.appendRelativePath(relativePath));

@@ -172,6 +172,11 @@ public class FSResource extends HierarchicalResourceDefaults<FSResource> impleme
         return new FSResource(newPath);
     }
 
+    @Override public FSResource appendString(String other) {
+        final FSPath newPath = path.appendString(other);
+        return new FSResource(newPath);
+    }
+
     @Override public FSResource appendOrReplaceWithPath(String other) {
         final FSPath newPath = path.appendOrReplaceWithPath(other);
         return new FSResource(newPath);

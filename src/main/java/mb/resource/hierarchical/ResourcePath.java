@@ -144,6 +144,15 @@ public interface ResourcePath extends ResourceKey {
 
 
     /**
+     * Returns a path where {@code path} is appended to the current path. If {@code path} is an absolute path, it is
+     * appended to the current path as if it was a relative path.
+     *
+     * @param path Relative path to append from.
+     * @return Appended path.
+     */
+    ResourcePath appendAsRelativePath(String path);
+
+    /**
      * Returns a path where {@code relativePath} is appended to the current path. Throws if {@code relativePath} is an
      * absolute path.
      *

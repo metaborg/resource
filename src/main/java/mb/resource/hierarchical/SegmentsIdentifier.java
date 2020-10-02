@@ -135,6 +135,11 @@ public class SegmentsIdentifier implements Serializable {
     }
 
 
+    public SegmentsIdentifier appendAsRelativePath(String path) {
+        final String[] relativePathSegments = path.split("/");
+        return appendSegments(relativePathSegments); // TODO: TEST
+    }
+
     public SegmentsIdentifier appendRelativePath(String relativePath) {
         if(relativePath.startsWith("/")) {
             throw new ResourceRuntimeException("Cannot append '" + relativePath + "', it is an absolute path");

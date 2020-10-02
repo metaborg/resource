@@ -2,6 +2,7 @@ package mb.resource.url;
 
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
+import mb.resource.hierarchical.ResourcePathDefaults;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.net.MalformedURLException;
@@ -13,9 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.Function;
 
-public class URLPath implements ResourcePath {
+public class URLPath extends ResourcePathDefaults<URLPath> implements ResourcePath {
     private final URI uri;
 
 
@@ -153,11 +153,11 @@ public class URLPath implements ResourcePath {
         return new URLPath(uri.resolve(String.join("/", segments)));
     }
 
-
     private URI resolve(String other) throws URISyntaxException {
         // Do string append instead of URI#resolve, as it ignores `other` when `uri` is opaque.
         return new URI(uri.toString() + other);
     }
+
 
     @Override public URLPath appendRelativePath(String relativePath) {
         try {
@@ -229,33 +229,9 @@ public class URLPath implements ResourcePath {
         throw new UnsupportedOperationException();
     }
 
-    @Override public URLPath appendToLeaf(String segment) {
-        throw new UnsupportedOperationException();
-    }
 
-    @Override public URLPath applyToLeaf(Function<String, String> func) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override public URLPath replaceLeafExtension(String extension) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public URLPath ensureLeafExtension(String extension) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public ResourcePath removeLeafExtension() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public URLPath appendToLeafExtension(String extension) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public URLPath applyToLeafExtension(Function<String, String> func) {
-        throw new UnsupportedOperationException();
+    @Override protected URLPath self() {
+        return this;
     }
 
 

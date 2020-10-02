@@ -1,5 +1,7 @@
 package mb.resource.classloader;
 
+import mb.resource.ResourceRuntimeException;
+import mb.resource.fs.FSResource;
 import mb.resource.hierarchical.HierarchicalResource;
 import mb.resource.hierarchical.HierarchicalResourceAccess;
 import mb.resource.hierarchical.HierarchicalResourceType;
@@ -12,9 +14,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.stream.Stream;
 
 public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> implements HierarchicalResource {
@@ -132,6 +137,43 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
 
+    public ClassloaderResourceLocations getLocations() throws IOException {
+        final ArrayList<FSResource> directories = new ArrayList<>();
+        final ArrayList<JarFileWithPath> jarFiles = new ArrayList<>();
+        final Enumeration<URL> resources = classLoader.getResources(path.getId().toString());
+        if(!resources.hasMoreElements()) {
+            throw new ResourceRuntimeException("Could not get class loader resource locations for '" + path + "'; no locations were found");
+        }
+        while(resources.hasMoreElements()) {
+            final URL url = resources.nextElement();
+            final String protocol = url.getProtocol();
+            if("file".equals(protocol)) {
+                try {
+                    final FSResource directory = new FSResource(url.toURI());
+                    directories.add(directory);
+                } catch(URISyntaxException e) {
+                    throw new ResourceRuntimeException("Could not get class loader resource locations for '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
+                }
+            } else if("jar".equals(protocol)) {
+                final String urlPath = url.getPath();
+                final int exclamationMarkIndex = urlPath.indexOf("!");
+                final String jarFilePath;
+                final String pathInJarFile;
+                if(exclamationMarkIndex < 0) {
+                    jarFilePath = urlPath.substring(5); // 5 to skip 'file:/'
+                    pathInJarFile = "";
+                } else {
+                    jarFilePath = urlPath.substring(5, exclamationMarkIndex); // 5 to skip 'file:/'
+                    pathInJarFile = urlPath.substring(exclamationMarkIndex + 1); // + 1 to skip '!'
+                }
+                final FSResource jarFile = new FSResource(jarFilePath);
+                jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
+            }
+        }
+        return new ClassloaderResourceLocations(directories, jarFiles);
+    }
+
+
     private @Nullable URL getResource() {
         return classLoader.getResource(path.getId().toString());
     }
@@ -149,6 +191,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     @Override protected ClassLoaderResource self() {
         return this;
     }
+
 
     @Override protected ClassLoaderResource create(SegmentsPath path) {
         return new ClassLoaderResource(classLoader, path);

@@ -34,6 +34,18 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
     }
 
 
+    @Override public SELF appendAsRelativePath(String path) {
+        if(path.startsWith("/")) {
+            return appendString(path);
+        } else {
+            return appendRelativePath(path);
+        }
+    }
+
+    @Override public abstract SELF appendRelativePath(String relativePath);
+
+    @Override public abstract SELF appendString(String other);
+
     @Override public abstract SELF appendRelativePath(ResourcePath relativePath);
 
     @Override public SELF appendOrReplaceWithPath(ResourcePath other) {

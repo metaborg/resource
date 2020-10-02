@@ -98,6 +98,10 @@ public class URLResource extends HierarchicalResourceDefaults<URLResource> imple
         return new URLResource(path.appendRelativePath(relativePath));
     }
 
+    @Override public URLResource appendString(String other) {
+        return new URLResource(path.appendString(other));
+    }
+
     @Override public URLResource appendOrReplaceWithPath(String other) {
         return new URLResource(path.appendOrReplaceWithPath(other));
     }
