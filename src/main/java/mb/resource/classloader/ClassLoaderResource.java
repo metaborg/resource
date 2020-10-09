@@ -14,6 +14,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -160,14 +161,18 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
                 final String jarFilePath;
                 final String pathInJarFile;
                 if(exclamationMarkIndex < 0) {
-                    jarFilePath = urlPath.substring(5); // 5 to skip 'file:/'
+                    jarFilePath = urlPath;
                     pathInJarFile = "";
                 } else {
-                    jarFilePath = urlPath.substring(5, exclamationMarkIndex); // 5 to skip 'file:/'
+                    jarFilePath = urlPath.substring(0, exclamationMarkIndex); // skip past '!'
                     pathInJarFile = urlPath.substring(exclamationMarkIndex + 1); // + 1 to skip '!'
                 }
-                final FSResource jarFile = new FSResource(jarFilePath);
-                jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
+                try {
+                    final FSResource jarFile = new FSResource(new URI(jarFilePath));
+                    jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
+                } catch(URISyntaxException e) {
+                    throw new ResourceRuntimeException("Could not add class loader resource location for '" + url + "'; conversion of nested path '" + jarFilePath + "' to an URI failed", e);
+                }
             }
         }
         return new ClassLoaderResourceLocations(directories, jarFiles);
