@@ -39,7 +39,7 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
-        return new SegmentsPath(qualifier, keyStr.getId());
+        return getPath(keyStr.getId());
     }
 
     @Override public ClassLoaderResource getResource(ResourceKey key) {
@@ -47,14 +47,26 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
             throw new ResourceRuntimeException(
                 "Cannot get class loader resource for key '" + key + "'; it is not of type ClassLoaderResourcePath");
         }
-        return new ClassLoaderResource(classLoader, (SegmentsPath)key);
+        return getResource((SegmentsPath)key);
     }
 
     @Override public ClassLoaderResource getResource(ResourceKeyString keyStr) {
         if(!keyStr.qualifierMatchesOrMissing(qualifier)) {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
-        final SegmentsPath path = new SegmentsPath(qualifier, keyStr.getId());
+        return getResource(keyStr.getId());
+    }
+
+
+    public SegmentsPath getPath(String path) {
+        return new SegmentsPath(qualifier, path);
+    }
+
+    public ClassLoaderResource getResource(String path) {
+        return new ClassLoaderResource(classLoader, qualifier, path);
+    }
+
+    public ClassLoaderResource getResource(SegmentsPath path) {
         return new ClassLoaderResource(classLoader, path);
     }
 

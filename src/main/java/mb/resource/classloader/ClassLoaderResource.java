@@ -137,7 +137,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
 
-    public ClassloaderResourceLocations getLocations() throws IOException {
+    public ClassLoaderResourceLocations getLocations() throws IOException {
         final ArrayList<FSResource> directories = new ArrayList<>();
         final ArrayList<JarFileWithPath> jarFiles = new ArrayList<>();
         final Enumeration<URL> resources = classLoader.getResources(path.getId().toString());
@@ -170,7 +170,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
                 jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
             }
         }
-        return new ClassloaderResourceLocations(directories, jarFiles);
+        return new ClassLoaderResourceLocations(directories, jarFiles);
     }
 
 
