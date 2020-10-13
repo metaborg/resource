@@ -186,16 +186,6 @@ public class URLPath extends ResourcePathDefaults<URLPath> implements ResourcePa
         }
     }
 
-    @Override public URLPath appendString(String other) {
-        final String appended = uri.toString() + other;
-        try {
-            final URI appendedUri = new URI(appended);
-            return new URLPath(appendedUri);
-        } catch(URISyntaxException e) {
-            throw new ResourceRuntimeException("Cannot append string '" + other + "' to '" + uri + "'", e);
-        }
-    }
-
     @Override public URLPath appendRelativePath(ResourcePath relativePath) {
         if(!(relativePath instanceof URLPath)) {
             throw new ResourceRuntimeException("Cannot append '" + relativePath + "', it is not an URIPath");

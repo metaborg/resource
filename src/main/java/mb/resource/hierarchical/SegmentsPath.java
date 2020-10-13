@@ -115,10 +115,6 @@ public class SegmentsPath extends ResourcePathDefaults<SegmentsPath> implements 
         return new SegmentsPath(qualifier, id.appendOrReplaceWithPath(other));
     }
 
-    @Override public SegmentsPath appendString(String other) {
-        return new SegmentsPath(qualifier, id.appendString(other));
-    }
-
 
     @Override public SegmentsPath appendRelativePath(ResourcePath relativePath) {
         if(!(relativePath instanceof SegmentsPath)) {

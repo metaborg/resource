@@ -33,7 +33,7 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
                  relative path API from ResourcePath, and instead only use strings for relative paths. Alternatively,
                  there may be another way to create URIs?
          */
-        this.uri = javaPath.toUri();
+        this.uri = toUri(javaPath);
         this.javaPath = javaPath;
     }
 
@@ -214,16 +214,6 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
         return appendOrReplaceWithPath(javaPath.getFileSystem().getPath(other));
     }
 
-    @Override public FSPath appendString(String other) {
-        final String appended = uri.toString() + other;
-        try {
-            final URI appendedUri = new URI(appended);
-            return new FSPath(appendedUri);
-        } catch(URISyntaxException e) {
-            throw new ResourceRuntimeException("Cannot append string '" + other + "' to '" + uri + "'", e);
-        }
-    }
-
     @Override public FSPath appendRelativePath(ResourcePath relativePath) {
         if(!(relativePath instanceof FSPath)) {
             throw new ResourceRuntimeException("Cannot append '" + relativePath + "', it is not an FSPath");
@@ -261,6 +251,26 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     @Override public FSPath replaceLeaf(String segment) {
         final Path javaPath = this.javaPath.resolveSibling(segment);
         return new FSPath(javaPath);
+    }
+
+
+    private static URI toUri(Path javaPath) {
+        final URI uri = javaPath.toUri();
+        @Nullable String path = uri.getPath();
+        /* HACK: Default file system puts trailing slash on the URI when the path points to a directory (yes, it does a
+                 system call to convert to a URI, what are they thinking?). Not only does this reduce performance a lot,
+                 it also means that path creation will be nondeterministic, because it will be different whether a
+                 directory exists or not, which is bad... We can make it more deterministic by stripping the trailing
+                 slash.
+         */
+        if(path != null && path.endsWith(File.separator) && path.length() > 1) {
+            path = path.substring(0, path.length() - 1);
+        }
+        try {
+            return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path, uri.getQuery(), uri.getFragment());
+        } catch(URISyntaxException e) {
+            throw new ResourceRuntimeException("Could not create URI from path '" + javaPath + "'", e);
+        }
     }
 
 

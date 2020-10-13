@@ -2,6 +2,7 @@ package mb.resource.hierarchical;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -30,8 +31,8 @@ public abstract class ResourcePathDefaults<SELF extends ResourcePathDefaults<SEL
 
 
     @Override public SELF appendAsRelativePath(String path) {
-        if(path.startsWith("/")) {
-            return appendString(path);
+        if(path.startsWith("/") || path.startsWith(File.separator)) {
+            return appendRelativePath(path.substring(1));
         } else {
             return appendRelativePath(path);
         }
@@ -39,7 +40,9 @@ public abstract class ResourcePathDefaults<SELF extends ResourcePathDefaults<SEL
 
     @Override public abstract SELF appendRelativePath(String relativePath);
 
-    @Override public abstract SELF appendString(String other);
+    @Override public SELF appendString(String other) {
+        return appendAsRelativePath(other);
+    }
 
     @Override public abstract SELF appendRelativePath(ResourcePath relativePath);
 

@@ -177,8 +177,9 @@ public interface ResourcePath extends ResourceKey {
      * @param other String to append.
      * @return Appended path.
      * @throws ResourceRuntimeException when {@code other} is not a valid string that can be appended to this path.
+     * @deprecated Use {@link #appendAsRelativePath} instead.
      */
-    ResourcePath appendString(String other);
+    @Deprecated ResourcePath appendString(String other);
 
     /**
      * Returns a path where {@code relativePath} is appended to the current path. Throws if {@code relativePath} is an
@@ -278,7 +279,7 @@ public interface ResourcePath extends ResourceKey {
 
     /**
      * Gets this path as a string, that can be used for appending with {@link #appendOrReplaceWithPath(String)}, {@link
-     * #appendRelativePath(String)} (if this path is relative), and {@link #appendString(String)}.
+     * #appendRelativePath(String)} (if this path is relative), and {@link #appendAsRelativePath(String)}.
      *
      * @return This path as a string.
      */
