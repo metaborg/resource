@@ -2,9 +2,9 @@ package mb.resource.hierarchical;
 
 import mb.resource.hierarchical.match.ResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
 
 
     @Override public SELF appendAsRelativePath(String path) {
-        if(path.startsWith("/") || path.startsWith(File.separator)) {
+        if(SeparatorUtil.startsWithSeparator(path)) {
             return appendRelativePath(path.substring(1));
         } else {
             return appendRelativePath(path);

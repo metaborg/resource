@@ -3,6 +3,7 @@ package mb.resource.fs;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
 import mb.resource.hierarchical.ResourcePathDefaults;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -263,7 +264,7 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
                  directory exists or not, which is bad... We can make it more deterministic by stripping the trailing
                  slash.
          */
-        if(path != null && path.endsWith(File.separator) && path.length() > 1) {
+        if(path != null && SeparatorUtil.endsWithSeparator(path) && path.length() > 1) {
             path = path.substring(0, path.length() - 1);
         }
         try {
@@ -289,7 +290,7 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     private static Path createLocalPath(Collection<String> segments) {
         final int segmentsSize = segments.size();
         if(segmentsSize == 0) {
-            return FileSystems.getDefault().getPath("/");
+            return FileSystems.getDefault().getPath(SeparatorUtil.unixSeparator);
         } else {
             @Nullable String first = null;
             final String[] more = new String[segmentsSize - 1];
@@ -308,7 +309,7 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     private static Path createLocalPath(String... segments) {
         final int segmentsSize = segments.length;
         if(segmentsSize == 0) {
-            return FileSystems.getDefault().getPath("/");
+            return FileSystems.getDefault().getPath(SeparatorUtil.unixSeparator);
         } else {
             final String first = segments[0];
             final String[] more = new String[segmentsSize - 1];

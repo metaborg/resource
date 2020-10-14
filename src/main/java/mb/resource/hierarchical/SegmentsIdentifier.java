@@ -1,6 +1,7 @@
 package mb.resource.hierarchical;
 
 import mb.resource.ResourceRuntimeException;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
@@ -28,10 +29,10 @@ public class SegmentsIdentifier implements Serializable {
     }
 
     public static SegmentsIdentifier fromString(String str) {
-        final String[] segments = str.split("/");
+        final String[] segments = SeparatorUtil.splitWithUnixSeparator(str);
         final @Nullable String root;
-        if(str.startsWith("/")) {
-            root = "/";
+        if(SeparatorUtil.startsWithUnixSeparator(str)) {
+            root = SeparatorUtil.unixSeparator;
         } else {
             root = null;
         }
@@ -136,28 +137,28 @@ public class SegmentsIdentifier implements Serializable {
 
 
     public SegmentsIdentifier appendAsRelativePath(String path) {
-        final String[] relativePathSegments = path.split("/");
+        final String[] relativePathSegments = SeparatorUtil.splitWithUnixSeparator(path);
         return appendSegments(relativePathSegments); // TODO: TEST
     }
 
     public SegmentsIdentifier appendRelativePath(String relativePath) {
-        if(relativePath.startsWith("/")) {
+        if(SeparatorUtil.startsWithUnixSeparator(relativePath)) {
             throw new ResourceRuntimeException("Cannot append '" + relativePath + "', it is an absolute path");
         }
-        final String[] relativePathSegments = relativePath.split("/");
+        final String[] relativePathSegments = SeparatorUtil.splitWithUnixSeparator(relativePath);
         return appendSegments(relativePathSegments); // TODO: TEST
     }
 
     public SegmentsIdentifier appendOrReplaceWithPath(String other) {
-        final String[] relativePathSegments = other.split("/");
-        if(other.startsWith("/")) {
-            return new SegmentsIdentifier("/", Arrays.asList(relativePathSegments));
+        final String[] relativePathSegments = SeparatorUtil.splitWithUnixSeparator(other);
+        if(SeparatorUtil.startsWithUnixSeparator(other)) {
+            return new SegmentsIdentifier(SeparatorUtil.unixSeparator, Arrays.asList(relativePathSegments));
         }
         return appendSegments(relativePathSegments); // TODO: TEST
     }
 
     public SegmentsIdentifier appendString(String other) {
-        final String[] pathSegments = other.split("/");
+        final String[] pathSegments = SeparatorUtil.splitWithUnixSeparator(other);
         return appendSegments(pathSegments); // TODO: TEST
     }
 
@@ -204,6 +205,6 @@ public class SegmentsIdentifier implements Serializable {
     }
 
     @Override public String toString() {
-        return (root != null ? root : "") + String.join("/", segments);
+        return (root != null ? root : "") + SeparatorUtil.joinWithUnixSeparator(segments);
     }
 }

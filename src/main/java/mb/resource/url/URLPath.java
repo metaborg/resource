@@ -3,6 +3,7 @@ package mb.resource.url;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
 import mb.resource.hierarchical.ResourcePathDefaults;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.net.MalformedURLException;
@@ -138,19 +139,19 @@ public class URLPath extends ResourcePathDefaults<URLPath> implements ResourcePa
     }
 
     @Override public URLPath appendSegments(Iterable<String> segments) {
-        return new URLPath(uri.resolve(String.join("/", segments)));
+        return new URLPath(uri.resolve(SeparatorUtil.joinWithUnixSeparator(segments)));
     }
 
     @Override public URLPath appendSegments(Collection<String> segments) {
-        return new URLPath(uri.resolve(String.join("/", segments)));
+        return new URLPath(uri.resolve(SeparatorUtil.joinWithUnixSeparator(segments)));
     }
 
     @Override public URLPath appendSegments(List<String> segments) {
-        return new URLPath(uri.resolve(String.join("/", segments)));
+        return new URLPath(uri.resolve(SeparatorUtil.joinWithUnixSeparator(segments)));
     }
 
     @Override public URLPath appendSegments(String... segments) {
-        return new URLPath(uri.resolve(String.join("/", segments)));
+        return new URLPath(uri.resolve(SeparatorUtil.joinWithUnixSeparator(segments)));
     }
 
     private URI resolve(String other) throws URISyntaxException {

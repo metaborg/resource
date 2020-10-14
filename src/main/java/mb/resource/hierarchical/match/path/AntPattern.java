@@ -1,5 +1,6 @@
 package mb.resource.hierarchical.match.path;
 
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
@@ -10,8 +11,8 @@ import java.util.Arrays;
  */
 public final class AntPattern implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final String SEPARATOR = "/";
-    private static final char SEPARATOR_CHAR = '/';
+    private static final String SEPARATOR = SeparatorUtil.unixSeparator;
+    private static final char SEPARATOR_CHAR = SeparatorUtil.unixSeparatorChar;
 
     private final String[] tokenizedPattern;
     private final boolean isCaseSensitive;

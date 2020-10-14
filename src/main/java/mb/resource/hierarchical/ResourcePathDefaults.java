@@ -1,5 +1,6 @@
 package mb.resource.hierarchical;
 
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -31,7 +32,7 @@ public abstract class ResourcePathDefaults<SELF extends ResourcePathDefaults<SEL
 
 
     @Override public SELF appendAsRelativePath(String path) {
-        if(path.startsWith("/") || path.startsWith(File.separator)) {
+        if(SeparatorUtil.startsWithSeparator(path)) {
             return appendRelativePath(path.substring(1));
         } else {
             return appendRelativePath(path);
