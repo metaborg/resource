@@ -33,6 +33,10 @@ public abstract class SegmentsResource<SELF extends SegmentsResource<SELF>> exte
         return create(root);
     }
 
+    @Override public HierarchicalResource getNormalized() {
+        return create(path.getNormalized());
+    }
+
 
     @Override public SELF appendSegment(String segment) {
         return create(path.appendSegment(segment));

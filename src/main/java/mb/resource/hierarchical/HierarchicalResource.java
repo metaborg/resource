@@ -34,6 +34,27 @@ public interface HierarchicalResource extends WritableResource {
 
 
     /**
+     * Tests if the path of this resource starts with the specified prefix.
+     *
+     * @param prefix Path prefix to look for
+     * @return {@code true} if the path of this resource starts with {@code prefix}, {@code false} otherwise.
+     * @throws ResourceRuntimeException when {@code prefix}'s (sub)type is not the same as this resource's path type.
+     * @throws ResourceRuntimeException when {@code prefix}'s qualifier is not the same as this resource's qualifier.
+     */
+    boolean startsWith(ResourcePath prefix);
+
+    /**
+     * Tests if the path of this resource starts with the specified prefix.
+     *
+     * @param prefix Path prefix of the resource to look for
+     * @return {@code true} if the path of this resource starts with {@code prefix}, {@code false} otherwise.
+     * @throws ResourceRuntimeException when {@code prefix}'s (sub)type is not the same as this resource's type.
+     * @throws ResourceRuntimeException when {@code prefix}'s qualifier is not the same as this resource's qualifier.
+     */
+    boolean startsWith(HierarchicalResource prefix);
+
+
+    /**
      * Gets the parent of this resource, or {@code null} if it has no parent (e.g., it is a root or empty).
      *
      * @return Parent of this resource, or {@code null} if it has none.
@@ -65,6 +86,13 @@ public interface HierarchicalResource extends WritableResource {
     default @Nullable String getLeafExtension() {
         return getPath().getLeafExtension();
     }
+
+    /**
+     * Returns a resource with a normalized path. Path normalization is implementation-defined.
+     *
+     * @throws ResourceRuntimeException when normalization fails.
+     */
+    HierarchicalResource getNormalized();
 
 
     /**

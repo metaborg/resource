@@ -20,6 +20,16 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
     protected abstract SELF self();
 
 
+    @Override public boolean startsWith(ResourcePath prefix) {
+        return getPath().startsWith(prefix);
+    }
+
+    @Override public boolean startsWith(HierarchicalResource prefix) {
+        return getPath().startsWith(prefix.getPath());
+    }
+
+
+
     @Override public abstract SELF appendSegments(Iterable<String> segments);
 
     @Override public SELF appendSegments(Collection<String> segments) {

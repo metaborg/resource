@@ -80,6 +80,11 @@ public class URLResource extends HierarchicalResourceDefaults<URLResource> imple
         return new URLResource(newPath);
     }
 
+    @Override public URLResource getNormalized() {
+        final URLPath newPath = path.getNormalized();
+        return new URLResource(newPath);
+    }
+
 
     @Override public URLResource appendSegment(String segment) {
         return new URLResource(path.appendSegment(segment));

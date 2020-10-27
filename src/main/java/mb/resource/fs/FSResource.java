@@ -150,6 +150,11 @@ public class FSResource extends HierarchicalResourceDefaults<FSResource> impleme
         return new FSResource(newPath);
     }
 
+    @Override public FSResource getNormalized() {
+        final FSPath newPath = path.getNormalized();
+        return new FSResource(newPath);
+    }
+
 
     @Override public FSResource appendSegment(String segment) {
         final FSPath newPath = path.appendSegment(segment);
@@ -346,11 +351,20 @@ public class FSResource extends HierarchicalResourceDefaults<FSResource> impleme
     }
 
     public void copyRecursivelyTo(FSResource other) throws IOException {
+        // Normalize target directory to ensure that unpacked files have the target directory as prefix.
+        final FSResource targetDirectory = other.getNormalized();
+        final Path targetDirectoryJavaPath = targetDirectory.getJavaPath();
+
         try {
             try(Stream<Path> stream = Files.walk(this.path.javaPath)) {
-                stream.forEachOrdered(sourcePath -> {
+                stream.forEachOrdered(source -> {
                     try {
-                        Files.copy(sourcePath, this.path.javaPath.resolve(other.path.javaPath.relativize(sourcePath)));
+                        final Path relativePath = this.path.javaPath.relativize(source);
+                        final Path target = targetDirectoryJavaPath.resolve(relativePath);
+                        if(!target.startsWith(targetDirectoryJavaPath)) {
+                            throw new IOException("Cannot copy '" + relativePath + "' from '" + this + "', resulting path '" + target + "' is not in the target directory '" + other + "'");
+                        }
+                        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                     } catch(IOException e) {
                         throw new UncheckedIOException(e);
                     }
