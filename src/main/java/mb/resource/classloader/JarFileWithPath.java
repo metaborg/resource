@@ -3,9 +3,10 @@ package mb.resource.classloader;
 import mb.resource.fs.FSResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class JarFileWithPath {
+public class JarFileWithPath implements Serializable {
     public final FSResource file;
     public final String path;
 

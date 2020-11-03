@@ -3,10 +3,11 @@ package mb.resource.classloader;
 import mb.resource.fs.FSResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class ClassLoaderResourceLocations {
+public class ClassLoaderResourceLocations implements Serializable {
     public final ArrayList<FSResource> directories;
     public final ArrayList<JarFileWithPath> jarFiles;
 
