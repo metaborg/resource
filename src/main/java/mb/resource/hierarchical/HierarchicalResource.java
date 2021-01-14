@@ -268,6 +268,10 @@ public interface HierarchicalResource extends WritableResource {
 
 
     /**
+     * Returns the type of the resource.
+     *
+     * @return Type of the resource.
+     * @throws IOException                   If the type cannot be determined.
      * @throws UnsupportedOperationException The operation is not supported.
      */
     HierarchicalResourceType getType() throws IOException;
@@ -288,22 +292,46 @@ public interface HierarchicalResource extends WritableResource {
 
 
     /**
+     * Returns a stream that non-recursively lists all resources inside this directory.
+     *
+     * The returned stream must be closed after use to close this directory. Failing to do so will cause this directory
+     * to stay open on some platforms (e.g., Windows), making it undeletable.
+     *
      * @throws UnsupportedOperationException The operation is not supported.
      */
     Stream<? extends HierarchicalResource> list() throws IOException;
 
     /**
+     * Returns a stream that non-recursively lists resources inside this directory, only visiting resources that pass
+     * the {@code matcher}.
+     *
+     * The returned stream must be closed after use to close this directory. Failing to do so will cause this directory
+     * to stay open on some platforms (e.g., Windows), making it undeletable.
+     *
      * @param matcher
      * @throws UnsupportedOperationException The operation is not supported.
      */
     Stream<? extends HierarchicalResource> list(ResourceMatcher matcher) throws IOException;
 
     /**
+     * Returns a stream that recursively walks all resources inside this directory.
+     *
+     * The returned stream must be closed after use to close this directory and any recursively visited directories.
+     * Failing to do so will cause visited directories to stay open on some platforms (e.g., Windows), making them
+     * undeletable.
+     *
      * @throws UnsupportedOperationException The operation is not supported.
      */
     Stream<? extends HierarchicalResource> walk() throws IOException;
 
     /**
+     * Returns a stream that recursively walks resources inside this directory, only traversing into directories that
+     * pass the {@code walker}, and only visiting resources that pass the {@code matcher}.
+     *
+     * The returned stream must be closed after use to close this directory and any recursively visited directories.
+     * Failing to do so will cause visited directories to stay open on some platforms (e.g., Windows), making them
+     * undeletable.
+     *
      * @param walker
      * @param matcher
      * @throws UnsupportedOperationException The operation is not supported.
@@ -311,6 +339,14 @@ public interface HierarchicalResource extends WritableResource {
     Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException;
 
     /**
+     * Returns a stream that recursively walks resources inside this directory, only traversing into directories that
+     * pass the {@code walker}, and only visiting resources that pass the {@code matcher}. If {@code access} is
+     * non-null, any visited resources are passed to {@link HierarchicalResourceAccess#read(HierarchicalResource)}.
+     *
+     * The returned stream must be closed after use to close this directory and any recursively visited directories.
+     * Failing to do so will cause visited directories to stay open on some platforms (e.g., Windows), making them
+     * undeletable.
+     *
      * @param walker
      * @param matcher
      * @param access
