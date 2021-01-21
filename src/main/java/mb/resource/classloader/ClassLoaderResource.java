@@ -32,8 +32,8 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
         this.classLoader = classLoader;
     }
 
-    ClassLoaderResource(ClassLoader classLoader, String qualifier, String path) {
-        super(new SegmentsPath(qualifier, path));
+    ClassLoaderResource(ClassLoader classLoader, String qualifier, String id) {
+        super(new SegmentsPath(qualifier, id));
         this.classLoader = classLoader;
     }
 

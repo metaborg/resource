@@ -5,6 +5,7 @@ import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRegistry;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.SegmentsPath;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Objects;
@@ -58,12 +59,24 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
     }
 
 
+    public String getPathIdentifierForClass(Class<?> clazz) {
+        return clazz.getCanonicalName().replace(".", SeparatorUtil.unixSeparator) + ".class";
+    }
+
     public SegmentsPath getPath(String path) {
         return new SegmentsPath(qualifier, path);
     }
 
+    public SegmentsPath getPath(Class<?> clazz) {
+        return new SegmentsPath(qualifier, getPathIdentifierForClass(clazz));
+    }
+
     public ClassLoaderResource getResource(String path) {
         return new ClassLoaderResource(classLoader, qualifier, path);
+    }
+
+    public ClassLoaderResource getResource(Class<?> clazz) {
+        return new ClassLoaderResource(classLoader, qualifier, getPathIdentifierForClass(clazz));
     }
 
     public ClassLoaderResource getResource(SegmentsPath path) {
