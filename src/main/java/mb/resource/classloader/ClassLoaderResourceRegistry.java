@@ -1,5 +1,6 @@
 package mb.resource.classloader;
 
+import mb.resource.Resource;
 import mb.resource.ResourceKey;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRegistry;
@@ -8,6 +9,7 @@ import mb.resource.hierarchical.SegmentsPath;
 import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.File;
 import java.util.Objects;
 
 public class ClassLoaderResourceRegistry implements ResourceRegistry {
@@ -45,8 +47,7 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
 
     @Override public ClassLoaderResource getResource(ResourceKey key) {
         if(!(key instanceof SegmentsPath)) {
-            throw new ResourceRuntimeException(
-                "Cannot get class loader resource for key '" + key + "'; it is not of type ClassLoaderResourcePath");
+            throw new ResourceRuntimeException("Cannot get class loader resource for key '" + key + "'; it is not of type SegmentsPath");
         }
         return getResource((SegmentsPath)key);
     }
@@ -59,9 +60,25 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
     }
 
 
+    @Override public @Nullable File toLocalFile(ResourceKey key) {
+        if(!(key instanceof SegmentsPath)) {
+            throw new ResourceRuntimeException("Cannot get local file for key '" + key + "'; it is not of type SegmentsPath");
+        }
+        return toLocalFile(getResource((SegmentsPath)key));
+    }
+
+    @Override public @Nullable File toLocalFile(Resource resource) {
+        if(!(resource instanceof ClassLoaderResource)) {
+            throw new ResourceRuntimeException("Cannot get local file for resource '" + resource + "'; it is not of type ClassLoaderResource");
+        }
+        return ((ClassLoaderResource)resource).asLocalFile();
+    }
+
+
     public String getPathIdentifierForClass(Class<?> clazz) {
         return clazz.getCanonicalName().replace(".", SeparatorUtil.unixSeparator) + ".class";
     }
+
 
     public SegmentsPath getPath(String path) {
         return new SegmentsPath(qualifier, path);
@@ -70,6 +87,7 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
     public SegmentsPath getPath(Class<?> clazz) {
         return new SegmentsPath(qualifier, getPathIdentifierForClass(clazz));
     }
+
 
     public ClassLoaderResource getResource(String path) {
         return new ClassLoaderResource(classLoader, qualifier, path);

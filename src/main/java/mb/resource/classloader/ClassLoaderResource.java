@@ -1,5 +1,6 @@
 package mb.resource.classloader;
 
+import mb.resource.ReadableResource;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.fs.FSResource;
 import mb.resource.hierarchical.HierarchicalResource;
@@ -11,6 +12,7 @@ import mb.resource.hierarchical.match.ResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,7 +99,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
 
 
     @Override public boolean exists() throws IOException {
-        return getResource() != null;
+        return getUrlToResource() != null;
     }
 
     @Override public boolean isReadable() throws IOException {
@@ -138,6 +140,72 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
 
+    /**
+     * Gets this resource as a {@link ReadableResource} if it is on the local filesystem, or itself otherwise.
+     *
+     * The returned resource cannot be used to resolve other resources, as class loaders can be sourced from multiple
+     * locations (i.e., the classpath), and the returned resource is only located in one of these locations.
+     *
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
+    public ReadableResource tryAsLocalResource() {
+        final @Nullable ReadableResource resource = asLocalResource();
+        if(resource != null) return resource;
+        return this;
+    }
+
+    /**
+     * Gets this resource as a {@link File local file} if it is on the local filesystem, or {@code null} if it is not on
+     * the local filesystem.
+     *
+     * The returned file should NOT be used to resolve other files, as class loaders can be sourced from multiple
+     * locations (i.e., the classpath), and the returned file is only located in one of these locations.
+     *
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
+    public @Nullable File asLocalFile() {
+        final @Nullable URL url = getUrlToResource();
+        if(url == null) return null;
+        if("file".equals(url.getProtocol())) {
+            try {
+                return new File(url.toURI());
+            } catch(URISyntaxException e) {
+                throw new ResourceRuntimeException("Could not get local file for class loader resource '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets this resource as a {@link ReadableResource} if it is on the local filesystem, or {@code null} if it is not
+     * on the local filesystem.
+     *
+     * The returned resource cannot be used to resolve other resources, as class loaders can be sourced from multiple
+     * locations (i.e., the classpath), and the returned resource is only located in one of these locations.
+     *
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
+    public @Nullable ReadableResource asLocalResource() {
+        final @Nullable URL url = getUrlToResource();
+        if(url == null) return null;
+        if("file".equals(url.getProtocol())) {
+            try {
+                return new FSResource(url.toURI());
+            } catch(URISyntaxException e) {
+                throw new ResourceRuntimeException("Could not get local filesystem resource for class loader resource '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the local filesystem directories and JAR files (located on the local filesystem) this resource is sourced
+     * from.
+     *
+     * @throws IOException              if {@link ClassLoader#getResources(String)} throws.
+     * @throws ResourceRuntimeException if no directories nor JAR files were found.
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
     public ClassLoaderResourceLocations getLocations() throws IOException {
         final ArrayList<FSResource> directories = new ArrayList<>();
         final ArrayList<JarFileWithPath> jarFiles = new ArrayList<>();
@@ -179,13 +247,13 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
 
-    private @Nullable URL getResource() {
+    private @Nullable URL getUrlToResource() {
         return classLoader.getResource(path.getId().toString());
     }
 
     private URLConnection openConnection() throws IOException {
         final String resourcePath = path.getId().toString();
-        final @Nullable URL url = getResource();
+        final @Nullable URL url = getUrlToResource();
         if(url == null) {
             throw new IOException("Resource '" + resourcePath + "' could not be found in class loader '" + classLoader + "'");
         }
@@ -196,7 +264,6 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     @Override protected ClassLoaderResource self() {
         return this;
     }
-
 
     @Override protected ClassLoaderResource create(SegmentsPath path) {
         return new ClassLoaderResource(classLoader, path);
