@@ -155,30 +155,8 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
     /**
-     * Gets this resource as a {@link File local file} if it is on the local filesystem, or {@code null} if it is not on
-     * the local filesystem.
-     *
-     * The returned file should NOT be used to resolve other files, as class loaders can be sourced from multiple
-     * locations (i.e., the classpath), and the returned file is only located in one of these locations.
-     *
-     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
-     */
-    public @Nullable File asLocalFile() {
-        final @Nullable URL url = getUrlToResource();
-        if(url == null) return null;
-        if("file".equals(url.getProtocol())) {
-            try {
-                return new File(url.toURI());
-            } catch(URISyntaxException e) {
-                throw new ResourceRuntimeException("Could not get local file for class loader resource '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets this resource as a {@link ReadableResource} if it is on the local filesystem, or {@code null} if it is not
-     * on the local filesystem.
+     * Gets this resource as a {@link ReadableResource} if it is on the local filesystem, or {@code null} if it does not
+     * exist nor is on the local filesystem.
      *
      * The returned resource cannot be used to resolve other resources, as class loaders can be sourced from multiple
      * locations (i.e., the classpath), and the returned resource is only located in one of these locations.
@@ -186,14 +164,54 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
      * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
      */
     public @Nullable ReadableResource asLocalResource() {
+        final @Nullable URI uri = asLocalUri();
+        if(uri == null) return null;
+        return new FSResource(uri);
+    }
+
+    /**
+     * Gets this resource as a {@link File local file} if it is on the local filesystem, or {@code null} if it does not
+     * exist nor is on the local filesystem.
+     *
+     * The returned file should NOT be used to resolve other files, as class loaders can be sourced from multiple
+     * locations (i.e., the classpath), and the returned file is only located in one of these locations. Use {@link
+     * #getLocations()} to query all locations of this resource.
+     *
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
+    public @Nullable File asLocalFile() {
+        final @Nullable URI uri = asLocalUri();
+        if(uri == null) return null;
+        return new File(uri);
+    }
+
+    /**
+     * Gets this resource as a {@link URI} if it is on the local filesystem (i.e., the URI has the file: protocol), or
+     * {@code null} if it does not exist nor is on the local filesystem.
+     *
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
+    public @Nullable URI asLocalUri() {
+        final @Nullable URL url = asLocalUrl();
+        if(url == null) return null;
+        try {
+            return url.toURI();
+        } catch(URISyntaxException e) {
+            throw new ResourceRuntimeException("Could not get local filesystem URI (with 'file' protocol) for class loader resource '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
+        }
+    }
+
+    /**
+     * Gets this resource as a {@link URI} if it is on the local filesystem (i.e., the URI has the file: protocol), or
+     * {@code null} if it does not exist nor is on the local filesystem.
+     *
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
+    public @Nullable URL asLocalUrl() {
         final @Nullable URL url = getUrlToResource();
         if(url == null) return null;
         if("file".equals(url.getProtocol())) {
-            try {
-                return new FSResource(url.toURI());
-            } catch(URISyntaxException e) {
-                throw new ResourceRuntimeException("Could not get local filesystem resource for class loader resource '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
-            }
+            return url;
         }
         return null;
     }
