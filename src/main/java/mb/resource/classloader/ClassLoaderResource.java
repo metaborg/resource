@@ -49,15 +49,15 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
 
-    @Override public Stream<? extends ClassLoaderResource> list() throws IOException {
+    @Override public Stream<ClassLoaderResource> list() throws IOException {
         throw new UnsupportedOperationException("Class loader resources do not support listing");
     }
 
-    @Override public Stream<? extends ClassLoaderResource> list(ResourceMatcher matcher) throws IOException {
+    @Override public Stream<ClassLoaderResource> list(ResourceMatcher matcher) throws IOException {
         throw new UnsupportedOperationException("Class loader resources do not support listing");
     }
 
-    @Override public Stream<? extends ClassLoaderResource> walk() throws IOException {
+    @Override public Stream<ClassLoaderResource> walk() throws IOException {
         throw new UnsupportedOperationException("Class loader resources do not support walking");
     }
 

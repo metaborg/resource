@@ -1,7 +1,9 @@
 package mb.resource.hierarchical;
 
 import mb.resource.hierarchical.match.ResourceMatcher;
+import mb.resource.hierarchical.match.TrueResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
+import mb.resource.hierarchical.walk.TrueResourceWalker;
 import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -27,7 +29,6 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
     @Override public boolean startsWith(HierarchicalResource prefix) {
         return getPath().startsWith(prefix.getPath());
     }
-
 
 
     @Override public abstract SELF appendSegments(Iterable<String> segments);
@@ -120,11 +121,31 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
 
 
     @Override
-    public abstract Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
+    public Stream<SELF> list() throws IOException {
+        return list(new TrueResourceMatcher());
+    }
 
-    @Override public Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+    @Override
+    public abstract Stream<SELF> list(ResourceMatcher matcher) throws IOException;
+
+
+    @Override
+    public Stream<SELF> walk() throws IOException {
+        return walk(new TrueResourceWalker(), new TrueResourceMatcher(), null);
+    }
+
+    @Override
+    public Stream<SELF> walk(ResourceMatcher matcher) throws IOException {
+        return walk(new TrueResourceWalker(), matcher, null);
+    }
+
+    @Override
+    public Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         return walk(walker, matcher, null);
     }
+
+    @Override
+    public abstract Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
 
 
     @Override public abstract SELF createFile(boolean createParents) throws IOException;

@@ -1,5 +1,6 @@
 package mb.resource.hierarchical;
 
+import mb.resource.ResourceRegistry;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.WritableResource;
 import mb.resource.hierarchical.match.ResourceMatcher;
@@ -308,7 +309,7 @@ public interface HierarchicalResource extends WritableResource {
      * The returned stream must be closed after use to close this directory. Failing to do so will cause this directory
      * to stay open on some platforms (e.g., Windows), making it undeletable.
      *
-     * @param matcher
+     * @param matcher {@link ResourceWalker Resource matcher} that determines which resources will be visited.
      * @throws UnsupportedOperationException The operation is not supported.
      */
     Stream<? extends HierarchicalResource> list(ResourceMatcher matcher) throws IOException;
@@ -325,6 +326,19 @@ public interface HierarchicalResource extends WritableResource {
     Stream<? extends HierarchicalResource> walk() throws IOException;
 
     /**
+     * Returns a stream that recursively walks resources inside this directory, traversing into all directories, but
+     * only visiting resources that pass the {@code matcher}.
+     *
+     * The returned stream must be closed after use to close this directory and any recursively visited directories.
+     * Failing to do so will cause visited directories to stay open on some platforms (e.g., Windows), making them
+     * undeletable.
+     *
+     * @param matcher {@link ResourceWalker Resource matcher} that determines which resources will be visited.
+     * @throws UnsupportedOperationException The operation is not supported.
+     */
+    Stream<? extends HierarchicalResource> walk(ResourceMatcher matcher) throws IOException;
+
+    /**
      * Returns a stream that recursively walks resources inside this directory, only traversing into directories that
      * pass the {@code walker}, and only visiting resources that pass the {@code matcher}.
      *
@@ -332,8 +346,8 @@ public interface HierarchicalResource extends WritableResource {
      * Failing to do so will cause visited directories to stay open on some platforms (e.g., Windows), making them
      * undeletable.
      *
-     * @param walker
-     * @param matcher
+     * @param walker  {@link ResourceWalker Resource walker} that determines which directories will be traversed into.
+     * @param matcher {@link ResourceWalker Resource matcher} that determines which resources will be visited.
      * @throws UnsupportedOperationException The operation is not supported.
      */
     Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException;
@@ -347,29 +361,42 @@ public interface HierarchicalResource extends WritableResource {
      * Failing to do so will cause visited directories to stay open on some platforms (e.g., Windows), making them
      * undeletable.
      *
-     * @param walker
-     * @param matcher
-     * @param access
+     * @param walker  {@link ResourceWalker Resource walker} that determines which directories will be traversed into.
+     * @param matcher {@link ResourceWalker Resource matcher} that determines which resources will be visited.
+     * @param access  {@link HierarchicalResourceAccess Resource access callback} which gets called on visisted
+     *                resources.
      * @throws UnsupportedOperationException The operation is not supported.
      */
     Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
 
 
     /**
+     * Copies this resource to another resource. Can only be used to copy resources that belong to the same {@link
+     * ResourceRegistry resource registry}. Copying files of different registries requires {@link #openRead() reading
+     * the bytes} of one resource and {@link #openWrite() writing} them into the other.
+     *
      * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
      * @throws UnsupportedOperationException The operation is not supported.
      */
     void copyTo(HierarchicalResource other) throws IOException;
 
     /**
+     * Recursively copies this resource to another resource. Same restriction on {@link ResourceRegistry resource
+     * registries} as {@link #copyTo} applies.
+     *
      * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
      * @throws UnsupportedOperationException The operation is not supported.
+     * @see #copyTo(HierarchicalResource)
      */
     void copyRecursivelyTo(HierarchicalResource other) throws IOException;
 
     /**
+     * Moves this resource to another resource. Same restriction on {@link ResourceRegistry resource registries} as
+     * {@link #copyTo} applies.
+     *
      * @throws ResourceRuntimeException      When {@code other}'s (sub)type is not the same as this resource's type.
      * @throws UnsupportedOperationException The operation is not supported.
+     * @see #copyTo(HierarchicalResource)
      */
     void moveTo(HierarchicalResource other) throws IOException;
 

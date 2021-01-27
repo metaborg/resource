@@ -39,8 +39,8 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     }
 
     public FSPath(URI uri) {
-        this.uri = uri;
-        this.javaPath = createJavaPath(uri);
+        this.uri = stripUriTrailingSlash(uri); // HACK: strip trailing slash in order to be consistent with method toUri.
+        this.javaPath = fromUri(this.uri);
     }
 
     public FSPath(File javaFile) {
@@ -257,25 +257,17 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
 
     private static URI toUri(Path javaPath) {
         final URI uri = javaPath.toUri();
-        @Nullable String path = uri.getPath();
         /* HACK: Default file system puts trailing slash on the URI when the path points to a directory (yes, it does a
                  system call to convert to a URI, what are they thinking?). Not only does this reduce performance a lot,
                  it also means that path creation will be nondeterministic, because it will be different whether a
                  directory exists or not, which is bad... We can make it more deterministic by stripping the trailing
                  slash.
-         */
-        if(path != null && SeparatorUtil.endsWithSeparator(path) && path.length() > 1) {
-            path = path.substring(0, path.length() - 1);
-        }
-        try {
-            return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path, uri.getQuery(), uri.getFragment());
-        } catch(URISyntaxException e) {
-            throw new ResourceRuntimeException("Could not create URI from path '" + javaPath + "'", e);
-        }
+        */
+        return stripUriTrailingSlash(uri);
     }
 
-
-    private static Path createJavaPath(URI uri) {
+    private static Path fromUri(URI uri) {
+        uri = stripUriTrailingSlash(uri); // HACK: strip trailing slash in order to be consistent with method toUri.
         if(uri.getScheme() == null) {
             // If the URI schema is null, Paths.get(uri) won't work. Just create a local path from the string of the URI instead.
             return createLocalPath(uri.toString());
@@ -337,6 +329,19 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
     }
 
 
+    private static URI stripUriTrailingSlash(URI uri) {
+        @Nullable String path = uri.getPath();
+        if(path != null && SeparatorUtil.endsWithSeparator(path) && path.length() > 1) {
+            path = path.substring(0, path.length() - 1);
+        }
+        try {
+            return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path, uri.getQuery(), uri.getFragment());
+        } catch(URISyntaxException e) {
+            throw new ResourceRuntimeException("Could not strip trailing slash from URI '" + uri + "'", e);
+        }
+    }
+
+
     @Override public String getQualifier() {
         return FSResourceRegistry.qualifier;
     }
@@ -378,6 +383,6 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
 
     private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
         in.defaultReadObject();
-        this.javaPath = createJavaPath(this.uri);
+        this.javaPath = fromUri(this.uri);
     }
 }
