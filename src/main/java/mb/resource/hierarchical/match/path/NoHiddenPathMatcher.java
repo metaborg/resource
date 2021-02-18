@@ -6,9 +6,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class NoHiddenPathMatcher implements PathMatcher {
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
         final @Nullable String leaf = path.getLeaf();
-        if(leaf == null) {
-            return false;
-        }
+        if(leaf == null) return true; // Can't check if this is a hidden path: assume it is not a hidden path.
         return !leaf.startsWith(".");
     }
 
