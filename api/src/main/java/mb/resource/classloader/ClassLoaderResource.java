@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -107,13 +108,28 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
     @Override public Instant getLastModifiedTime() throws IOException {
-        // TODO: opens new connection every time: not efficient?
-        return Instant.ofEpochMilli(openConnection().getLastModified());
+        final URLConnection connection = openConnection();
+        final Instant lastModified = Instant.ofEpochMilli(connection.getLastModified());
+        closeConnection(connection);
+        return lastModified;
     }
 
     @Override public long getSize() throws IOException {
-        // TODO: opens new connection every time: not efficient?
-        return openConnection().getContentLengthLong();
+        final URLConnection connection = openConnection();
+        final long size = connection.getContentLengthLong();
+        closeConnection(connection);
+        return size;
+    }
+
+    private void closeConnection(URLConnection connection) throws IOException {
+        // URLConnection leaks its input stream when getting metadata: https://bugs.openjdk.java.net/browse/JDK-6956385.
+        // HACK: get input stream and immediately close it, which closes the input stream it is leaking.
+        connection.getInputStream().close();
+        // HACK: for JarURLConnections, also close the JAR file.
+        if(connection instanceof JarURLConnection) {
+            final JarURLConnection jarUrlConnection = (JarURLConnection)connection;
+            jarUrlConnection.getJarFile().close();
+        }
     }
 
     @Override public InputStream openRead() throws IOException {
