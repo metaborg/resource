@@ -28,16 +28,19 @@ import java.util.stream.Stream;
 
 public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> implements HierarchicalResource {
     private final ClassLoader classLoader;
+    private final ClassLoaderUrlResolver urlResolver;
 
 
-    ClassLoaderResource(ClassLoader classLoader, SegmentsPath path) {
+    ClassLoaderResource(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver, SegmentsPath path) {
         super(path);
         this.classLoader = classLoader;
+        this.urlResolver = urlResolver;
     }
 
-    ClassLoaderResource(ClassLoader classLoader, String qualifier, String id) {
+    ClassLoaderResource(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver, String qualifier, String id) {
         super(new SegmentsPath(qualifier, id));
         this.classLoader = classLoader;
+        this.urlResolver = urlResolver;
     }
 
     @Override public void close() throws IOException {
@@ -234,50 +237,60 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
 
     /**
      * Gets the local filesystem directories and JAR files (located on the local filesystem) this resource is sourced
-     * from.
+     * from. Unrecognized URLs are returned as well.
      *
      * @throws IOException              if {@link ClassLoader#getResources(String)} throws.
      * @throws ResourceRuntimeException if no directories nor JAR files were found.
      * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
      */
     public ClassLoaderResourceLocations getLocations() throws IOException {
-        final ArrayList<FSResource> directories = new ArrayList<>();
-        final ArrayList<JarFileWithPath> jarFiles = new ArrayList<>();
+        final ClassLoaderResourceLocations locations = new ClassLoaderResourceLocations();
         final Enumeration<URL> resources = classLoader.getResources(path.getId().toString());
         if(!resources.hasMoreElements()) {
             throw new ResourceRuntimeException("Could not get class loader resource locations for '" + path + "'; no locations were found");
         }
         while(resources.hasMoreElements()) {
             final URL url = resources.nextElement();
-            final String protocol = url.getProtocol();
-            if("file".equals(protocol)) {
-                try {
-                    final FSResource directory = new FSResource(url.toURI());
-                    directories.add(directory);
-                } catch(URISyntaxException e) {
-                    throw new ResourceRuntimeException("Could not get class loader resource locations for '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
-                }
-            } else if("jar".equals(protocol)) {
-                final String urlPath = url.getPath();
-                final int exclamationMarkIndex = urlPath.indexOf("!");
-                final String jarFilePath;
-                final String pathInJarFile;
-                if(exclamationMarkIndex < 0) {
-                    jarFilePath = urlPath;
-                    pathInJarFile = "";
-                } else {
-                    jarFilePath = urlPath.substring(0, exclamationMarkIndex); // skip past '!'
-                    pathInJarFile = urlPath.substring(exclamationMarkIndex + 1); // + 1 to skip '!'
-                }
-                try {
-                    final FSResource jarFile = new FSResource(new URI(jarFilePath));
-                    jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
-                } catch(URISyntaxException e) {
-                    throw new ResourceRuntimeException("Could not add class loader resource location for '" + url + "'; conversion of nested path '" + jarFilePath + "' to an URI failed", e);
-                }
+            processLocationUrl(url, locations);
+        }
+        return locations;
+    }
+
+    private void processLocationUrl(URL url, ClassLoaderResourceLocations locations) {
+        final String protocol = url.getProtocol();
+        if("file".equals(protocol)) {
+            try {
+                final FSResource directory = new FSResource(url.toURI());
+                locations.directories.add(directory);
+            } catch(URISyntaxException e) {
+                throw new ResourceRuntimeException("Could not get class loader resource locations for '" + path + "'; conversion of URL '" + url + "' to an URI failed", e);
+            }
+        } else if("jar".equals(protocol)) {
+            final String urlPath = url.getPath();
+            final int exclamationMarkIndex = urlPath.indexOf("!");
+            final String jarFilePath;
+            final String pathInJarFile;
+            if(exclamationMarkIndex < 0) {
+                jarFilePath = urlPath;
+                pathInJarFile = "";
+            } else {
+                jarFilePath = urlPath.substring(0, exclamationMarkIndex); // before '!'
+                pathInJarFile = urlPath.substring(exclamationMarkIndex + 1); // + 1 to skip past '!'
+            }
+            try {
+                final FSResource jarFile = new FSResource(new URI(jarFilePath));
+                locations.jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
+            } catch(URISyntaxException e) {
+                throw new ResourceRuntimeException("Could not add class loader resource location for '" + url + "'; conversion of nested path '" + jarFilePath + "' to an URI failed", e);
+            }
+        } else {
+            final @Nullable URL resolvedUrl = urlResolver.resolve(url);
+            if(resolvedUrl != null) {
+                processLocationUrl(resolvedUrl, locations);
+            } else {
+                locations.unrecognizedUrls.add(url);
             }
         }
-        return new ClassLoaderResourceLocations(directories, jarFiles);
     }
 
 
@@ -300,7 +313,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
     @Override protected ClassLoaderResource create(SegmentsPath path) {
-        return new ClassLoaderResource(classLoader, path);
+        return new ClassLoaderResource(classLoader, urlResolver, path);
     }
 
 

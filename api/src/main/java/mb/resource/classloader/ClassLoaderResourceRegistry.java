@@ -17,19 +17,29 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
 
     private final String qualifier;
     private final ClassLoader classLoader;
+    private final ClassLoaderUrlResolver urlResolver;
 
 
-    public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader) {
+    public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader, ClassLoaderUrlResolver urlResolver) {
         this.qualifier = qualifier;
         this.classLoader = classLoader;
+        this.urlResolver = urlResolver;
+    }
+
+    public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader) {
+        this(qualifier, classLoader, new NoopClassLoaderUrlResolver());
+    }
+
+    public ClassLoaderResourceRegistry(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver) {
+        this(defaultQualifier, classLoader, urlResolver);
     }
 
     public ClassLoaderResourceRegistry(ClassLoader classLoader) {
-        this(defaultQualifier, classLoader);
+        this(classLoader, new NoopClassLoaderUrlResolver());
     }
 
     public ClassLoaderResourceRegistry() {
-        this(defaultQualifier, ClassLoaderResourceRegistry.class.getClassLoader());
+        this(ClassLoaderResourceRegistry.class.getClassLoader());
     }
 
 
@@ -90,15 +100,15 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
 
 
     public ClassLoaderResource getResource(String path) {
-        return new ClassLoaderResource(classLoader, qualifier, path);
+        return new ClassLoaderResource(classLoader, urlResolver, qualifier, path);
     }
 
     public ClassLoaderResource getResource(Class<?> clazz) {
-        return new ClassLoaderResource(classLoader, qualifier, getPathIdentifierForClass(clazz));
+        return new ClassLoaderResource(classLoader, urlResolver, qualifier, getPathIdentifierForClass(clazz));
     }
 
     public ClassLoaderResource getResource(SegmentsPath path) {
-        return new ClassLoaderResource(classLoader, path);
+        return new ClassLoaderResource(classLoader, urlResolver, path);
     }
 
 
