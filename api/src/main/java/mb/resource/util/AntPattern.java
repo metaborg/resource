@@ -1,6 +1,5 @@
-package mb.resource.hierarchical.match.path;
+package mb.resource.util;
 
-import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;

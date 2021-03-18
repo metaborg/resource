@@ -1,13 +1,18 @@
 package mb.resource.hierarchical.match.path;
 
 import mb.resource.hierarchical.ResourcePath;
+import mb.resource.util.AntPattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class PatternPathMatcher implements PathMatcher {
+public class AntPatternPathMatcher implements PathMatcher {
     private final AntPattern pattern;
 
-    public PatternPathMatcher(AntPattern pattern) {
+    public AntPatternPathMatcher(AntPattern pattern) {
         this.pattern = pattern;
+    }
+
+    public AntPatternPathMatcher(String pattern) {
+        this(new AntPattern(pattern));
     }
 
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
@@ -18,7 +23,7 @@ public class PatternPathMatcher implements PathMatcher {
     @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final PatternPathMatcher that = (PatternPathMatcher) o;
+        final AntPatternPathMatcher that = (AntPatternPathMatcher)o;
         return pattern.equals(that.pattern);
     }
 

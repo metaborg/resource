@@ -1,19 +1,39 @@
 package mb.resource.hierarchical.match.path;
 
 import mb.resource.hierarchical.ResourcePath;
+import mb.resource.util.AntPattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class PatternsPathMatcher implements PathMatcher {
+public class AntPatternsPathMatcher implements PathMatcher {
     private final ArrayList<AntPattern> patterns;
 
-    public PatternsPathMatcher(Iterable<String> patterns) {
+
+    public AntPatternsPathMatcher(ArrayList<AntPattern> patterns) {
+        this.patterns = patterns;
+    }
+
+    public AntPatternsPathMatcher(Iterable<AntPattern> patterns) {
+        this.patterns = new ArrayList<>();
+        for(AntPattern pattern : patterns) {
+            this.patterns.add(pattern);
+        }
+    }
+
+    public AntPatternsPathMatcher(AntPattern... patterns) {
+        this.patterns = new ArrayList<>();
+        Collections.addAll(this.patterns, patterns);
+    }
+
+    public AntPatternsPathMatcher(String... patterns) {
         this.patterns = new ArrayList<>();
         for(String pattern : patterns) {
             this.patterns.add(new AntPattern(pattern));
         }
     }
+
 
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
         final String relative = rootDir.relativize(path);
@@ -28,7 +48,7 @@ public class PatternsPathMatcher implements PathMatcher {
     @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final PatternsPathMatcher that = (PatternsPathMatcher) o;
+        final AntPatternsPathMatcher that = (AntPatternsPathMatcher)o;
         return patterns.equals(that.patterns);
     }
 
