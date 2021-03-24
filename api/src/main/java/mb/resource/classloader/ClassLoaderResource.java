@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.stream.Stream;
 
@@ -231,6 +230,10 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
         if(url == null) return null;
         if("file".equals(url.getProtocol())) {
             return url;
+        }
+        final @Nullable URL resolvedUrl = urlResolver.resolve(url);
+        if(resolvedUrl != null && "file".equals(resolvedUrl.getProtocol())) {
+            return resolvedUrl;
         }
         return null;
     }
