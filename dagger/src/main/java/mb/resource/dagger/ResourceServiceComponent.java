@@ -41,7 +41,7 @@ public interface ResourceServiceComponent extends AutoCloseable {
     }
 
 
-    @Override default void close() throws Exception {
+    @Override default void close() {
         // For now, nothing to close. ResourceService will implement AutoCloseable in the future.
     }
 }
