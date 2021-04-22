@@ -1,7 +1,6 @@
 package mb.resource.url;
 
 import mb.resource.hierarchical.HierarchicalResource;
-import mb.resource.hierarchical.HierarchicalResourceAccess;
 import mb.resource.hierarchical.HierarchicalResourceDefaults;
 import mb.resource.hierarchical.HierarchicalResourceType;
 import mb.resource.hierarchical.ResourcePath;
@@ -134,25 +133,11 @@ public class URLResource extends HierarchicalResourceDefaults<URLResource> imple
     }
 
 
-    @Override public Stream<URLResource> list() throws IOException {
-        throw new UnsupportedOperationException("URL resources do not support listing");
-    }
-
     @Override public Stream<URLResource> list(ResourceMatcher matcher) throws IOException {
         throw new UnsupportedOperationException("URL resources do not support listing");
     }
 
-    @Override public Stream<URLResource> walk() throws IOException {
-        throw new UnsupportedOperationException("URL resources do not support walking");
-    }
-
-    @Override
-    public Stream<URLResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
-        throw new UnsupportedOperationException("URL resources do not support walking");
-    }
-
-    @Override
-    public Stream<URLResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
+    @Override public Stream<URLResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         throw new UnsupportedOperationException("URL resources do not support walking");
     }
 

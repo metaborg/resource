@@ -131,21 +131,16 @@ public abstract class HierarchicalResourceDefaults<SELF extends HierarchicalReso
 
     @Override
     public Stream<SELF> walk() throws IOException {
-        return walk(new TrueResourceWalker(), new TrueResourceMatcher(), null);
+        return walk(new TrueResourceWalker(), new TrueResourceMatcher());
     }
 
     @Override
     public Stream<SELF> walk(ResourceMatcher matcher) throws IOException {
-        return walk(new TrueResourceWalker(), matcher, null);
+        return walk(new TrueResourceWalker(), matcher);
     }
 
     @Override
-    public Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
-        return walk(walker, matcher, null);
-    }
-
-    @Override
-    public abstract Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
+    public abstract Stream<SELF> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException;
 
 
     @Override public abstract SELF createFile(boolean createParents) throws IOException;

@@ -9,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Collection;
@@ -314,6 +315,24 @@ public interface HierarchicalResource extends WritableResource {
      */
     Stream<? extends HierarchicalResource> list(ResourceMatcher matcher) throws IOException;
 
+    default void listForEach(ResourceMatcher matcher, HierarchicalResourceConsumer consumer) throws IOException {
+        try {
+            if(exists() && isDirectory()) {
+                try(final Stream<? extends HierarchicalResource> stream = list(matcher)) {
+                    stream.forEach(resource -> {
+                        try {
+                            consumer.accept(resource);
+                        } catch(IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                }
+            }
+        } catch(UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
+
     /**
      * Returns a stream that recursively walks all resources inside this directory.
      *
@@ -352,23 +371,27 @@ public interface HierarchicalResource extends WritableResource {
      */
     Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException;
 
-    /**
-     * Returns a stream that recursively walks resources inside this directory, only traversing into directories that
-     * pass the {@code walker}, and only visiting resources that pass the {@code matcher}. If {@code access} is
-     * non-null, any visited resources are passed to {@link HierarchicalResourceAccess#read(HierarchicalResource)}.
-     *
-     * The returned stream must be closed after use to close this directory and any recursively visited directories.
-     * Failing to do so will cause visited directories to stay open on some platforms (e.g., Windows), making them
-     * undeletable.
-     *
-     * @param walker  {@link ResourceWalker Resource walker} that determines which directories will be traversed into.
-     * @param matcher {@link ResourceWalker Resource matcher} that determines which resources will be visited.
-     * @param access  {@link HierarchicalResourceAccess Resource access callback} which gets called on visisted
-     *                resources.
-     * @throws UnsupportedOperationException The operation is not supported.
-     */
-    Stream<? extends HierarchicalResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException;
+    default void walkForEach(ResourceMatcher matcher, HierarchicalResourceConsumer consumer) throws IOException {
+        walkForEach(ResourceWalker.ofTrue(), matcher, consumer);
+    }
 
+    default void walkForEach(ResourceWalker walker, ResourceMatcher matcher, HierarchicalResourceConsumer consumer) throws IOException {
+        try {
+            if(exists() && isDirectory()) {
+                try(final Stream<? extends HierarchicalResource> stream = walk(walker, matcher)) {
+                    stream.forEach(resource -> {
+                        try {
+                            consumer.accept(resource);
+                        } catch(IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                }
+            }
+        } catch(UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
 
     /**
      * Copies this resource to another resource. Can only be used to copy resources that belong to the same {@link

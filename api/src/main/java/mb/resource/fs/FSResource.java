@@ -2,7 +2,6 @@ package mb.resource.fs;
 
 import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.HierarchicalResource;
-import mb.resource.hierarchical.HierarchicalResourceAccess;
 import mb.resource.hierarchical.HierarchicalResourceDefaults;
 import mb.resource.hierarchical.HierarchicalResourceType;
 import mb.resource.hierarchical.ResourcePath;
@@ -269,11 +268,9 @@ public class FSResource extends HierarchicalResourceDefaults<FSResource> impleme
         return Files.walk(path.javaPath).map(FSResource::new);
     }
 
-    @Override
-    public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher, @Nullable HierarchicalResourceAccess access) throws IOException {
+    @Override public Stream<FSResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         final Stream.Builder<FSResource> streamBuilder = Stream.builder();
-        final ResourceWalkerFileVisitor
-            visitor = new ResourceWalkerFileVisitor(walker, matcher, this, streamBuilder, access);
+        final ResourceWalkerFileVisitor visitor = new ResourceWalkerFileVisitor(walker, matcher, this, streamBuilder);
         Files.walkFileTree(path.javaPath, visitor);
         return streamBuilder.build();
     }

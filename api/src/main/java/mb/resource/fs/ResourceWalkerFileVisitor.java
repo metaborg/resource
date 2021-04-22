@@ -1,6 +1,5 @@
 package mb.resource.fs;
 
-import mb.resource.hierarchical.HierarchicalResourceAccess;
 import mb.resource.hierarchical.match.ResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -18,23 +17,17 @@ class ResourceWalkerFileVisitor implements FileVisitor<Path> {
     private final ResourceWalker walker;
     private final FSResource rootDirectory;
     private final Builder<FSResource> streamBuilder;
-    private final @Nullable HierarchicalResourceAccess access;
 
-    ResourceWalkerFileVisitor(ResourceWalker walker, ResourceMatcher matcher, FSResource rootDirectory, Builder<FSResource> streamBuilder,
-        @Nullable HierarchicalResourceAccess access) {
+    ResourceWalkerFileVisitor(ResourceWalker walker, ResourceMatcher matcher, FSResource rootDirectory, Builder<FSResource> streamBuilder) {
         this.matcher = matcher;
         this.walker = walker;
         this.rootDirectory = rootDirectory;
         this.streamBuilder = streamBuilder;
-        this.access = access;
     }
 
     @Override
     public FileVisitResult preVisitDirectory(@NonNull Path dir, @NonNull BasicFileAttributes attrs) throws IOException {
         final FSResource resource = new FSResource(dir);
-        if(access != null) {
-            access.read(resource);
-        }
         if(matcher.matches(resource, rootDirectory)) {
             streamBuilder.add(resource);
         }
@@ -47,9 +40,6 @@ class ResourceWalkerFileVisitor implements FileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(@NonNull Path file, @NonNull BasicFileAttributes attrs) throws IOException {
         final FSResource resource = new FSResource(file);
-        if(access != null) {
-            access.read(resource);
-        }
         if(matcher.matches(resource, rootDirectory)) {
             streamBuilder.add(resource);
         }
