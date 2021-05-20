@@ -63,4 +63,13 @@ public interface ResourceMatcher extends Serializable {
         Collections.addAll(anyMatchers, matchers);
         return new AnyResourceMatcher(anyMatchers);
     }
+
+
+    static ResourceMatcher ofFileExtension(String extension) {
+        return ofPath(PathMatcher.ofExtension(extension)).and(ofFile());
+    }
+
+    static ResourceMatcher ofFileExtensions(String... extensions) {
+        return ofPath(PathMatcher.ofExtensions(extensions)).and(ofFile());
+    }
 }

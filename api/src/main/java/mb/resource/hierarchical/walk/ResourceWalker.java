@@ -22,4 +22,7 @@ public interface ResourceWalker extends Serializable {
     static PathResourceWalker ofPath(PathMatcher matcher) {
         return new PathResourceWalker(matcher);
     }
+
+
+    static PathResourceWalker ofNoHidden() { return ofPath(PathMatcher.ofNoHidden()); }
 }
