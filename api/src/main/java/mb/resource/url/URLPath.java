@@ -4,6 +4,7 @@ import mb.resource.ResourceRuntimeException;
 import mb.resource.hierarchical.ResourcePath;
 import mb.resource.hierarchical.ResourcePathDefaults;
 import mb.resource.util.SeparatorUtil;
+import mb.resource.util.UriEncode;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.net.MalformedURLException;
@@ -33,7 +34,7 @@ public class URLPath extends ResourcePathDefaults<URLPath> implements ResourcePa
     }
 
     public URLPath(String str) throws URISyntaxException {
-        this.uri = new URI(str);
+        this.uri = UriEncode.encodeToUri(str);
     }
 
 
@@ -156,13 +157,13 @@ public class URLPath extends ResourcePathDefaults<URLPath> implements ResourcePa
 
     private URI resolve(String other) throws URISyntaxException {
         // Do string append instead of URI#resolve, as it ignores `other` when `uri` is opaque.
-        return new URI(uri.toString() + other);
+        return new URI(uri.toString() + UriEncode.encodeFull(other));
     }
 
 
     @Override public URLPath appendRelativePath(String relativePath) {
         try {
-            final URI relativeURI = new URI(relativePath);
+            final URI relativeURI = UriEncode.encodeToUri(relativePath);
             if(relativeURI.isAbsolute()) {
                 throw new ResourceRuntimeException(
                     "Cannot append '" + relativePath + "', it is an absolute URI");
@@ -176,7 +177,7 @@ public class URLPath extends ResourcePathDefaults<URLPath> implements ResourcePa
 
     @Override public URLPath appendOrReplaceWithPath(String other) {
         try {
-            final URI otherUri = new URI(other);
+            final URI otherUri = UriEncode.encodeToUri(other);
             if(otherUri.isAbsolute()) {
                 return new URLPath(otherUri);
             }

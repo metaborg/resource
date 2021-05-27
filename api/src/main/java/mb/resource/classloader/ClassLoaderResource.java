@@ -10,6 +10,7 @@ import mb.resource.hierarchical.SegmentsPath;
 import mb.resource.hierarchical.SegmentsResource;
 import mb.resource.hierarchical.match.ResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
+import mb.resource.util.UriEncode;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -272,7 +273,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
                 pathInJarFile = urlPath.substring(exclamationMarkIndex + 1); // + 1 to skip past '!'
             }
             try {
-                final FSResource jarFile = new FSResource(new URI(jarFilePath));
+                final FSResource jarFile = new FSResource(UriEncode.encodeToUri(jarFilePath));
                 locations.jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
             } catch(URISyntaxException e) {
                 throw new ResourceRuntimeException("Could not add class loader resource location for '" + url + "'; conversion of nested path '" + jarFilePath + "' to an URI failed", e);

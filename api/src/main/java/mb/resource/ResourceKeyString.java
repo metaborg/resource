@@ -1,5 +1,6 @@
 package mb.resource;
 
+import mb.resource.util.UriEncode;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.net.URI;
@@ -52,7 +53,8 @@ public interface ResourceKeyString {
      *
      * @param uri {@link URI} representation of a (partial) resource key string.
      * @return Resource key string.
-     * @throws ResourceRuntimeException when given {@link URI} has no {@link URI#getSchemeSpecificPart() scheme-specific part}.
+     * @throws ResourceRuntimeException when given {@link URI} has no {@link URI#getSchemeSpecificPart() scheme-specific
+     *                                  part}.
      */
     static ResourceKeyString of(URI uri) {
         final @Nullable String scheme = uri.getScheme();
@@ -134,9 +136,9 @@ public interface ResourceKeyString {
      */
     default URI toUri() {
         try {
-            return new URI(getQualifier(), UriEncode.encodePath(getId()), null);
+            final @Nullable String encodedQualifier = getQualifier() != null ? UriEncode.encodeComponent(getQualifier()) : null;
+            return new URI(encodedQualifier, UriEncode.encodeComponent(getId()), null);
         } catch(URISyntaxException e) {
-            // TODO: should ensure that URISyntaxException can never be thrown. To ensure this, qualifiers may only contain alphanumeric and +.-.
             throw new ResourceRuntimeException("Converting '" + this + "' to an URI failed unexpectedly", e);
         }
     }
