@@ -114,7 +114,7 @@ public class URLPath extends ResourcePathDefaults<URLPath> implements ResourcePa
         return null;
     }
 
-    @Override public @Nullable String getLeafExtension() {
+    @Override public @Nullable String getLeafFileExtension() {
         return null;
     }
 

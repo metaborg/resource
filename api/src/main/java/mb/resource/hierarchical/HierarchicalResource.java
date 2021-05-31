@@ -86,7 +86,7 @@ public interface HierarchicalResource extends WritableResource {
      * @return File extension of the leaf segment of this resource, or {@code null} it it has none.
      */
     default @Nullable String getLeafExtension() {
-        return getPath().getLeafExtension();
+        return getPath().getLeafFileExtension();
     }
 
     /**

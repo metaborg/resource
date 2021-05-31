@@ -71,10 +71,24 @@ public interface ResourcePath extends ResourceKey {
      *
      * @return File extension of the leaf segment of this path, or {@code null} it it has none.
      */
-    default @Nullable String getLeafExtension() {
+    default @Nullable String getLeafFileExtension() {
         final @Nullable String leaf = getLeaf();
         if(leaf != null) {
             return FilenameExtensionUtil.getExtension(leaf);
+        }
+        return null;
+    }
+
+    /**
+     * Gets the leaf segment of this path without a file extension, or {@code null} if it has no leaf segment (e.g., it is
+     * empty).
+     *
+     * @return Leaf segment of this path without file extension, or {@code null} it it has none.
+     */
+    default @Nullable String getLeafWithoutFileExtension() {
+        final @Nullable String leaf = getLeaf();
+        if(leaf != null) {
+            return FilenameExtensionUtil.removeExtension(leaf);
         }
         return null;
     }

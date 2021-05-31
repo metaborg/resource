@@ -36,7 +36,7 @@ public class ExtensionsPathMatcher implements PathMatcher {
     }
 
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
-        final @Nullable String extension = path.getLeafExtension();
+        final @Nullable String extension = path.getLeafFileExtension();
         if(extension == null) {
             return false;
         }
