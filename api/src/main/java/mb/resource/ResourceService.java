@@ -253,9 +253,11 @@ public interface ResourceService {
      * @param registries          Resource registries for the child.
      * @param additionalAncestors Other resource services that serve as parent for the child.
      * @return Child resource service.
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
      */
     ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries,
-        Iterable<ResourceService> additionalAncestors);
+                                Iterable<ResourceService> additionalAncestors);
 
     /**
      * Creates a child resource service, with a new default resource registry and additional resource registries. The
@@ -265,6 +267,8 @@ public interface ResourceService {
      * @param defaultRegistry Default resource registry for the child.
      * @param registries      Resource registries for the child.
      * @return Child resource service.
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
      */
     default ResourceService createChild(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
         return createChild(defaultRegistry, registries, Collections.emptyList());
@@ -277,6 +281,8 @@ public interface ResourceService {
      *
      * @param registries Resource registries for the child.
      * @return Child resource service.
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
      */
     default ResourceService createChild(Iterable<ResourceRegistry> registries) {
         return createChild(getDefaultResourceRegistry(), registries);
@@ -289,6 +295,8 @@ public interface ResourceService {
      *
      * @param registries Resource registries for the child.
      * @return Child resource service.
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
      */
     default ResourceService createChild(ResourceRegistry... registries) {
         return createChild(getDefaultResourceRegistry(), Arrays.asList(registries));
@@ -302,6 +310,8 @@ public interface ResourceService {
      * @param registries          Resource registries for the child.
      * @param additionalAncestors Other resource services that serve as ancestors for the child.
      * @return Child resource service.
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
      */
     default ResourceService createChild(Iterable<ResourceRegistry> registries, Iterable<ResourceService> additionalAncestors) {
         return createChild(getDefaultResourceRegistry(), registries, additionalAncestors);
@@ -313,6 +323,8 @@ public interface ResourceService {
      *
      * @param additionalAncestors Other resource services that serve as ancestors for the child.
      * @return Child resource service.
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
      */
     default ResourceService createChild(ResourceService... additionalAncestors) {
         return createChild(Collections.emptyList(), Arrays.asList(additionalAncestors));

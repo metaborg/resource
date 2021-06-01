@@ -24,14 +24,26 @@ public class DefaultResourceService implements ResourceService {
         this.registries = registries;
     }
 
+    /**
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
+     */
     public DefaultResourceService(List<ResourceService> ancestors, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
         this(new ArrayList<>(ancestors), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
     }
 
+    /**
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
+     */
     public DefaultResourceService(ResourceService parent, ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
         this(Collections.singletonList(parent), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
     }
 
+    /**
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
+     */
     public DefaultResourceService(ResourceService parent, ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
         this(Collections.singletonList(parent), defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
     }
@@ -40,21 +52,41 @@ public class DefaultResourceService implements ResourceService {
         this(Collections.emptyList(), defaultRegistry, registries);
     }
 
+    /**
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
+     */
     public DefaultResourceService(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
         this(Collections.emptyList(), defaultRegistry, toRegistriesHashMap(defaultRegistry, registries));
     }
 
+    /**
+     * @throws IllegalArgumentException when there is a duplicate {@link ResourceRegistry#qualifier() resource registry
+     *                                  qualifier}.
+     */
     public DefaultResourceService(ResourceRegistry defaultRegistry, ResourceRegistry... registries) {
         this(Collections.emptyList(), defaultRegistry, toRegistriesHashMap(defaultRegistry, Arrays.asList(registries)));
     }
 
     private static HashMap<String, ResourceRegistry> toRegistriesHashMap(ResourceRegistry defaultRegistry, Iterable<ResourceRegistry> registries) {
-        final HashMap<String, ResourceRegistry> registriesMap = new HashMap<>();
-        registriesMap.put(defaultRegistry.qualifier(), defaultRegistry);
+        final HashMap<String, ResourceRegistry> map = new HashMap<>();
         for(ResourceRegistry registry : registries) {
-            registriesMap.put(registry.qualifier(), registry);
+            final String qualifier = registry.qualifier();
+            final @Nullable ResourceRegistry existing = map.put(qualifier, registry);
+            if(existing != null) {
+                throw new IllegalArgumentException("Resource registry with qualifier '" + qualifier + "' already exists: " + existing);
+            }
         }
-        return registriesMap;
+
+        if(!map.containsValue(defaultRegistry)) {
+            final String qualifier = defaultRegistry.qualifier();
+            if(!map.containsKey(qualifier)) {
+                map.put(qualifier, defaultRegistry);
+            } else {
+                throw new IllegalArgumentException("An existing resource registry already exists for qualifier '" + qualifier + "' of the default resource registry, but it is not equal to the default resource registry. Either provide the default resource registry as part of the resource registries list, or ensure it does not have an overlapping qualifier with a different resource registry");
+            }
+        }
+        return map;
     }
 
 
