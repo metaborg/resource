@@ -57,8 +57,8 @@ public class FSResourceRegistry implements ResourceRegistry {
         }
         final FSPath path = (FSPath)key;
         try {
-            return new File(path.uri);
-        } catch(IllegalArgumentException e) {
+            return path.javaPath.toFile();
+        } catch(UnsupportedOperationException e) {
             return null;
         }
     }
