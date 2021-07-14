@@ -5,6 +5,7 @@ import mb.resource.ResourceKey;
 import mb.resource.ResourceKeyString;
 import mb.resource.ResourceRegistry;
 import mb.resource.ResourceRuntimeException;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
@@ -24,7 +25,8 @@ public class FSResourceRegistry implements ResourceRegistry {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         try {
-            return new FSPath(new URI(keyStr.getId()));
+            // Convert to UNIX separators (/) as URIs require them.
+            return new FSPath(new URI(SeparatorUtil.convertCurrentToUnixSeparator(keyStr.getId())));
         } catch(URISyntaxException e) {
             throw new ResourceRuntimeException("Could not create FSPath from '" + keyStr + "', URI parsing failed", e);
         }

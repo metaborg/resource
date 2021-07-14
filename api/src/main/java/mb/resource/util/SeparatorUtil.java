@@ -33,7 +33,15 @@ public class SeparatorUtil {
         return String.join(SeparatorUtil.unixSeparator, segments);
     }
 
-    public static String joinWithUnixSeparator( Iterable<? extends CharSequence> segments) {
+    public static String joinWithUnixSeparator(Iterable<? extends CharSequence> segments) {
         return String.join(SeparatorUtil.unixSeparator, segments);
+    }
+
+
+    public static String convertCurrentToUnixSeparator(String path) {
+        if(File.separatorChar != '/') {
+            return path.replace(File.separatorChar, '/');
+        }
+        return path;
     }
 }
