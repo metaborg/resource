@@ -8,7 +8,7 @@ import java.net.URI;
 /**
  * String representation of a {@link ResourceKey resource key}.
  */
-public interface QualifiedResourceKeyString extends ResourceKeyString {
+public interface QualifiedResourceKeyString extends ResourceKeyString, Comparable<QualifiedResourceKeyString> {
     String separator = "##";
 
 

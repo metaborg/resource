@@ -115,6 +115,10 @@ public abstract class ResourcePathDefaults<SELF extends ResourcePathDefaults<SEL
     }
 
 
+    @Override public int compareTo(ResourcePath o) {
+        return this.asResourceKeyString().compareTo(o.asResourceKeyString());
+    }
+
     @Override public abstract boolean equals(@Nullable Object other);
 
     @Override public abstract int hashCode();

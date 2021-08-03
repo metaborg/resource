@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-public interface ResourcePath extends ResourceKey {
+public interface ResourcePath extends ResourceKey, Comparable<ResourcePath> {
     /**
      * Checks if this path is absolute.
      *

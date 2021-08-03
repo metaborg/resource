@@ -2,7 +2,10 @@ package mb.resource;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Comparator;
 import java.util.Objects;
+
+import static java.util.Comparator.comparing;
 
 public class DefaultQualifiedResourceKeyString implements QualifiedResourceKeyString, ResourceKeyString {
     private final String qualifier;
@@ -13,6 +16,7 @@ public class DefaultQualifiedResourceKeyString implements QualifiedResourceKeySt
         this.id = id;
     }
 
+
     @Override public String getQualifier() {
         return qualifier;
     }
@@ -20,6 +24,16 @@ public class DefaultQualifiedResourceKeyString implements QualifiedResourceKeySt
     @Override public String getId() {
         return id;
     }
+
+
+    private static final Comparator<QualifiedResourceKeyString> comparator =
+        comparing(QualifiedResourceKeyString::getQualifier)
+            .thenComparing(QualifiedResourceKeyString::getId);
+
+    @Override public int compareTo(QualifiedResourceKeyString o) {
+        return comparator.compare(this, o);
+    }
+
 
     @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;

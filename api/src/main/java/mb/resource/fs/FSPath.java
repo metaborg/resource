@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath, Comparable<FSPath>, Serializable {
+public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath, Serializable {
     // URI version of the path which can be serialized and deserialized.
     final URI uri;
     // Transient and non-final for deserialization in readObject. Invariant: always nonnull.
@@ -352,11 +352,6 @@ public class FSPath extends ResourcePathDefaults<FSPath> implements ResourcePath
 
     @Override public String getIdAsString() {
         return uri.toString();
-    }
-
-
-    @Override public int compareTo(FSPath other) {
-        return this.javaPath.compareTo(other.javaPath);
     }
 
 
