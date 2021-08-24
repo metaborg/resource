@@ -45,7 +45,7 @@ public class FSResourceRegistry implements ResourceRegistry {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         try {
-            return new FSResource(new URI(keyStr.getId()));
+            return new FSResource(new URI(SeparatorUtil.convertCurrentToUnixSeparator(keyStr.getId())));
         } catch(URISyntaxException e) {
             throw new ResourceRuntimeException("Could not create FSPath from '" + keyStr + "', URI parsing failed", e);
         }
