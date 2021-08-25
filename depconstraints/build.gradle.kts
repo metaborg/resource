@@ -3,7 +3,7 @@ plugins {
   `maven-publish`
 }
 
-val logVersion = "0.5.4"
+val logVersion = "0.5.5"
 
 val checkerframeworkVersion = "3.16.0"
 
