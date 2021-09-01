@@ -27,7 +27,7 @@ public class FSResourceRegistry implements ResourceRegistry {
         try {
             // Convert to UNIX separators (/) as URIs require them.
             return new FSPath(new URI(SeparatorUtil.convertCurrentToUnixSeparator(keyStr.getId())));
-        } catch(URISyntaxException e) {
+        } catch(URISyntaxException | ResourceRuntimeException e) {
             return new FSPath(keyStr.getId()); // Try as local path
         }
     }
@@ -47,7 +47,7 @@ public class FSResourceRegistry implements ResourceRegistry {
         try {
             // Convert to UNIX separators (/) as URIs require them.
             return new FSResource(new URI(SeparatorUtil.convertCurrentToUnixSeparator(keyStr.getId())));
-        } catch(URISyntaxException e) {
+        } catch(URISyntaxException | ResourceRuntimeException e) {
             return new FSResource(keyStr.getId()); // Try as local path
         }
     }

@@ -62,7 +62,8 @@ class ResourceKeyStringTest {
         final FSResource resource = getResource(false, tempDir);
         final String resourceAsString = resource.getJavaPath().toString();
         assertThrows(ResourceRuntimeException.class, () -> {
-            ResourceKeyString.parse(resourceAsString);
+            final ResourceKeyString parsedResourceKeyString = ResourceKeyString.parse(resourceAsString);
+            resourceService.getResource(parsedResourceKeyString);
         });
     }
 }
