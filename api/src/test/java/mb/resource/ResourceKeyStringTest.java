@@ -45,13 +45,12 @@ class ResourceKeyStringTest {
         assertEquals(resource, parsedResource);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void testResourceKeyStringUnexpectedStringOnUnix(boolean useJimFs, @TempDir Path tempDir) {
-        final FSResource resource = getResource(useJimFs, tempDir);
+    @Test
+    void testResourceKeyStringLocalFileSystemString(@TempDir Path tempDir) {
+        final FSResource resource = getResource(false, tempDir);
         final String resourceAsString = resource.getJavaPath().toString();
         final ResourceKeyString parsedResourceKeyString = ResourceKeyString.parse(resourceAsString);
         final Resource parsedResource = resourceService.getResource(parsedResourceKeyString);
-        assertNotEquals(resource, parsedResource);
+        // No assertion. May not be equal but should at least not throw an exception.
     }
 }
