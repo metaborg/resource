@@ -28,7 +28,7 @@ public class FSResourceRegistry implements ResourceRegistry {
             // Convert to UNIX separators (/) as URIs require them.
             return new FSPath(new URI(SeparatorUtil.convertCurrentToUnixSeparator(keyStr.getId())));
         } catch(URISyntaxException e) {
-            throw new ResourceRuntimeException("Could not create FSPath from '" + keyStr + "', URI parsing failed", e);
+            return new FSPath(keyStr.getId()); // Try as local path
         }
     }
 
@@ -45,9 +45,10 @@ public class FSResourceRegistry implements ResourceRegistry {
             throw new ResourceRuntimeException("Qualifier of '" + keyStr + "' does not match qualifier '" + qualifier + "' of this resource registry");
         }
         try {
+            // Convert to UNIX separators (/) as URIs require them.
             return new FSResource(new URI(SeparatorUtil.convertCurrentToUnixSeparator(keyStr.getId())));
         } catch(URISyntaxException e) {
-            throw new ResourceRuntimeException("Could not create FSPath from '" + keyStr + "', URI parsing failed", e);
+            return new FSResource(keyStr.getId()); // Try as local path
         }
     }
 
