@@ -47,23 +47,11 @@ class ResourceKeyStringTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "Windows test below, because it throws an exception")
     void testResourceKeyStringUnexpectedStringOnUnix(boolean useJimFs, @TempDir Path tempDir) {
         final FSResource resource = getResource(useJimFs, tempDir);
         final String resourceAsString = resource.getJavaPath().toString();
         final ResourceKeyString parsedResourceKeyString = ResourceKeyString.parse(resourceAsString);
         final Resource parsedResource = resourceService.getResource(parsedResourceKeyString);
         assertNotEquals(resource, parsedResource);
-    }
-
-    @Test
-    @EnabledOnOs(value = OS.WINDOWS, disabledReason = "Unix tests above, because they do not throw an exception")
-    void testResourceKeyStringUnexpectedStringOnWindows(@TempDir Path tempDir) {
-        final FSResource resource = getResource(false, tempDir);
-        final String resourceAsString = resource.getJavaPath().toString();
-        assertThrows(ResourceRuntimeException.class, () -> {
-            final ResourceKeyString parsedResourceKeyString = ResourceKeyString.parse(resourceAsString);
-            resourceService.getResource(parsedResourceKeyString);
-        });
     }
 }
