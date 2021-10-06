@@ -27,18 +27,21 @@ import java.util.stream.Stream;
 public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> implements HierarchicalResource {
     private final ClassLoader classLoader;
     private final ClassLoaderUrlResolver urlResolver;
+    private final ClassLoaderToNativeResolver toNativeResolver;
 
 
-    ClassLoaderResource(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver, SegmentsPath path) {
+    ClassLoaderResource(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver, ClassLoaderToNativeResolver toNativeResolver, SegmentsPath path) {
         super(path);
         this.classLoader = classLoader;
         this.urlResolver = urlResolver;
+        this.toNativeResolver = toNativeResolver;
     }
 
-    ClassLoaderResource(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver, String qualifier, String id) {
+    ClassLoaderResource(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver, ClassLoaderToNativeResolver toNativeResolver, String id, String qualifier) {
         super(new SegmentsPath(qualifier, id));
         this.classLoader = classLoader;
         this.urlResolver = urlResolver;
+        this.toNativeResolver = toNativeResolver;
     }
 
     @Override public void close() throws IOException {
@@ -55,7 +58,8 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
         throw new UnsupportedOperationException("Class loader resources do not support listing");
     }
 
-    @Override public Stream<ClassLoaderResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
+    @Override
+    public Stream<ClassLoaderResource> walk(ResourceWalker walker, ResourceMatcher matcher) throws IOException {
         throw new UnsupportedOperationException("Class loader resources do not support walking");
     }
 
@@ -149,33 +153,41 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
 
 
     /**
-     * Gets this resource as a {@link ReadableResource} if it is on the local filesystem, or itself otherwise.
+     * Gets this resource as a {@link ReadableResource} if it is a native resource, or itself otherwise.
      *
      * The returned resource cannot be used to resolve other resources, as class loaders can be sourced from multiple
      * locations (i.e., the classpath), and the returned resource is only located in one of these locations.
      *
      * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
      */
-    public ReadableResource tryAsLocalResource() {
-        final @Nullable ReadableResource resource = asLocalResource();
+    public ReadableResource tryAsNativeResource() {
+        final @Nullable ReadableResource resource = asNativeResource();
         if(resource != null) return resource;
         return this;
     }
 
     /**
-     * Gets this resource as a {@link ReadableResource} if it is on the local filesystem, or {@code null} if it does not
-     * exist nor is on the local filesystem.
+     * Gets this resource as a {@link ReadableResource} if it is a native resource, or {@code null} if it does not exist
+     * nor is a native resource.
      *
      * The returned resource cannot be used to resolve other resources, as class loaders can be sourced from multiple
      * locations (i.e., the classpath), and the returned resource is only located in one of these locations.
      *
      * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
      */
-    public @Nullable ReadableResource asLocalResource() {
-        final @Nullable URI uri = asLocalUri();
-        if(uri == null) return null;
-        return new FSResource(uri);
+    public @Nullable ReadableResource asNativeResource() {
+        final @Nullable URL url = getUrlToResource();
+        if(url == null) return null;
+        final @Nullable ReadableResource nativeResource = toNativeResolver.toNativeResource(url);
+        if(nativeResource == null) {
+            final @Nullable URL resolvedUrl = urlResolver.resolve(url);
+            if(resolvedUrl != null) {
+                return toNativeResolver.toNativeResource(resolvedUrl);
+            }
+        }
+        return nativeResource;
     }
+
 
     /**
      * Gets this resource as a {@link File local file} if it is on the local filesystem, or {@code null} if it does not
@@ -227,6 +239,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
         }
         return null;
     }
+
 
     /**
      * Gets the local filesystem directories and JAR files (located on the local filesystem) this resource is sourced
@@ -307,7 +320,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
     @Override protected ClassLoaderResource create(SegmentsPath path) {
-        return new ClassLoaderResource(classLoader, urlResolver, path);
+        return new ClassLoaderResource(classLoader, urlResolver, toNativeResolver, path);
     }
 
 

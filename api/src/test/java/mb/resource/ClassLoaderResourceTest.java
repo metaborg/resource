@@ -51,11 +51,11 @@ class ClassLoaderResourceTest {
 
     @Test void testReadFileAsLocalFilesystemResource() throws Exception {
         final ClassLoaderResource resource = registry.getResource("mb/resource");
-        final @Nullable ReadableResource file1 = resource.appendRelativePath(file1Name).asLocalResource();
+        final @Nullable ReadableResource file1 = resource.appendRelativePath(file1Name).asNativeResource();
         assertNotNull(file1);
         assertTrue(file1.exists());
         assertTrue(file1.readString().contains(file1Name));
-        final @Nullable ReadableResource file2 = resource.appendAsRelativePath("classloader").appendRelativePath(file2Name).asLocalResource();
+        final @Nullable ReadableResource file2 = resource.appendAsRelativePath("classloader").appendRelativePath(file2Name).asNativeResource();
         assertNotNull(file2);
         assertTrue(file2.exists());
         assertTrue(file2.readString().contains(file2Name));

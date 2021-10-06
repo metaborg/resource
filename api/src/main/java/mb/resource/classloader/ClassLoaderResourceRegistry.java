@@ -13,29 +13,50 @@ import java.io.File;
 import java.util.Objects;
 
 public class ClassLoaderResourceRegistry implements ResourceRegistry {
-    private static final String defaultQualifier = "classloader-resource";
+    public static final String defaultQualifier = "classloader-resource";
+    public static final ClassLoaderUrlResolver defaultUrlResolver = new NoopClassLoaderUrlResolver();
+    public static final ClassLoaderToNativeResolver defaultToNativeResolver = new FSResourceClassLoaderToNativeResolver();
 
     private final String qualifier;
     private final ClassLoader classLoader;
     private final ClassLoaderUrlResolver urlResolver;
+    private final ClassLoaderToNativeResolver toNativeResolver;
 
 
-    public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader, ClassLoaderUrlResolver urlResolver) {
+    public ClassLoaderResourceRegistry(
+        String qualifier,
+        ClassLoader classLoader,
+        ClassLoaderUrlResolver urlResolver,
+        ClassLoaderToNativeResolver toNativeResolver
+    ) {
         this.qualifier = qualifier;
         this.classLoader = classLoader;
         this.urlResolver = urlResolver;
+        this.toNativeResolver = toNativeResolver;
+    }
+
+    public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader, ClassLoaderUrlResolver urlResolver) {
+        this(qualifier, classLoader, urlResolver, defaultToNativeResolver);
+    }
+
+    public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader, ClassLoaderToNativeResolver toNativeResolver) {
+        this(qualifier, classLoader, defaultUrlResolver, toNativeResolver);
     }
 
     public ClassLoaderResourceRegistry(String qualifier, ClassLoader classLoader) {
-        this(qualifier, classLoader, new NoopClassLoaderUrlResolver());
+        this(qualifier, classLoader, defaultUrlResolver, defaultToNativeResolver);
     }
 
     public ClassLoaderResourceRegistry(ClassLoader classLoader, ClassLoaderUrlResolver urlResolver) {
-        this(defaultQualifier, classLoader, urlResolver);
+        this(defaultQualifier, classLoader, urlResolver, defaultToNativeResolver);
+    }
+
+    public ClassLoaderResourceRegistry(ClassLoader classLoader, ClassLoaderToNativeResolver toNativeResolver) {
+        this(defaultQualifier, classLoader, defaultUrlResolver, toNativeResolver);
     }
 
     public ClassLoaderResourceRegistry(ClassLoader classLoader) {
-        this(classLoader, new NoopClassLoaderUrlResolver());
+        this(classLoader, defaultUrlResolver);
     }
 
     public ClassLoaderResourceRegistry() {
@@ -100,15 +121,15 @@ public class ClassLoaderResourceRegistry implements ResourceRegistry {
 
 
     public ClassLoaderResource getResource(String path) {
-        return new ClassLoaderResource(classLoader, urlResolver, qualifier, path);
+        return new ClassLoaderResource(classLoader, urlResolver, toNativeResolver, path, qualifier);
     }
 
     public ClassLoaderResource getResource(Class<?> clazz) {
-        return new ClassLoaderResource(classLoader, urlResolver, qualifier, getPathIdentifierForClass(clazz));
+        return new ClassLoaderResource(classLoader, urlResolver, toNativeResolver, getPathIdentifierForClass(clazz), qualifier);
     }
 
     public ClassLoaderResource getResource(SegmentsPath path) {
-        return new ClassLoaderResource(classLoader, urlResolver, path);
+        return new ClassLoaderResource(classLoader, urlResolver, toNativeResolver, path);
     }
 
 
