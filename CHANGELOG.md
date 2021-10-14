@@ -3,7 +3,14 @@ All notable changes to this project are documented in this file, based on [Keep 
 
 
 ## [Unreleased]
+### Added
+- `ClassLoaderResource#getLocationsTryAsNative` to get class loader resource locations as native resources.
 
+### Changed
+- `ClassLoaderResource#tryAsNativeResource` to `tryAsNativeFile`.
+- `ClassLoaderResource#asNativeResource` to `asNativeFile`.
+- `ClassLoaderResourceLocations` and `JarFileWithPath` to take a type argument with the kind of resources they hold.
+- `ClassLoaderToNativeResolver` to have separate methods for resolving files and directories.
 
 ## [0.12.0] - 2021-10-11
 ### Added

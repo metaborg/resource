@@ -1,15 +1,23 @@
 package mb.resource.classloader;
 
-import mb.resource.ReadableResource;
 import mb.resource.ResourceRuntimeException;
 import mb.resource.fs.FSResource;
+import mb.resource.hierarchical.HierarchicalResource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.net.URISyntaxException;
 import java.net.URL;
 
 public class FSResourceClassLoaderToNativeResolver implements ClassLoaderToNativeResolver {
-    @Override public @Nullable ReadableResource toNativeResource(URL url) {
+    @Override public @Nullable HierarchicalResource toNativeFile(URL url) {
+        return toNativeResource(url);
+    }
+
+    @Override public @Nullable HierarchicalResource toNativeDirectory(URL url) {
+        return toNativeResource(url);
+    }
+
+    private @Nullable HierarchicalResource toNativeResource(URL url) {
         if("file".equals(url.getProtocol())) {
             try {
                 return new FSResource(url.toURI());

@@ -160,9 +160,9 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
      *
      * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
      */
-    public ReadableResource tryAsNativeResource() {
-        final @Nullable ReadableResource resource = asNativeResource();
-        if(resource != null) return resource;
+    public ReadableResource tryAsNativeFile() {
+        final @Nullable ReadableResource nativeFile = asNativeFile();
+        if(nativeFile != null) return nativeFile;
         return this;
     }
 
@@ -175,17 +175,17 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
      *
      * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
      */
-    public @Nullable ReadableResource asNativeResource() {
+    public @Nullable ReadableResource asNativeFile() {
         final @Nullable URL url = getUrlToResource();
         if(url == null) return null;
-        final @Nullable ReadableResource nativeResource = toNativeResolver.toNativeResource(url);
-        if(nativeResource == null) {
+        final @Nullable ReadableResource nativeFile = toNativeResolver.toNativeFile(url);
+        if(nativeFile == null) {
             final @Nullable URL resolvedUrl = urlResolver.resolve(url);
             if(resolvedUrl != null) {
-                return toNativeResolver.toNativeResource(resolvedUrl);
+                return toNativeResolver.toNativeFile(resolvedUrl);
             }
         }
-        return nativeResource;
+        return nativeFile;
     }
 
 
@@ -242,6 +242,71 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
 
 
     /**
+     * Gets the native directories and JAR files (located in a native directory) this resource is sourced from.
+     * Unrecognized URLs are returned as well.
+     *
+     * @throws IOException              if {@link ClassLoader#getResources(String)} throws.
+     * @throws ResourceRuntimeException if no directories nor JAR files were found.
+     * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
+     */
+    public ClassLoaderResourceLocations<HierarchicalResource> getLocationsTryAsNative() throws IOException {
+        final ClassLoaderResourceLocations<HierarchicalResource> locations = new ClassLoaderResourceLocations<>();
+        final Enumeration<URL> resources = classLoader.getResources(path.getId().toString());
+        if(!resources.hasMoreElements()) {
+            throw new ResourceRuntimeException("Could not get class loader resource locations for '" + path + "'; no locations were found");
+        }
+        while(resources.hasMoreElements()) {
+            final URL url = resources.nextElement();
+            processLocationUrlTryAsNative(url, locations);
+        }
+        return locations;
+    }
+
+    // We operate under the expectation that `url` is encoded.
+    private void processLocationUrlTryAsNative(URL url, ClassLoaderResourceLocations<HierarchicalResource> locations) throws IOException {
+        final @Nullable HierarchicalResource nativeDirectory = toNativeResolver.toNativeDirectory(url);
+        if(nativeDirectory != null) {
+            locations.directories.add(nativeDirectory);
+            return;
+        }
+
+        final String protocol = url.getProtocol();
+        if("jar".equals(protocol)) {
+            final String urlPath = url.getPath();
+            final int exclamationMarkIndex = urlPath.indexOf("!");
+            final String jarFilePath;
+            final String pathInJarFile;
+            if(exclamationMarkIndex < 0) {
+                jarFilePath = urlPath;
+                pathInJarFile = "";
+            } else {
+                jarFilePath = urlPath.substring(0, exclamationMarkIndex); // before '!'
+                pathInJarFile = urlPath.substring(exclamationMarkIndex + 1); // + 1 to skip past '!'
+            }
+            try {
+                final HierarchicalResource jarFile;
+                final @Nullable HierarchicalResource nativeJarFile = toNativeResolver.toNativeFile(new URL(jarFilePath));
+                if(nativeJarFile != null) {
+                    jarFile = nativeJarFile;
+                } else {
+                    jarFile = new FSResource(new URI(jarFilePath));
+                }
+                locations.jarFiles.add(new JarFileWithPath<>(jarFile, pathInJarFile));
+            } catch(URISyntaxException e) {
+                throw new ResourceRuntimeException("Could not add class loader resource location for '" + url + "'; conversion of nested path '" + jarFilePath + "' to an URI failed", e);
+            }
+        } else {
+            final @Nullable URL resolvedUrl = urlResolver.resolve(url);
+            if(resolvedUrl != null) {
+                processLocationUrlTryAsNative(resolvedUrl, locations);
+            } else {
+                locations.unrecognizedUrls.add(url);
+            }
+        }
+    }
+
+
+    /**
      * Gets the local filesystem directories and JAR files (located on the local filesystem) this resource is sourced
      * from. Unrecognized URLs are returned as well.
      *
@@ -249,8 +314,8 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
      * @throws ResourceRuntimeException if no directories nor JAR files were found.
      * @throws ResourceRuntimeException if {@link URL#toURI()} throws.
      */
-    public ClassLoaderResourceLocations getLocations() throws IOException {
-        final ClassLoaderResourceLocations locations = new ClassLoaderResourceLocations();
+    public ClassLoaderResourceLocations<FSResource> getLocations() throws IOException {
+        final ClassLoaderResourceLocations<FSResource> locations = new ClassLoaderResourceLocations<>();
         final Enumeration<URL> resources = classLoader.getResources(path.getId().toString());
         if(!resources.hasMoreElements()) {
             throw new ResourceRuntimeException("Could not get class loader resource locations for '" + path + "'; no locations were found");
@@ -263,7 +328,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
     }
 
     // We operate under the expectation that `url` is encoded.
-    private void processLocationUrl(URL url, ClassLoaderResourceLocations locations) {
+    private void processLocationUrl(URL url, ClassLoaderResourceLocations<FSResource> locations) {
         final String protocol = url.getProtocol();
         if("file".equals(protocol)) {
             try {
@@ -286,7 +351,7 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
             }
             try {
                 final FSResource jarFile = new FSResource(new URI(jarFilePath));
-                locations.jarFiles.add(new JarFileWithPath(jarFile, pathInJarFile));
+                locations.jarFiles.add(new JarFileWithPath<>(jarFile, pathInJarFile));
             } catch(URISyntaxException e) {
                 throw new ResourceRuntimeException("Could not add class loader resource location for '" + url + "'; conversion of nested path '" + jarFilePath + "' to an URI failed", e);
             }
