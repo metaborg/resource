@@ -12,6 +12,7 @@ All notable changes to this project are documented in this file, based on [Keep 
 - `ClassLoaderResourceLocations` and `JarFileWithPath` to take a type argument with the kind of resources they hold.
 - `ClassLoaderToNativeResolver` to have separate methods for resolving files and directories.
 
+
 ## [0.12.0] - 2021-10-11
 ### Added
 - `ClassLoaderToNativeResolver` to allow class loader resources to be resolved to resources native to the application, such as Eclipse resources. `FSResourceClassLoaderToNativeResolver` is the default implementation that resolves to local filesystem resources.

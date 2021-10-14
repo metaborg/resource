@@ -63,7 +63,7 @@ class ClassLoaderResourceTest {
 
     @Test void testDirectoryLocations() throws Exception {
         final String path = "mb/resource";
-        final ClassLoaderResourceLocations locations = registry.getResource(path).getLocations();
+        final ClassLoaderResourceLocations<FSResource> locations = registry.getResource(path).getLocations();
         assertTrue(locations.directories.size() > 0);
         for(FSResource directory : locations.directories) {
             assertTrue(directory.exists());
@@ -73,9 +73,9 @@ class ClassLoaderResourceTest {
 
     @Test void testJarLocations() throws Exception {
         final String path = "org/junit/jupiter/api";
-        final ClassLoaderResourceLocations locations = registry.getResource(path).getLocations();
+        final ClassLoaderResourceLocations<FSResource> locations = registry.getResource(path).getLocations();
         assertTrue(locations.jarFiles.size() > 0);
-        for(JarFileWithPath jarFileWithPath : locations.jarFiles) {
+        for(JarFileWithPath<FSResource> jarFileWithPath : locations.jarFiles) {
             assertTrue(jarFileWithPath.file.exists());
             assertTrue(jarFileWithPath.file.isFile());
             final @Nullable String leaf = jarFileWithPath.file.getLeaf();
