@@ -5,6 +5,11 @@ All notable changes to this project are documented in this file, based on [Keep 
 ## [Unreleased]
 
 
+## [0.13.1] - 2021-11-09
+### Fixed
+- Fix `ClassLoaderResource`s `getLastModifiedTime` and `getSize` methods closing the backing JAR file, which could still be used concurrently by different threads, thereby fixing stream closed exceptions.
+
+
 ## [0.13.0] - 2021-10-18
 ### Added
 - `ClassLoaderResource#getLocationsTryAsNative` to get class loader resource locations as native resources.
@@ -30,7 +35,8 @@ All notable changes to this project are documented in this file, based on [Keep 
 - `FSResourceRegistry` accepts local filesystem paths in `getResourceKey` and `getResource`.
 
 
-[Unreleased]: https://github.com/metaborg/resource/compare/release-0.13.0...HEAD
+[Unreleased]: https://github.com/metaborg/resource/compare/release-0.13.1...HEAD
+[0.13.1]: https://github.com/metaborg/resource/compare/release-0.13.0...release-0.13.1
 [0.13.0]: https://github.com/metaborg/resource/compare/release-0.12.0...release-0.13.0
 [0.12.0]: https://github.com/metaborg/resource/compare/release-0.11.5...release-0.12.0
 [0.11.5]: https://github.com/metaborg/resource/compare/release-0.11.4...release-0.11.5
