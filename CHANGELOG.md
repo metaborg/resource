@@ -3,6 +3,9 @@ All notable changes to this project are documented in this file, based on [Keep 
 
 
 ## [Unreleased]
+
+
+## [0.13.2] - 2021-11-10
 ### Changed
 - All `PathMatcher`s to work with UNIX path segment separators `/`.
 
@@ -41,7 +44,8 @@ All notable changes to this project are documented in this file, based on [Keep 
 - `FSResourceRegistry` accepts local filesystem paths in `getResourceKey` and `getResource`.
 
 
-[Unreleased]: https://github.com/metaborg/resource/compare/release-0.13.1...HEAD
+[Unreleased]: https://github.com/metaborg/resource/compare/release-0.13.2...HEAD
+[0.13.2]: https://github.com/metaborg/resource/compare/release-0.13.1...release-0.13.2
 [0.13.1]: https://github.com/metaborg/resource/compare/release-0.13.0...release-0.13.1
 [0.13.0]: https://github.com/metaborg/resource/compare/release-0.12.0...release-0.13.0
 [0.12.0]: https://github.com/metaborg/resource/compare/release-0.11.5...release-0.12.0
