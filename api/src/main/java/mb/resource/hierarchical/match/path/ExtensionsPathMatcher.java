@@ -55,7 +55,7 @@ public class ExtensionsPathMatcher implements PathMatcher {
     }
 
     @Override public String toString() {
-        return "ExtensionsPathMatcher(" + extensions + ")";
+        return "with-any-extension(" + extensions + ")";
     }
 
     private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {

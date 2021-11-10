@@ -20,6 +20,6 @@ public class DirectoryResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "DirectoryResourceMatcher()";
+        return "is-directory";
     }
 }

@@ -17,6 +17,6 @@ public class FalseResourceWalker implements ResourceWalker {
     }
 
     @Override public String toString() {
-        return "FalseResourceWalker()";
+        return "false";
     }
 }

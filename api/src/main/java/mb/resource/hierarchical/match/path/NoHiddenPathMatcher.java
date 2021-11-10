@@ -19,6 +19,6 @@ public class NoHiddenPathMatcher implements PathMatcher {
     }
 
     @Override public String toString() {
-        return "NoHiddenPathMatcher()";
+        return "no-hidden";
     }
 }

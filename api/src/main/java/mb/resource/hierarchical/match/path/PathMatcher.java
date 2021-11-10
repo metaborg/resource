@@ -18,6 +18,18 @@ public interface PathMatcher extends Serializable {
         return new ExtensionsPathMatcher(extensions);
     }
 
+    static StartsWithPathMatcher ofStartsWith(String prefix) {
+        return new StartsWithPathMatcher(prefix);
+    }
+
+    static EndsWithPathMatcher ofEndsWith(String suffix) {
+        return new EndsWithPathMatcher(suffix);
+    }
+
+    static LeafPathMatcher ofLeaf(String leaf) {
+        return new LeafPathMatcher(leaf);
+    }
+
     static AntPatternPathMatcher ofAntPattern(AntPattern antPattern) {
         return new AntPatternPathMatcher(antPattern);
     }

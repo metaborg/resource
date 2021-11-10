@@ -17,6 +17,6 @@ public class TrueResourceWalker implements ResourceWalker {
     }
 
     @Override public String toString() {
-        return "TrueResourceWalker()";
+        return "true";
     }
 }

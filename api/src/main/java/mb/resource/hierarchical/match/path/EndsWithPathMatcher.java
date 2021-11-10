@@ -1,38 +1,33 @@
 package mb.resource.hierarchical.match.path;
 
 import mb.resource.hierarchical.ResourcePath;
-import mb.resource.util.AntPattern;
 import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class AntPatternPathMatcher implements PathMatcher {
-    private final AntPattern pattern;
+public class EndsWithPathMatcher implements PathMatcher {
+    private final String suffix;
 
-    public AntPatternPathMatcher(AntPattern pattern) {
-        this.pattern = pattern;
-    }
-
-    public AntPatternPathMatcher(String pattern) {
-        this(new AntPattern(pattern));
+    public EndsWithPathMatcher(String suffix) {
+        this.suffix = suffix;
     }
 
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
         final String relative = SeparatorUtil.convertCurrentToUnixSeparator(rootDir.relativize(path));
-        return pattern.match(relative);
+        return relative.endsWith(suffix);
     }
 
     @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final AntPatternPathMatcher that = (AntPatternPathMatcher)o;
-        return pattern.equals(that.pattern);
+        final EndsWithPathMatcher that = (EndsWithPathMatcher)o;
+        return suffix.equals(that.suffix);
     }
 
     @Override public int hashCode() {
-        return pattern.hashCode();
+        return suffix.hashCode();
     }
 
     @Override public String toString() {
-        return "with-ant-pattern(" + pattern + ")";
+        return "ends-with(" + suffix + ")";
     }
 }

@@ -20,6 +20,6 @@ public class FileResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "FileResourceMatcher()";
+        return "is-file";
     }
 }

@@ -27,6 +27,6 @@ public class PathResourceWalker implements ResourceWalker {
     }
 
     @Override public String toString() {
-        return "PathResourceWalker(" + pathMatcher + ")";
+        return "with-path-matcher(" + pathMatcher + ")";
     }
 }

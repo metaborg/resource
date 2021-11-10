@@ -30,6 +30,6 @@ public class ExtensionPathMatcher implements PathMatcher {
     }
 
     @Override public String toString() {
-        return "ExtensionPathMatcher(" + extension + ")";
+        return "with-extension(" + extension + ")";
     }
 }

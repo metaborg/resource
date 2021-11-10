@@ -40,6 +40,6 @@ public class AllResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "AllResourceMatcher(" + matchers.toString() + ")";
+        return "all(" + matchers + ")";
     }
 }

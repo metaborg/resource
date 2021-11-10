@@ -27,6 +27,6 @@ public class PathResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "PathResourceMatcher(" + matcher + ")";
+        return "with-path-matcher(" + matcher + ")";
     }
 }

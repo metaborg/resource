@@ -17,6 +17,6 @@ public class TrueResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "TrueResourceMatcher()";
+        return "true";
     }
 }

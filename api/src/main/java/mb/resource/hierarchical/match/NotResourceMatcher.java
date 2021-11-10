@@ -30,6 +30,6 @@ public class NotResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "NotResourceMatcher(" + matcher.toString() + ")";
+        return "!" + matcher;
     }
 }

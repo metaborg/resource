@@ -3,6 +3,12 @@ All notable changes to this project are documented in this file, based on [Keep 
 
 
 ## [Unreleased]
+### Changed
+- All `PathMatcher`s to work with UNIX path segment separators `/`.
+
+### Added
+- `AllResourceWalker`, `AnyResourceWalker`, `NotResourceWalker`.
+- `EndsWithPathMatcher`, `StartsWithPatchMatcher`, `LeafPathMatcher`.
 
 
 ## [0.13.1] - 2021-11-09

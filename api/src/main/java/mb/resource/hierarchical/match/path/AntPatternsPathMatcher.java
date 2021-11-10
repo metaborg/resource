@@ -2,6 +2,7 @@ package mb.resource.hierarchical.match.path;
 
 import mb.resource.hierarchical.ResourcePath;
 import mb.resource.util.AntPattern;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class AntPatternsPathMatcher implements PathMatcher {
 
 
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
-        final String relative = rootDir.relativize(path);
+        final String relative = SeparatorUtil.convertCurrentToUnixSeparator(rootDir.relativize(path));
         for(AntPattern pattern : patterns) {
             if(pattern.match(relative)) {
                 return true;
@@ -57,6 +58,6 @@ public class AntPatternsPathMatcher implements PathMatcher {
     }
 
     @Override public String toString() {
-        return "PatternsPathMatcher(" + patterns + ")";
+        return "with-any-ant-patterns(" + patterns + ")";
     }
 }

@@ -17,6 +17,6 @@ public class FalseResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "FalseResourceMatcher()";
+        return "false";
     }
 }

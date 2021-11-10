@@ -40,6 +40,6 @@ public class AnyResourceMatcher implements ResourceMatcher {
     }
 
     @Override public String toString() {
-        return "AnyResourceMatcher(" + matchers.toString() + ")";
+        return "any(" + matchers + ")";
     }
 }

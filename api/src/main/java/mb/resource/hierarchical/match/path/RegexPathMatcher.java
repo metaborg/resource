@@ -1,6 +1,7 @@
 package mb.resource.hierarchical.match.path;
 
 import mb.resource.hierarchical.ResourcePath;
+import mb.resource.util.SeparatorUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
@@ -17,14 +18,14 @@ public class RegexPathMatcher implements PathMatcher {
     }
 
     @Override public boolean matches(ResourcePath path, ResourcePath rootDir) {
-        final String relative = rootDir.relativize(path);
+        final String relative = SeparatorUtil.convertCurrentToUnixSeparator(rootDir.relativize(path));
         return compiledPattern.matcher(relative).matches();
     }
 
     @Override public boolean equals(@Nullable Object o) {
         if(this == o) return true;
         if(o == null || getClass() != o.getClass()) return false;
-        final RegexPathMatcher that = (RegexPathMatcher) o;
+        final RegexPathMatcher that = (RegexPathMatcher)o;
         return pattern.equals(that.pattern);
     }
 
@@ -33,7 +34,7 @@ public class RegexPathMatcher implements PathMatcher {
     }
 
     @Override public String toString() {
-        return "RegexPathMatcher(" + pattern + ")";
+        return "with-regex(" + pattern + ")";
     }
 
     private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
