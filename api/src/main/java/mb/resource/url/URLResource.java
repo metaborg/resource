@@ -8,6 +8,7 @@ import mb.resource.hierarchical.match.ResourceMatcher;
 import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -204,14 +205,25 @@ public class URLResource extends HierarchicalResourceDefaults<URLResource> imple
         // Not supported.
     }
 
-    @Override public OutputStream openWriteExisting() throws IOException {
+
+    @Override public OutputStream openWrite() throws IOException {
         final URLConnection connection = openConnection();
         connection.setDoOutput(true);
         return connection.getOutputStream();
     }
 
     @Override public OutputStream openWriteAppend() throws IOException {
-        throw new UnsupportedOperationException("URL resources do not support opening an appending output stream");
+        return openWrite(); // TODO: not sure if this appends or replaces?
+    }
+
+    @Override public OutputStream openWriteExisting() throws IOException {
+        if(!exists()) throw new FileNotFoundException("URL resource '" + path + "' does not exist");
+        return openWrite();
+    }
+
+    @Override public OutputStream openWriteNew() throws IOException {
+        if(exists()) throw new FileNotFoundException("URL resource '" + path + "' already exists");
+        return openWrite();
     }
 
 

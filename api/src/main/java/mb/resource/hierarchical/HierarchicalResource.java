@@ -424,17 +424,6 @@ public interface HierarchicalResource extends WritableResource {
     void moveTo(HierarchicalResource other) throws IOException;
 
 
-    @Override default OutputStream openWrite() throws IOException {
-        ensureFileExists();
-        return openWriteExisting();
-    }
-
-    @Override default OutputStream openWriteNew() throws IOException {
-        createFile();
-        return openWriteExisting();
-    }
-
-
     /**
      * Creates this file resource.
      *

@@ -3,6 +3,8 @@ All notable changes to this project are documented in this file, based on [Keep 
 
 
 ## [Unreleased]
+### Removed
+- `HierarchicalResource#openWrite` and `HierarchicalResource#openWriteNew`, as their implementations were dubious.
 
 
 ## [0.13.2] - 2021-11-10

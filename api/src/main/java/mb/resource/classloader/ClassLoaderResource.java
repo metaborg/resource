@@ -12,6 +12,7 @@ import mb.resource.hierarchical.walk.ResourceWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -135,14 +136,25 @@ public class ClassLoaderResource extends SegmentsResource<ClassLoaderResource> i
         // Not supported.
     }
 
-    @Override public OutputStream openWriteAppend() throws IOException {
+
+    @Override public OutputStream openWrite() throws IOException {
         final URLConnection connection = openConnection();
         connection.setDoOutput(true);
         return connection.getOutputStream();
     }
 
+    @Override public OutputStream openWriteAppend() throws IOException {
+        return openWrite(); // TODO: not sure if this appends or replaces?
+    }
+
     @Override public OutputStream openWriteExisting() throws IOException {
-        throw new UnsupportedOperationException("Class loader resources do not support opening an appending output stream");
+        if(!exists()) throw new FileNotFoundException("Class loader resource '" + path + "' does not exist");
+        return openWrite();
+    }
+
+    @Override public OutputStream openWriteNew() throws IOException {
+        if(exists()) throw new FileNotFoundException("Class loader resource '" + path + "' already exists");
+        return openWrite();
     }
 
 
