@@ -3,6 +3,9 @@ All notable changes to this project are documented in this file, based on [Keep 
 
 
 ## [Unreleased]
+
+
+## [0.14.0] - 2022-03-25
 ### Removed
 - `HierarchicalResource#openWrite` and `HierarchicalResource#openWriteNew`, as their implementations were dubious.
 
@@ -46,7 +49,8 @@ All notable changes to this project are documented in this file, based on [Keep 
 - `FSResourceRegistry` accepts local filesystem paths in `getResourceKey` and `getResource`.
 
 
-[Unreleased]: https://github.com/metaborg/resource/compare/release-0.13.2...HEAD
+[Unreleased]: https://github.com/metaborg/resource/compare/release-0.14.0...HEAD
+[0.14.0]: https://github.com/metaborg/resource/compare/release-0.13.2...release-0.14.0
 [0.13.2]: https://github.com/metaborg/resource/compare/release-0.13.1...release-0.13.2
 [0.13.1]: https://github.com/metaborg/resource/compare/release-0.13.0...release-0.13.1
 [0.13.0]: https://github.com/metaborg/resource/compare/release-0.12.0...release-0.13.0
