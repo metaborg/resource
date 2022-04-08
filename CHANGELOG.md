@@ -3,6 +3,8 @@ All notable changes to this project are documented in this file, based on [Keep 
 
 
 ## [Unreleased]
+### Changed
+- `FileExtensionUtil.hasExtension`.
 
 
 ## [0.14.0] - 2022-03-25

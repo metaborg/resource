@@ -13,6 +13,12 @@ public class FilenameExtensionUtil {
         return null;
     }
 
+    public static boolean hasExtension(String filename, String extension) {
+        final @Nullable String fileExtension = getExtension(filename);
+        if(fileExtension == null) return false;
+        return fileExtension.equals(extension);
+    }
+
     public static String replaceExtension(String filename, String extension) {
         final int i = filename.lastIndexOf('.');
         if(i < 0) {
