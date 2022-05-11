@@ -3,7 +3,10 @@ All notable changes to this project are documented in this file, based on [Keep 
 
 
 ## [Unreleased]
-### Changed
+
+
+## [0.14.1] - 2022-05-11
+### Added
 - `FileExtensionUtil.hasExtension`.
 
 
@@ -51,7 +54,8 @@ All notable changes to this project are documented in this file, based on [Keep 
 - `FSResourceRegistry` accepts local filesystem paths in `getResourceKey` and `getResource`.
 
 
-[Unreleased]: https://github.com/metaborg/resource/compare/release-0.14.0...HEAD
+[Unreleased]: https://github.com/metaborg/resource/compare/release-0.14.1...HEAD
+[0.14.1]: https://github.com/metaborg/resource/compare/release-0.14.0...release-0.14.1
 [0.14.0]: https://github.com/metaborg/resource/compare/release-0.13.2...release-0.14.0
 [0.13.2]: https://github.com/metaborg/resource/compare/release-0.13.1...release-0.13.2
 [0.13.1]: https://github.com/metaborg/resource/compare/release-0.13.0...release-0.13.1
