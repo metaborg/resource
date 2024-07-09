@@ -10,6 +10,7 @@ group = "org.metaborg"
 dependencies {
     compileOnly(libs.checkerframework.android)
 
+    testImplementation(libs.junit)
     testImplementation(libs.junit.params)
     testImplementation(libs.jimfs)
     testCompileOnly(libs.checkerframework.android)
