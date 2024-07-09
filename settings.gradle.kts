@@ -30,7 +30,6 @@ fun includeProject(path: String, id: String = "resource.${path.replace('/', '.')
     project(":$id").projectDir = file(path)
 }
 
-includeProject("depconstraints")
 include("resource")
 project(":resource").projectDir = file("api") // TODO: consider renaming "resource" to "resource.api"
 includeProject("dagger")
