@@ -10,14 +10,6 @@ plugins {
     id("org.metaborg.convention.settings") version "0.0.6"
 }
 
-
-
-
-fun includeProject(path: String, id: String = "resource.${path.replace('/', '.')}") {
-    include(id)
-    project(":$id").projectDir = file(path)
-}
-
-include("resource")
-project(":resource").projectDir = file("api") // TODO: consider renaming "resource" to "resource.api"
-includeProject("dagger")
+include(":resource.api")
+project(":resource.api").name = "resource" // TODO: consider renaming "resource" to "resource.api"
+include(":resource.dagger")
