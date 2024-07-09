@@ -8,15 +8,15 @@ plugins {
 group = "org.metaborg"
 
 dependencies {
-    api(platform(project(":resource.depconstraints")))
-    annotationProcessor(platform(project(":resource.depconstraints")))
+    api(platform(libs.spoofax3.bom))
 
     api(project(":resource"))
-    api("org.metaborg:log.dagger")
-    api("com.google.dagger:dagger")
+    api(libs.spoofax3.log.dagger)
+    api(libs.dagger)
 
-    annotationProcessor("com.google.dagger:dagger-compiler")
-    compileOnly("org.checkerframework:checker-qual-android")
+    annotationProcessor(libs.dagger.compiler)
+    compileOnly(libs.checkerframework.android)
+}
 
 mavenPublishConvention {
     repoOwner.set("metaborg")
