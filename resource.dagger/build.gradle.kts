@@ -8,10 +8,10 @@ plugins {
 group = "org.metaborg"
 
 dependencies {
-    api(platform(libs.spoofax3.platform))
+    api(platform(libs.metaborg.platform))
 
     api(project(":resource"))
-    api(libs.spoofax3.log.dagger)
+    api(libs.metaborg.log.dagger)
     api(libs.dagger)
 
     annotationProcessor(libs.dagger.compiler)
