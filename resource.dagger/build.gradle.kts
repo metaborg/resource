@@ -18,11 +18,6 @@ dependencies {
     compileOnly(libs.checkerframework.android)
 }
 
-mavenPublishConvention {
-    repoOwner.set("metaborg")
-    repoName.set("resource")
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
