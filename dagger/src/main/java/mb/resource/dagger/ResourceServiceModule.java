@@ -7,7 +7,7 @@ import mb.resource.ResourceRegistry;
 import mb.resource.ResourceService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;

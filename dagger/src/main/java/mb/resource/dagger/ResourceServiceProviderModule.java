@@ -6,7 +6,7 @@ import mb.resource.DefaultResourceService;
 import mb.resource.ResourceRegistry;
 import mb.resource.ResourceService;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 import java.util.Optional;
 import java.util.Set;
 
