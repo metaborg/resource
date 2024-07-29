@@ -7,7 +7,7 @@ val logVersion = "0.5.5"
 
 val checkerframeworkVersion = "3.16.0"
 
-val daggerVersion = "2.41" // Do not upgrade, causes Gradle/Kotlin compatibility issues due to upgrade to Kotlin 1.5.
+val daggerVersion = "2.41"
 
 dependencies {
     constraints {
