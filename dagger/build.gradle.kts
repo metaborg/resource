@@ -9,7 +9,7 @@ dependencies {
     api(project(":resource"))
     api("org.metaborg:log.dagger")
     api("com.google.dagger:dagger")
-    compileOnly("jakarta.inject:jakarta.inject-api")
+    api("jakarta.inject:jakarta.inject-api")
 
     annotationProcessor("com.google.dagger:dagger-compiler")
     compileOnly("org.checkerframework:checker-qual-android")
