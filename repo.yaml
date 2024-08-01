@@ -1,0 +1,40 @@
+---
+repoOwner: "metaborg"
+repoName: "resource"
+mainBranch: "master"
+
+title: "Metaborg Resource"
+description: |
+  A resource/filesystem abstraction for Metaborg projects.
+inceptionYear: "2017"
+
+spoofax3Libraries:
+  - group: "org.metaborg"
+    name: "resource"
+    description: "Resource API"
+  - group: "org.metaborg"
+    name: "resource.dagger"
+    description: "Resource Dagger bindings"
+
+contributors:
+  - id: "Gohla"
+    name: "Gabriel Konat"
+  - id: "Virtlink"
+    name: "Daniel A. A. Pelsmaeker"
+
+developers:
+  - id: "Apanatshka"
+    name: "Jeff Smits"
+
+files:
+  githubWorkflows:
+    publishRelease: true
+    publishSnapshot: true
+  gradleRootProject:
+    generate: true
+    rootProjectName: "resource.root"
+    includedProjects:
+      - name: ":resource"
+        path: "resource.api/"
+      - name: ":resource.dagger"
+

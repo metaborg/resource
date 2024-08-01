@@ -1,4 +1,6 @@
-rootProject.name = "resource.root"
+// !! THIS FILE WAS GENERATED USING repoman !!
+// Modify `repo.yaml` instead and use `repoman` to update this file
+// See: https://github.com/metaborg/metaborg-gradle/
 
 dependencyResolutionManagement {
     repositories {
@@ -18,6 +20,7 @@ plugins {
     id("org.metaborg.convention.settings") version "latest.integration"
 }
 
-include(":resource.api")
-project(":resource.api").name = "resource" // TODO: consider renaming "resource" to "resource.api"
+rootProject.name = "resource.root"
+include(":resource")
+project(":resource").projectDir = file("resource.api/")
 include(":resource.dagger")

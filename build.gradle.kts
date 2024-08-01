@@ -1,3 +1,7 @@
+// !! THIS FILE WAS GENERATED USING repoman !!
+// Modify `repo.yaml` instead and use `repoman` to update this file
+// See: https://github.com/metaborg/metaborg-gradle/
+
 import org.metaborg.convention.Person
 import org.metaborg.convention.MavenPublishConventionExtension
 
@@ -6,11 +10,20 @@ import org.metaborg.convention.MavenPublishConventionExtension
 plugins {
     id("org.metaborg.convention.root-project")
     alias(libs.plugins.gitonium)
+    alias(libs.plugins.spoofax.gradle.langspec) apply false
 }
 
+rootProjectConvention {
+    // Add `publishAll` and `publish` tasks that delegate to the subprojects and included builds.
+    registerPublishTasks.set(true)
+}
 allprojects {
     apply(plugin = "org.metaborg.gitonium")
 
+    // Configure Gitonium before setting the version
+    gitonium {
+        mainBranch.set("master")
+    }
     version = gitonium.version
     group = "org.metaborg"
 
@@ -20,10 +33,13 @@ allprojects {
             repoName.set("resource")
 
             metadata {
-                inceptionYear.set("2019")
+                inceptionYear.set("2017")
                 developers.set(listOf(
-                    Person("Gohla", "Gabriel Konat", "gabrielkonat@gmail.com"),
-                    Person("Virtlink", "Daniel A. A. Pelsmaeker", "developer@pelsmaeker.net"),
+                    Person("Jeff Smits", email = null, id = "Apanatshka"),
+                ))
+                contributors.set(listOf(
+                    Person("Gabriel Konat", email = null, id = "Gohla"),
+                    Person("Daniel A. A. Pelsmaeker", email = null, id = "Virtlink"),
                 ))
             }
         }
